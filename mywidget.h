@@ -9,6 +9,10 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QDateTime>
+#include <QIntValidator>
+
+#include <QTcpServer>
+#include <QTcpSocket>
 
 class MyWidget : public QWidget
 {
@@ -21,10 +25,18 @@ private:
  QPushButton* pcmdOff;
  QHBoxLayout* phlay;
  QVBoxLayout* pvlay;
+ QValidator* pvalidator;
+
+ QTcpServer* pserver;
+
 
 public:
  MyWidget(QWidget* parent=nullptr);
  ~MyWidget();
+
+private slots:
+ void slotStartServer();
+ void slotStopServer();
 };
 
 #endif // MYWIDGET_H

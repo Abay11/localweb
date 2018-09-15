@@ -11,6 +11,7 @@ MyWidget::MyWidget(QWidget *parent)
  ,pvlay(new QVBoxLayout)
  ,pvalidator(new QIntValidator(1000, 65535, plePort))
  ,pserver(new QTcpServer(this))
+ ,logger(new MyLogger)
 {
  plePort->setValidator(pvalidator);
 
@@ -46,11 +47,18 @@ void MyWidget::slotStartServer()
 	 pcmdOff->setEnabled(false);
 	 return;
 	}
+
  pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")+"Сервер запущен.");
+
  pcmdOff->setEnabled(true);
  pcmdOn->setEnabled(false);
-// pserver->listen(QHostAddress::Any,
-//								 static_cast<quint16>(plePort->text().toInt()));
+
+ if(!pserver->listen(QHostAddress::Any,
+								 static_cast<quint16>(plePort->text().toInt())))
+	{
+//	 m_p
+	}
+
 }
 
 void MyWidget::slotStopServer()
@@ -58,9 +66,11 @@ void MyWidget::slotStopServer()
  pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")+"Сервер остановлен.");
  pcmdOn->setEnabled(true);
  pcmdOff->setEnabled(false);
+
+ qInfo()<<"Сервер остановлен.";
 }
 
 MyWidget::~MyWidget()
 {
-
+ delete logger;
 }

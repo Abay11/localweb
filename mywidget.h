@@ -14,6 +14,8 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 
+#include "mylogger.h"
+
 class MyWidget : public QWidget
 {
  Q_OBJECT
@@ -29,6 +31,7 @@ private:
 
  QTcpServer* pserver;
 
+ MyLogger* logger;
 
 public:
  MyWidget(QWidget* parent=nullptr);

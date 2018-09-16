@@ -13,6 +13,7 @@
 
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QNetworkInterface>
 
 #include "mylogger.h"
 
@@ -20,7 +21,9 @@ class MyWidget : public QWidget
 {
  Q_OBJECT
 private:
+ QLabel* plblAddress;
  QLabel* plblPort;
+ QLineEdit* pleAddress;
  QLineEdit* plePort;
  QTextEdit* pInfo;
  QPushButton* pcmdOn;
@@ -33,13 +36,19 @@ private:
 
  MyLogger* logger;
 
+ QList<QTcpSocket*> clients;
+ QString m_address;
 public:
  MyWidget(QWidget* parent=nullptr);
  ~MyWidget();
 
+ void sendToClient();
+
 private slots:
  void slotStartServer();
  void slotStopServer();
+ void slotNewConnection();
+ void slotReadClient();
 };
 
 #endif // MYWIDGET_H

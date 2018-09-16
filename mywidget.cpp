@@ -2,7 +2,9 @@
 
 MyWidget::MyWidget(QWidget *parent)
  :QWidget(parent)
+ ,plblAddress(new QLabel("IP адрес:"))
  ,plblPort(new QLabel("Номер порта:"))
+ ,pleAddress(new QLineEdit)
  ,plePort(new QLineEdit("7165"))
  ,pInfo(new QTextEdit)
  ,pcmdOn(new QPushButton("Пуск"))
@@ -20,6 +22,15 @@ MyWidget::MyWidget(QWidget *parent)
  pInfo->setText(QDateTime::currentDateTime().toString("[hh:mm:ss] ")+"Сервер не запущен.");
  pInfo->setReadOnly(true);
 
+ foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+	 if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
+		m_address=address.toString();
+	}
+
+ pleAddress->setText(m_address);
+ pleAddress->setReadOnly(true);
+ phlay->addWidget(plblAddress);
+ phlay->addWidget(pleAddress);
  phlay->addWidget(plblPort);
  phlay->addWidget(plePort);
  phlay->addWidget(pcmdOn);
@@ -56,9 +67,19 @@ void MyWidget::slotStartServer()
  if(!pserver->listen(QHostAddress::Any,
 								 static_cast<quint16>(plePort->text().toInt())))
 	{
-//	 m_p
+	 qCritical()<<"Невозможно запустить сервер: "<<pserver->errorString();
+	 pserver->close();
+	 return;
 	}
 
+ plePort->setEnabled(false);
+
+
+ connect(pserver, SIGNAL(newConnection()),
+				 SLOT(slotNewConnection()));
+
+ qInfo()<<QString("Сервер запущен. IP адрес: %1. Порт: %2")
+					 .arg(m_address).arg(pserver->serverPort());
 }
 
 void MyWidget::slotStopServer()
@@ -67,7 +88,19 @@ void MyWidget::slotStopServer()
  pcmdOn->setEnabled(true);
  pcmdOff->setEnabled(false);
 
+ plePort->setEnabled(true);
+ pserver->close();
  qInfo()<<"Сервер остановлен.";
+}
+
+void MyWidget::slotNewConnection()
+{
+
+}
+
+void MyWidget::slotReadClient()
+{
+
 }
 
 MyWidget::~MyWidget()

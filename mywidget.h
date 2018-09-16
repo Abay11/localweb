@@ -38,6 +38,7 @@ private:
 
  QList<QTcpSocket*> clients;
  QString m_address;
+ quint16 m_nextBlockSize;
 public:
  MyWidget(QWidget* parent=nullptr);
  ~MyWidget();

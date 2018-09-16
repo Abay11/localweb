@@ -14,6 +14,7 @@ MyWidget::MyWidget(QWidget *parent)
  ,pvalidator(new QIntValidator(1000, 65535, plePort))
  ,pserver(new QTcpServer(this))
  ,logger(new MyLogger)
+ ,m_nextBlockSize(0)
 {
  plePort->setValidator(pvalidator);
 
@@ -95,12 +96,40 @@ void MyWidget::slotStopServer()
 
 void MyWidget::slotNewConnection()
 {
-
+	QTcpSocket* pclient=pserver->nextPendingConnection();
+	connect(pclient, SIGNAL(disconnected), SLOT(deleteLater()));
+	connect(pclient, SIGNAL(readyRead()), SLOT(slotReadClient()));
 }
 
 void MyWidget::slotReadClient()
 {
+ QTcpSocket* pclient=static_cast<QTcpSocket*>(sender());
+// QDataStream in(pclient);
+// in.setVersion(QDataStream::Qt_5_11);
+ QByteArray ba=pclient->readAll();
+ pInfo->append(ba);
 
+// forever
+// {
+//	if(!m_nextBlockSize)
+//	 {
+//		if(pclient->bytesAvailable()<static_cast<qint64>(sizeof(quint16)))
+//		 break;
+
+//		in>>m_nextBlockSize;
+//	 }
+
+
+//	if(pclient->bytesAvailable()<m_nextBlockSize)
+//	 break;
+
+//	QString str;
+//	in>>str;
+
+//	pInfo->append("Сообщение от пользователя: " +str);
+//	m_nextBlockSize=0;
+
+// }
 }
 
 MyWidget::~MyWidget()

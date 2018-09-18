@@ -104,32 +104,34 @@ void MyWidget::slotNewConnection()
 void MyWidget::slotReadClient()
 {
  QTcpSocket* pclient=static_cast<QTcpSocket*>(sender());
-// QDataStream in(pclient);
-// in.setVersion(QDataStream::Qt_5_11);
- QByteArray ba=pclient->readAll();
- pInfo->append(ba);
+ QDataStream in(pclient);
+ in.setVersion(QDataStream::Qt_5_11);
+// QByteArray ba=pclient->readAll();
+// pInfo->append(ba);
 
-// forever
-// {
-//	if(!m_nextBlockSize)
-//	 {
-//		if(pclient->bytesAvailable()<static_cast<qint64>(sizeof(quint16)))
-//		 break;
+ forever
+ {
+	if(!m_nextBlockSize)
+	 {
+		if(pclient->bytesAvailable()<static_cast<qint64>(sizeof(quint16)))
+		 break;
 
-//		in>>m_nextBlockSize;
-//	 }
+		in>>m_nextBlockSize;
+	 }
 
 
-//	if(pclient->bytesAvailable()<m_nextBlockSize)
-//	 break;
+	if(pclient->bytesAvailable()<m_nextBlockSize)
+	 break;
 
-//	QString str;
-//	in>>str;
+	QString str;
+	QTime time;
+	in>>time>>str;
 
-//	pInfo->append("Сообщение от пользователя: " +str);
-//	m_nextBlockSize=0;
+	str=time.toString("[hh:mm:ss] ")+"Сообщение от пользователя: "+str;
+	pInfo->append(str);
+	m_nextBlockSize=0;
 
-// }
+ }
 }
 
 MyWidget::~MyWidget()

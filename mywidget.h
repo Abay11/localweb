@@ -1,6 +1,9 @@
 #ifndef MYWIDGET_H
 #define MYWIDGET_H
 
+#include "mylogger.h"
+#include "clientinfo.h"
+
 #include <QWidget>
 #include <QLabel>
 #include <QLineEdit>
@@ -15,7 +18,7 @@
 #include <QTcpSocket>
 #include <QNetworkInterface>
 
-#include "mylogger.h"
+
 
 class MyWidget : public QWidget
 {
@@ -39,6 +42,8 @@ private:
  QList<QTcpSocket*> clients;
  QString m_address;
  quint16 m_nextBlockSize;
+
+
 public:
  MyWidget(QWidget* parent=nullptr);
  ~MyWidget();

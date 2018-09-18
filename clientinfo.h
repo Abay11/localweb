@@ -3,16 +3,35 @@
 
 #include <QString>
 
-class ClientInfo
+enum DATATYPE{REGISTRATION=0, CONNECT, MESSAGE};
+
+class ClientSimpleInfo
+{
+private:
+ QString mnickname;
+ DATATYPE mtype;
+public:
+ ClientSimpleInfo(QString, DATATYPE);
+ const QString& nickname() const;
+ DATATYPE type() const;
+};
+
+class ClientRegInfo:public ClientSimpleInfo
 {
  QString maddress;
  int mport;
- QString mname;
+ QString mfullName;
 public:
- ClientInfo(QString addr, int, QString);
+ ClientRegInfo(QString
+												,DATATYPE
+												,QString
+												,int
+												,QString
+												);
+
  const QString& address();
  int port();
- const QString& name();
+ const QString& fullName();
 };
 
 #endif // CLIENTINFO_H

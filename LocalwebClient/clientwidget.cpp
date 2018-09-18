@@ -2,22 +2,27 @@
 
 ClientWidget::ClientWidget(QWidget *parent)
  : QWidget(parent)
-
- ,plblAddress(new QLabel("IP адрес"))
- ,pleAddress(new QLineEdit)
- ,plblPort(new QLabel("Номер порта"))
- ,plePort(new QLineEdit("7166"))
+ ,mnNextBlockSize(0)
+ ,plblAddress(new QLabel("IP адрес сервера"))
+ ,pleAddress(new QLineEdit("127.0.0.1"))
+ ,plblPort(new QLabel("Номер порта сервера"))
+ ,plePort(new QLineEdit("7165"))
  ,pcmdConnect(new QPushButton("Подключиться"))
  ,pcmdDisconnect(new QPushButton("Отсоединиться"))
+ ,pcmdSend(new QPushButton("Отправить"))
  ,pInfo(new QTextEdit)
+ ,pmsgField(new QTextEdit)
  ,phlay(new QHBoxLayout)
  ,pvlay(new QVBoxLayout)
+ ,psocket(new QTcpSocket)
 {
- foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
-	 if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
-		m_address=address.toString();
-	}
- pleAddress->setText(m_address);
+// foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+//	 if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
+//		maddress=address.toString();
+//	}
+ pleAddress->setText(pleAddress->text());
+ pmsgField->setPlaceholderText("Введите сообщение...");
+ pcmdDisconnect->setEnabled(false);
 
  phlay->addWidget(plblAddress);
  phlay->addWidget(pleAddress);
@@ -27,9 +32,119 @@ ClientWidget::ClientWidget(QWidget *parent)
  phlay->addWidget(pcmdDisconnect);
  pvlay->addLayout(phlay);
  pvlay->addWidget(pInfo);
+ pvlay->addWidget(pmsgField);
+ pvlay->addWidget(pcmdSend);
+
+ connect(pcmdConnect, SIGNAL(clicked()),
+				 SLOT(slotConnectToServer()));
+ connect(pcmdDisconnect, SIGNAL(clicked()),
+				 SLOT(slotDisconnectFromServer()));
+ connect(pcmdSend, SIGNAL(clicked())
+				 ,SLOT(slotSendToServer()));
+ connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
+ connect(psocket, SIGNAL(error(QAbstractSocket::SocketError))
+				 ,SLOT(slotError(QAbstractSocket::SocketError)));
+ connect(psocket, SIGNAL(readyRead())
+				 ,SLOT(slotReadyRead()));
+
 
  setLayout(pvlay);
  resize(640, 480);
+}
+
+void ClientWidget::slotConnectToServer()
+{
+ //mserverAddress -> Localhost
+ psocket->connectToHost(pleAddress->text(),
+												static_cast<quint16>(plePort->text()
+																						 .toInt()));
+ pcmdDisconnect->setEnabled(true);
+ pcmdConnect->setEnabled(false);
+}
+
+void ClientWidget::slotDisconnectFromServer()
+{
+ psocket->close();
+ pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+							 +"Отсоединение от сервера.");
+ pcmdConnect->setEnabled(true);
+ pcmdDisconnect->setEnabled(false);
+}
+
+void ClientWidget::slotReadyRead()
+{
+ QDataStream in(psocket) ;
+ in.setVersion(QDataStream::Qt_5_11);
+ forever
+ {
+	if(!mnNextBlockSize)
+	 {
+		if(static_cast<size_t>(psocket->bytesAvailable())<sizeof(quint16))
+		 break;
+
+		in>>mnNextBlockSize;
+	 }
+
+	if(psocket->bytesAvailable()<mnNextBlockSize)
+	 break;
+
+	QTime time;
+	QString msg;
+
+	in>>time>>msg;
+
+	pInfo->append(time.toString()+" "+msg);
+	mnNextBlockSize=0;
+ }
+}
+
+void ClientWidget::slotError(QAbstractSocket::SocketError nerr)
+{
+ QString info("Произошла ошибка при подключении к серверу: ");
+ switch(nerr)
+	{
+	case QAbstractSocket::HostNotFoundError:
+	 info.append("Удаленный сервер не найден. "
+							 "Удостоверьте, что введен правильный адрес и порт сервера.");
+	 break;
+	case QAbstractSocket::RemoteHostClosedError:
+	 info.append("Удаленный сервер закрыл соединение. "
+							 "Обратитесь к администратору сети.");
+	 break;
+	case QAbstractSocket::ConnectionRefusedError:
+	 info.append("Удаленный сервер отказал в доступе. "
+							 "Обратитесь к администратору сети.");
+	 break;
+	default:
+	 info.append("Произошла критическая ошибка. "
+							 "Обратитесь к администратору сети.");
+	}
+ pInfo->append(info);
+ pcmdDisconnect->setEnabled(false);
+ pcmdConnect->setEnabled(true);
+}
+
+void ClientWidget::slotSendToServer()
+{
+ QByteArray arrBlock;
+ QDataStream out(&arrBlock, QIODevice::WriteOnly);
+
+ out.setVersion(QDataStream::Qt_5_11);
+ out<<quint16(0)<<QTime::currentTime()<<pmsgField->toPlainText();
+
+ out.device()->seek(0);
+ out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
+
+ psocket->write(arrBlock);
+ pInfo->append(QDateTime::currentDateTime().toString("[hh:MM:ss] Вы: ")
+							 + pmsgField->toPlainText());
+ pmsgField->clear();
+}
+
+void ClientWidget::slotConnected()
+{
+ pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+							 +"Соединение с сервером установлено.");
 }
 
 ClientWidget::~ClientWidget()

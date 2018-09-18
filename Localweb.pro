@@ -25,11 +25,13 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mywidget.cpp \
-    mylogger.cpp
+    mylogger.cpp \
+    clientinfo.cpp
 
 HEADERS += \
         mywidget.h \
-    mylogger.h
+    mylogger.h \
+    clientinfo.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

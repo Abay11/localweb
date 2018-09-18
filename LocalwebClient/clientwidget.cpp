@@ -15,6 +15,7 @@ ClientWidget::ClientWidget(QWidget *parent)
  ,phlay(new QHBoxLayout)
  ,pvlay(new QVBoxLayout)
  ,psocket(new QTcpSocket)
+ ,logger(new MyLogger)
 {
 // foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
 //	 if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
@@ -60,6 +61,14 @@ void ClientWidget::slotConnectToServer()
 																						 .toInt()));
  pcmdDisconnect->setEnabled(true);
  pcmdConnect->setEnabled(false);
+
+}
+
+void ClientWidget::slotConnected()
+{
+ pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+							 +"Соединение с сервером установлено.");
+ qInfo()<<"Соединение с сервером установлено.";
 }
 
 void ClientWidget::slotDisconnectFromServer()
@@ -69,6 +78,7 @@ void ClientWidget::slotDisconnectFromServer()
 							 +"Отсоединение от сервера.");
  pcmdConnect->setEnabled(true);
  pcmdDisconnect->setEnabled(false);
+	qInfo()<<"Соединение с сервером разорвано.";
 }
 
 void ClientWidget::slotReadyRead()
@@ -122,6 +132,8 @@ void ClientWidget::slotError(QAbstractSocket::SocketError nerr)
  pInfo->append(info);
  pcmdDisconnect->setEnabled(false);
  pcmdConnect->setEnabled(true);
+
+	qCritical()<<"Ошибка соединения с сервером: "<<psocket->errorString();
 }
 
 void ClientWidget::slotSendToServer()
@@ -141,13 +153,9 @@ void ClientWidget::slotSendToServer()
  pmsgField->clear();
 }
 
-void ClientWidget::slotConnected()
-{
- pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
-							 +"Соединение с сервером установлено.");
-}
+
 
 ClientWidget::~ClientWidget()
 {
-
+ delete logger;
 }

@@ -22,18 +22,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += c++11
 
+
 SOURCES += \
         main.cpp \
-        clientwidget.cpp
+        clientwidget.cpp \
+    ../mylogger.cpp
 
 HEADERS += \
         clientwidget.h\
+    ../mylogger.h
 
-DESTDIR = /home/adygha/Projects/Qt/LocalwebClient
-OBJECTS_DIR = /home/adygha/Projects/Qt/LocalwebClient/.obj
-MOC_DIR = /home/adygha/Projects/Qt/LocalwebClient/.moc
-RCC_DIR = /home/adygha/Projects/Qt/LocalwebClient/.rcc
-UI_DIR = /home/adygha/Projects/Qt/LocalwebClient/.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

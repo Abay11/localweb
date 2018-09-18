@@ -1,6 +1,8 @@
 #ifndef CLIENTWIDGET_H
 #define CLIENTWIDGET_H
 
+#include "../mylogger.h"
+
 #include <QWidget>
 #include <QLineEdit>
 #include <QTextEdit>
@@ -12,6 +14,7 @@
 
 #include <QTcpSocket>
 #include <QNetworkInterface>
+
 
 class ClientWidget : public QWidget
 {
@@ -37,6 +40,8 @@ private:
  QVBoxLayout* pvlay;
 
  QTcpSocket* psocket;
+
+ MyLogger* logger;
 
 public:
  ClientWidget(QWidget *parent = nullptr);

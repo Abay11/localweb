@@ -20,11 +20,13 @@ MyWidget::MyWidget(QWidget *parent)
 
  pcmdOff->setEnabled(false);
 
- pInfo->setText(QDateTime::currentDateTime().toString("[hh:mm:ss] ")+"Сервер не запущен.");
+ pInfo->setText(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+								+"Сервер не запущен.");
  pInfo->setReadOnly(true);
 
  foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
-	 if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
+	 if (address.protocol() == QAbstractSocket::IPv4Protocol
+			 && address != QHostAddress(QHostAddress::LocalHost))
 		m_address=address.toString();
 	}
 
@@ -47,6 +49,48 @@ MyWidget::MyWidget(QWidget *parent)
  resize(640, 480);
 }
 
+MyWidget::~MyWidget()
+{
+ delete logger;
+}
+
+void sendToClient(QTcpSocket* psocket,
+									const QString& msg)
+{
+ QByteArray byteArr;
+ QDataStream out(&byteArr, QIODevice::WriteOnly);
+ out.setVersion(QDataStream::Qt_5_11);
+
+ out<<quint16(0)<<QTime::currentTime()<<msg;
+ out.device()->seek(0);
+ out<<quint16(static_cast<size_t>(byteArr.size())-sizeof (quint16));
+
+ psocket->write(byteArr);
+}
+
+void MyWidget::updateClientBase(ClientSimpleInfo& pinfo)
+{
+ ClientRegInfo* temp=dynamic_cast<ClientRegInfo*>(&pinfo);
+ if(temp) //means need to register a new user
+	{
+	 addNewUser(*temp);
+	 return;
+	}
+
+ //else we just need only update client's ip and port
+ auto it=clientbase.find(pinfo.nickname());
+ (*it)->address()=pinfo.address();
+ (*it)->port()=pinfo.port();
+}
+
+void MyWidget::addNewUser(ClientRegInfo& pclient)
+{
+ ClientRegInfo* temp
+	 =new ClientRegInfo(dynamic_cast<ClientRegInfo&>(pclient));
+
+ clientbase.insert(temp->nickname(), std::move(temp));
+}
+
 void MyWidget::slotStartServer()
 {
  QString nPort=plePort->text();
@@ -54,13 +98,15 @@ void MyWidget::slotStartServer()
  if(pvalidator->validate(nPort, pos)!=QValidator::Acceptable)
 	{
 	 pInfo->setTextColor(Qt::red);
-	 pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")+"Некорректный адрес порта.");
+	 pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+								 +"Некорректный адрес порта.");
 	 pInfo->setTextColor(Qt::black);
 	 pcmdOff->setEnabled(false);
 	 return;
 	}
 
- pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")+"Сервер запущен.");
+ pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+							 +"Сервер запущен.");
 
  pcmdOff->setEnabled(true);
  pcmdOn->setEnabled(false);
@@ -85,7 +131,8 @@ void MyWidget::slotStartServer()
 
 void MyWidget::slotStopServer()
 {
- pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")+"Сервер остановлен.");
+ pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+							 +"Сервер остановлен.");
  pcmdOn->setEnabled(true);
  pcmdOff->setEnabled(false);
 
@@ -132,9 +179,4 @@ void MyWidget::slotReadClient()
 	m_nextBlockSize=0;
 
  }
-}
-
-MyWidget::~MyWidget()
-{
- delete logger;
 }

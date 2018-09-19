@@ -4,6 +4,8 @@
 #include "mylogger.h"
 #include "clientinfo.h"
 
+#include <QMap>
+
 #include <QWidget>
 #include <QLabel>
 #include <QLineEdit>
@@ -43,12 +45,16 @@ private:
  QString m_address;
  quint16 m_nextBlockSize;
 
+ QMap<QString, ClientRegInfo*> clientbase;
 
 public:
  MyWidget(QWidget* parent=nullptr);
  ~MyWidget();
 
- void sendToClient();
+ void sendToClient(QTcpSocket*, const QString&);
+ void updateClientBase(ClientSimpleInfo&);
+ void addNewUser(ClientRegInfo&);
+ void removeUser();
 
 private slots:
  void slotStartServer();

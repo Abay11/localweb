@@ -1,27 +1,36 @@
 #include "clientinfo.h"
 
-ClientSimpleInfo::ClientSimpleInfo(QString nick, DATATYPE type)
- :mnickname(nick)
+ClientSimpleInfo::ClientSimpleInfo(QString address
+																	 ,int port
+																	 ,DATATYPE type)
+ :maddress(address)
+ ,mport(port)
  ,mtype(type){}
 
-const QString& ClientSimpleInfo::nickname()const{return mnickname;}
+ClientSimpleInfo::~ClientSimpleInfo(){}
+
+const QString& ClientSimpleInfo::address(){return maddress;}
+
+int ClientSimpleInfo::port(){return mport;}
 
 DATATYPE ClientSimpleInfo::type()const{return mtype;}
 
-ClientRegInfo::ClientRegInfo(QString nick
-														 ,DATATYPE type
-														 ,QString address
+
+////////////////////Client Registration Information////////////////////
+
+
+ClientRegInfo::ClientRegInfo(QString address
 														 ,int port
+														 ,DATATYPE type
+														 ,QString nick
 														 ,QString fullName
 														 )
- :ClientSimpleInfo(nick, type)
- ,maddress(address)
- ,mport(port)
- ,mfullName(fullName)
-{}
+ :ClientSimpleInfo(address, port, type)
+ ,mnickname(nick)
+ ,mfullName(fullName){}
 
-const QString& ClientRegInfo::address(){return maddress;}
+ClientRegInfo::~ClientRegInfo(){}
 
-int ClientRegInfo::port(){return mport;}
+const QString& ClientRegInfo::nickname()const{return mnickname;}
 
 const QString& ClientRegInfo::fullName(){return mfullName;}

@@ -16,7 +16,8 @@ const QString& ClientSimpleInfo::nickname()const{return mnickname;}
 const QString& ClientSimpleInfo::address()const{return maddress;}
 QString& ClientSimpleInfo::address(){return maddress;}
 
-int ClientSimpleInfo::port(){return mport;}
+int ClientSimpleInfo::port()const{return mport;}
+int& ClientSimpleInfo::port(){return mport;}
 
 DATATYPE ClientSimpleInfo::type()const{return mtype;}
 

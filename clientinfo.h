@@ -20,7 +20,8 @@ public:
  const QString& nickname() const;
  const QString& address()const;
  QString& address();
- int port();
+ int port() const;
+ int& port();
  DATATYPE type() const;
 };
 

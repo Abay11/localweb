@@ -26,11 +26,13 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         clientwidget.cpp \
-    ../mylogger.cpp
+    ../mylogger.cpp \
+    ../clientinfo.cpp
 
 HEADERS += \
         clientwidget.h\
-    ../mylogger.h
+    ../mylogger.h \
+    ../clientinfo.h
 
 
 # Default rules for deployment.

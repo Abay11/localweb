@@ -1,40 +1,35 @@
 #include "clientinfo.h"
 
-ClientSimpleInfo::ClientSimpleInfo(QString nick
-																	 ,QString address
-																	 ,int port
-																	 ,DATATYPE type)
+QDataStream& operator<<(QDataStream& out, DATATYPE& type)
+{
+ int i=static_cast<int>(type);
+ return out<<i;
+}
+
+QDataStream& operator>>(QDataStream& out, DATATYPE& type)
+{
+ int c;
+ out>>c;
+ type=DATATYPE(static_cast<char>(c));
+ return out;
+}
+
+ClientInfo::ClientInfo(QString nick
+											 ,QTcpSocket* sock
+											 ,QString info)
  :mnickname(nick)
- ,maddress(address)
- ,mport(port)
- ,mtype(type){}
+ ,psocket(sock)
+ ,mfullName(info)
+ {}
 
-ClientSimpleInfo::~ClientSimpleInfo(){}
+ClientInfo::~ClientInfo(){}
 
-const QString& ClientSimpleInfo::nickname()const{return mnickname;}
+const QString& ClientInfo::nickname()const{return mnickname;}
 
-const QString& ClientSimpleInfo::address()const{return maddress;}
-QString& ClientSimpleInfo::address(){return maddress;}
+const QString& ClientInfo::address()const{return maddress;}
+QString& ClientInfo::address(){return maddress;}
 
-int ClientSimpleInfo::port()const{return mport;}
-int& ClientSimpleInfo::port(){return mport;}
+int ClientInfo::port()const{return mport;}
+int& ClientInfo::port(){return mport;}
 
-DATATYPE ClientSimpleInfo::type()const{return mtype;}
-
-
-////////////////////Client Registration Information////////////////////
-
-
-ClientRegInfo::ClientRegInfo(QString nick
-														 ,QString address
-														 ,int port
-														 ,DATATYPE type
-														 ,QString fullName
-														 )
- :ClientSimpleInfo(nick, address, port, type)
- ,mfullName(fullName){}
-
-ClientRegInfo::~ClientRegInfo(){}
-
-
-const QString& ClientRegInfo::fullName(){return mfullName;}
+const QString& ClientInfo::fullName(){return mfullName;}

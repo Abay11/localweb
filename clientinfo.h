@@ -2,20 +2,30 @@
 #define CLIENTINFO_H
 
 #include <QString>
+#include <QDataStream>
+#include <QTcpSocket>
 
-enum DATATYPE{REGISTRATION=0, CONNECT, MESSAGE};
+enum class DATATYPE:char{
+ REGISTRATION=0,
+ CONNECT,
+ MESSAGE
+};
 
-class ClientSimpleInfo
+QDataStream& operator<<(QDataStream& out, DATATYPE& type);
+QDataStream& operator>>(QDataStream& out, DATATYPE& type);
+
+class ClientInfo
 {
 private:
  QString mnickname;
+ QTcpSocket* psocket;
+ QString mfullName;
  QString maddress;
  int mport;
- DATATYPE mtype;
 
 public:
- ClientSimpleInfo(QString, QString, int, DATATYPE);
- virtual ~ClientSimpleInfo();
+ ClientInfo(QString nickname, QTcpSocket* psocket, QString info);
+ virtual ~ClientInfo();
 
  const QString& nickname() const;
  const QString& address()const;
@@ -23,22 +33,6 @@ public:
  int port() const;
  int& port();
  DATATYPE type() const;
-};
-
-class ClientRegInfo:public ClientSimpleInfo
-{
- QString mfullName;
-
-public:
- ClientRegInfo(QString
-							 ,QString
-							 ,int
-							 ,DATATYPE
-							 ,QString
-							 );
-
-virtual ~ClientRegInfo();
-
  const QString& fullName();
 };
 

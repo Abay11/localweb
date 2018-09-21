@@ -180,6 +180,32 @@ void MyWidget::slotReadClient()
 	in>>type;
 
 	switch (type) {
+	 case DATATYPE::REGISTRATION:
+	 {
+		 QString nick;
+		 QString fullname;
+		 in>>nick>>fullname;
+		 clientbase.insert(nick, new ClientInfo(nick, pclient, fullname));
+		 break;
+	 }
+	 case DATATYPE::DELETION:
+	 {
+		 QString nick;
+		 in>>nick;
+		 clientbase.remove(nick);
+		 break;
+	 }
+	 case DATATYPE::CONNECT:
+	 {
+		 QString nick;
+		 in>>nick;
+		 auto client=clientbase.find(nick);
+		 if(client!=clientbase.end())
+			{
+			 *client.value()->socket()=pclient; //update socket info
+			}
+		 break;
+	 }
 	 case DATATYPE::MESSAGE:
 	 {
 		 in>>time>>str;
@@ -187,8 +213,8 @@ void MyWidget::slotReadClient()
 		 pInfo->append(str);
 		 break;
 	 }
-	 default:
-		qDebug()<<"INCORRECT DATATYPE";
+//	 default:
+//		qDebug()<<"INCORRECT DATATYPE";
 	 }
 
 	m_nextBlockSize=0;

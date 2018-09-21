@@ -68,9 +68,9 @@ void sendToClient(QTcpSocket* psocket,
  psocket->write(byteArr);
 }
 
-void MyWidget::updateClientBase(ClientSimpleInfo& pinfo)
+void MyWidget::updateClientBase(ClientInfo& pinfo)
 {
- ClientRegInfo* temp=dynamic_cast<ClientRegInfo*>(&pinfo);
+ ClientInfo* temp=dynamic_cast<ClientInfo*>(&pinfo);
  if(temp) //means need to register a new user
 	{
 	 addNewUser(*temp);
@@ -83,12 +83,17 @@ void MyWidget::updateClientBase(ClientSimpleInfo& pinfo)
  (*it)->port()=pinfo.port();
 }
 
-void MyWidget::addNewUser(ClientRegInfo& pclient)
+void MyWidget::addNewUser(ClientInfo& pclient)
 {
- ClientRegInfo* temp
-	 =new ClientRegInfo(dynamic_cast<ClientRegInfo&>(pclient));
+ ClientInfo* temp =new ClientInfo(
+		dynamic_cast<ClientInfo&>(pclient));
 
  clientbase.insert(temp->nickname(), std::move(temp));
+}
+
+void MyWidget::removeUser(QString nickname)
+{
+ clientbase.remove(nickname);
 }
 
 void MyWidget::slotStartServer()
@@ -153,8 +158,6 @@ void MyWidget::slotReadClient()
  QTcpSocket* pclient=static_cast<QTcpSocket*>(sender());
  QDataStream in(pclient);
  in.setVersion(QDataStream::Qt_5_11);
-// QByteArray ba=pclient->readAll();
-// pInfo->append(ba);
 
  forever
  {
@@ -172,11 +175,22 @@ void MyWidget::slotReadClient()
 
 	QString str;
 	QTime time;
-	in>>time>>str;
 
-	str=time.toString("[hh:mm:ss] ")+"Сообщение от пользователя: "+str;
-	pInfo->append(str);
+	DATATYPE type;
+	in>>type;
+
+	switch (type) {
+	 case DATATYPE::MESSAGE:
+	 {
+		 in>>time>>str;
+		 str=time.toString("[hh:mm:ss] ")+"Сообщение от пользователя: "+str;
+		 pInfo->append(str);
+		 break;
+	 }
+	 default:
+		qDebug()<<"INCORRECT DATATYPE";
+	 }
+
 	m_nextBlockSize=0;
-
  }
 }

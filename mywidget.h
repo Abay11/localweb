@@ -45,16 +45,16 @@ private:
  QString m_address;
  quint16 m_nextBlockSize;
 
- QMap<QString, ClientRegInfo*> clientbase;
+ QMap<QString, ClientInfo*> clientbase;
 
 public:
  MyWidget(QWidget* parent=nullptr);
  ~MyWidget();
 
  void sendToClient(QTcpSocket*, const QString&);
- void updateClientBase(ClientSimpleInfo&);
- void addNewUser(ClientRegInfo&);
- void removeUser();
+ void updateClientBase(ClientInfo&);
+ void addNewUser(ClientInfo&);
+ void removeUser(QString);
 
 private slots:
  void slotStartServer();

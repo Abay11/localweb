@@ -7,6 +7,7 @@
 
 enum class DATATYPE:char{
  REGISTRATION=0,
+ DELETION,
  CONNECT,
  MESSAGE
 };
@@ -28,6 +29,9 @@ public:
  virtual ~ClientInfo();
 
  const QString& nickname() const;
+
+ QTcpSocket** socket();
+
  const QString& address()const;
  QString& address();
  int port() const;

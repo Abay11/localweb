@@ -26,6 +26,8 @@ ClientInfo::~ClientInfo(){}
 
 const QString& ClientInfo::nickname()const{return mnickname;}
 
+QTcpSocket** ClientInfo::socket(){return &psocket;}
+
 const QString& ClientInfo::address()const{return maddress;}
 QString& ClientInfo::address(){return maddress;}
 

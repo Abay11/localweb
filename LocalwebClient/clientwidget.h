@@ -2,6 +2,7 @@
 #define CLIENTWIDGET_H
 
 #include "../mylogger.h"
+#include "../clientinfo.h"
 
 #include <QWidget>
 #include <QLineEdit>
@@ -33,6 +34,7 @@ private:
  QPushButton* pcmdConnect;
  QPushButton* pcmdDisconnect;
  QPushButton* pcmdSend;
+ QPushButton* pcmdRegistration;
  QTextEdit* pInfo;
  QTextEdit* pmsgField;
 
@@ -42,6 +44,7 @@ private:
  QTcpSocket* psocket;
 
  MyLogger* logger;
+ ClientInfo* pclientInfo;
 
 public:
  ClientWidget(QWidget *parent = nullptr);
@@ -53,6 +56,7 @@ public slots:
  void slotReadyRead();
  void slotError(QAbstractSocket::SocketError);
  void slotSendToServer();
+ void slotRegistration();
  void slotConnected();
 };
 

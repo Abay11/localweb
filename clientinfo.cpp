@@ -25,6 +25,7 @@ ClientInfo::ClientInfo(QString nick
 ClientInfo::~ClientInfo(){}
 
 const QString& ClientInfo::nickname()const{return mnickname;}
+QString& ClientInfo::nickname(){return mnickname;}
 
 QTcpSocket** ClientInfo::socket(){return &psocket;}
 
@@ -34,4 +35,16 @@ QString& ClientInfo::address(){return maddress;}
 int ClientInfo::port()const{return mport;}
 int& ClientInfo::port(){return mport;}
 
-const QString& ClientInfo::fullName(){return mfullName;}
+const QString& ClientInfo::fullName()const{return mfullName;}
+QString& ClientInfo::fullName(){return mfullName;}
+
+QDataStream& operator<<(QDataStream& out, const ClientInfo& cinfo)
+{
+ return out<<cinfo.nickname()
+					<<cinfo.fullName();
+}
+
+QDataStream& operator>>(QDataStream& out, ClientInfo& cinfo)
+{
+ return out>>cinfo.nickname()>>cinfo.fullName();
+}

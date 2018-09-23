@@ -38,13 +38,13 @@ int& ClientInfo::port(){return mport;}
 const QString& ClientInfo::fullName()const{return mfullName;}
 QString& ClientInfo::fullName(){return mfullName;}
 
-QDataStream& operator<<(QDataStream& out, const ClientInfo& cinfo)
+QDataStream &operator>>(QDataStream &out, ClientInfo *&cinfo)
 {
- return out<<cinfo.nickname()
-					<<cinfo.fullName();
+ cinfo=new ClientInfo;
+ return out>>cinfo->nickname()>>cinfo->fullName();
 }
 
-QDataStream& operator>>(QDataStream& out, ClientInfo& cinfo)
+QDataStream &operator<<(QDataStream &out, const ClientInfo *const&cinfo)
 {
- return out>>cinfo.nickname()>>cinfo.fullName();
+ return out<<cinfo->nickname()<<cinfo->fullName();
 }

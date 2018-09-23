@@ -12,8 +12,6 @@ enum class DATATYPE:char{
  MESSAGE
 };
 
-
-
 class ClientInfo
 {
 private:
@@ -24,7 +22,9 @@ private:
  int mport;
 
 public:
- ClientInfo(QString nickname, QTcpSocket* psocket, QString info);
+ ClientInfo(QString nickname=QString(),
+						QTcpSocket* psocket=nullptr,
+						QString info=QString());
  virtual ~ClientInfo();
 
  const QString& nickname() const;
@@ -41,8 +41,8 @@ public:
  QString& fullName();
 };
 
-QDataStream& operator<<(QDataStream& out, const ClientInfo& cinfo);
-QDataStream& operator>>(QDataStream& out, ClientInfo& cinfo);
+QDataStream& operator>>(QDataStream& out, ClientInfo *&cinfo);
+QDataStream& operator<<(QDataStream& out, const ClientInfo *const&cinfo);
 
 QDataStream& operator<<(QDataStream& out, DATATYPE& type);
 QDataStream& operator>>(QDataStream& out, DATATYPE& type);

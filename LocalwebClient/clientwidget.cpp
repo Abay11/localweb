@@ -51,6 +51,8 @@ ClientWidget::ClientWidget(QWidget *parent)
 				 ,SLOT(slotError(QAbstractSocket::SocketError)));
  connect(psocket, SIGNAL(readyRead())
 				 ,SLOT(slotReadyRead()));
+ connect(pcmdRegistration, SIGNAL(clicked())
+				 ,SLOT(slotRegistration()));
 
 
  setLayout(pvlay);
@@ -167,14 +169,14 @@ void ClientWidget::slotSendToServer()
 
 void ClientWidget::slotRegistration()
 {
+ qDebug()<<"slotRegistratoin()";
+
  QByteArray arrBlock;
  QDataStream out(&arrBlock, QIODevice::WriteOnly);
 
  out.setVersion(QDataStream::Qt_5_11);
  out<<quint16(0)<<static_cast<int>(DATATYPE::REGISTRATION);
  out<<QString("testuser");
- out<<QString("127.0.0.1");
- out<<psocket->localPort();
  out<<QString("My fullname");
  out.device()->seek(0);
  out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));

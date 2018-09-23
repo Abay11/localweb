@@ -55,6 +55,8 @@ public:
  void updateClientBase(ClientInfo&);
  void addNewUser(ClientInfo&);
  void removeUser(QString);
+ void saveBase();
+ void readBase();
 
 private slots:
  void slotStartServer();

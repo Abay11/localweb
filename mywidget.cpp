@@ -45,6 +45,8 @@ MyWidget::MyWidget(QWidget *parent)
  connect(pcmdOn, SIGNAL(clicked()), SLOT(slotStartServer()));
  connect(pcmdOff, SIGNAL(clicked()), SLOT(slotStopServer()));
 
+ readBase();
+
  setLayout(pvlay);
  resize(640, 480);
 }
@@ -52,6 +54,7 @@ MyWidget::MyWidget(QWidget *parent)
 MyWidget::~MyWidget()
 {
  delete logger;
+ saveBase();
 }
 
 void sendToClient(QTcpSocket* psocket,
@@ -94,6 +97,36 @@ void MyWidget::addNewUser(ClientInfo& pclient)
 void MyWidget::removeUser(QString nickname)
 {
  clientbase.remove(nickname);
+}
+
+void MyWidget::saveBase()
+{
+qDebug()<<"File saving";
+ if(clientbase.isEmpty())
+	return;
+
+ QFile file("clientbase.dat");
+ if(file.open(QFile::WriteOnly))
+	{
+	 QDataStream out(&file);
+	 out<<clientbase;
+	 file.close();
+	}
+ else
+	qCritical()<<"Ошибка сохранения базы";
+}
+
+void MyWidget::readBase()
+{
+ QFile file("clientbase.dat");
+ if(file.open(QFile::ReadOnly))
+	{
+	 QDataStream out(&file);
+	 out>>clientbase;
+	 file.close();
+	}
+ else
+	qDebug()<<"Error restoring clients base";
 }
 
 void MyWidget::slotStartServer()
@@ -182,6 +215,7 @@ void MyWidget::slotReadClient()
 	switch (type) {
 	 case DATATYPE::REGISTRATION:
 	 {
+		 qDebug()<<"User registration";
 		 QString nick;
 		 QString fullname;
 		 in>>nick>>fullname;
@@ -213,8 +247,6 @@ void MyWidget::slotReadClient()
 		 pInfo->append(str);
 		 break;
 	 }
-//	 default:
-//		qDebug()<<"INCORRECT DATATYPE";
 	 }
 
 	m_nextBlockSize=0;

@@ -42,7 +42,7 @@ void MyLogger::myMessageOutputHandler(QtMsgType type
 	 break;
 
 	case QtWarningMsg:
-	 out<<QDateTime::currentDateTime().toString("dd/MM/yy [hh:mm:ss] ")
+	 out<<QDateTime::currentDateTime().toString("[dd/MM/yy hh:mm:ss] ")
 		 <<QString("Warning: %1\n")
 				.arg(localMsg.constData());
 	 break;

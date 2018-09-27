@@ -27,12 +27,16 @@ SOURCES += \
         main.cpp \
         clientwidget.cpp \
     ../mylogger.cpp \
-    ../clientinfo.cpp
+    ../clientinfo.cpp \
+    registration.cpp \
+    stackedwindows.cpp
 
 HEADERS += \
         clientwidget.h\
     ../mylogger.h \
-    ../clientinfo.h
+    ../clientinfo.h \
+    registration.h \
+    stackedwindows.h
 
 
 # Default rules for deployment.

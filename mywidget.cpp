@@ -57,7 +57,7 @@ MyWidget::~MyWidget()
  saveBase();
 }
 
-void sendToClient(QTcpSocket* psocket,
+void MyWidget::sendToClient(QTcpSocket* psocket,
 									const QString& msg)
 {
  QByteArray byteArr;
@@ -219,7 +219,16 @@ void MyWidget::slotReadClient()
 		 QString nick;
 		 QString fullname;
 		 in>>nick>>fullname;
+		 nick=nick.toLower();
+
+		 auto res = clientbase.find(nick);
+		 QString answer="true";
+		 if(res!=clientbase.end())
+			answer="false";
+
 		 clientbase.insert(nick, new ClientInfo(nick, pclient, fullname));
+
+		 sendToClient(pclient, answer);
 		 break;
 	 }
 	 case DATATYPE::DELETION:

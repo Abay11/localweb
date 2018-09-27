@@ -36,8 +36,6 @@ Registration::Registration(MyLogger *logger, QWidget *parent)
  setLayout(pglay);
 
  connect(pcmdRegister, SIGNAL(clicked()), SLOT(slotRegister()));
-
- // connect(pcmdExit, SIGNAL(clicked()), pmain, SLOT(close()));
 }
 
 QPushButton *Registration::cmdExit()

@@ -21,6 +21,7 @@ StackedWindows::StackedWindows(QWidget *parent):QMainWindow(parent)
 	 connect(preg, SIGNAL(registered(int)),
 				 this,
 				 SLOT(setCurrentIndex(int)));
+	 connect(preg->cmdExit(), SIGNAL(clicked()), SLOT(close()));
 	}
 
  QMenu *pfileMenu=new QMenu("Файл", this);
@@ -37,5 +38,4 @@ StackedWindows::StackedWindows(QWidget *parent):QMainWindow(parent)
  menuBar()->addMenu(new QMenu("О приложении", this));
 
  setCentralWidget(pstackWidgets);
- connect(preg->cmdExit(), SIGNAL(clicked()), SLOT(close()));
 }

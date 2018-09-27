@@ -27,27 +27,27 @@ private:
  QString mserverPort;
  quint16 mnNextBlockSize;
 
- QLabel* plblAddress;
- QLineEdit* pleAddress;
- QLabel* plblPort;
- QLineEdit* plePort;
- QPushButton* pcmdConnect;
- QPushButton* pcmdDisconnect;
- QPushButton* pcmdSend;
- QPushButton* pcmdRegistration;
- QTextEdit* pInfo;
- QTextEdit* pmsgField;
+ QLabel *plblAddress;
+ QLineEdit *pleAddress;
+ QLabel *plblPort;
+ QLineEdit *plePort;
+ QPushButton *pcmdConnect;
+ QPushButton *pcmdDisconnect;
+ QPushButton *pcmdSend;
+ QPushButton *pcmdRegistration;
+ QTextEdit *pInfo;
+ QTextEdit *pmsgField;
 
- QHBoxLayout* phlay;
- QVBoxLayout* pvlay;
+ QHBoxLayout *phlay;
+ QVBoxLayout *pvlay;
 
- QTcpSocket* psocket;
+ QTcpSocket *psocket;
 
- MyLogger* logger;
- ClientInfo* pclientInfo;
+ MyLogger *plogger;
+ ClientInfo *pclientInfo;
 
 public:
- ClientWidget(QWidget *parent = nullptr);
+ ClientWidget(MyLogger *logger, QWidget *parent = nullptr);
  ~ClientWidget();
 
 public slots:

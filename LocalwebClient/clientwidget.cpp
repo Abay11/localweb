@@ -1,6 +1,6 @@
 #include "clientwidget.h"
 
-ClientWidget::ClientWidget(QWidget *parent)
+ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
  : QWidget(parent)
  ,mnNextBlockSize(0)
  ,plblAddress(new QLabel("IP адрес сервера"))
@@ -16,7 +16,7 @@ ClientWidget::ClientWidget(QWidget *parent)
  ,phlay(new QHBoxLayout)
  ,pvlay(new QVBoxLayout)
  ,psocket(new QTcpSocket)
- ,logger(new MyLogger)
+ ,plogger(logger)
 {
 // foreach (const QHostAddress &address, QNetworkInterface::allAddresses())
 //	{
@@ -186,5 +186,5 @@ void ClientWidget::slotRegistration()
 
 ClientWidget::~ClientWidget()
 {
- delete logger;
+ delete plogger;
 }

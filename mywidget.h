@@ -62,6 +62,7 @@ private slots:
  void slotStartServer();
  void slotStopServer();
  void slotNewConnection();
+ void slotDisconnection();
  void slotReadClient();
 };
 

@@ -182,8 +182,18 @@ void MyWidget::slotStopServer()
 void MyWidget::slotNewConnection()
 {
 	QTcpSocket* pclient=pserver->nextPendingConnection();
-	connect(pclient, SIGNAL(disconnected), SLOT(deleteLater()));
+	connect(pclient, SIGNAL(disconnected()), SLOT(slotDisconnection()));
 	connect(pclient, SIGNAL(readyRead()), SLOT(slotReadClient()));
+}
+
+void MyWidget::slotDisconnection()
+{
+ QTcpSocket* pclient
+	 =static_cast<QTcpSocket*>(sender());
+
+ pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
+							 +"Клиент отсоединился.");
+ pclient->deleteLater();
 }
 
 void MyWidget::slotReadClient()
@@ -247,6 +257,17 @@ void MyWidget::slotReadClient()
 			{
 			 *client.value()->socket()=pclient; //update socket info
 			}
+
+		 //send to client clientbase
+		 QByteArray arrBlock;
+		 QDataStream out(&arrBlock, QIODevice::WriteOnly);
+		 out<<quint16(0)<<static_cast<int>(DATATYPE::CONNECT)
+			 <<clientbase;
+		 out.device()->seek(0);
+		 out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
+		 pclient->write(arrBlock);
+
+		 qDebug()<<"Отправка клиенту базы";
 		 break;
 	 }
 	 case DATATYPE::MESSAGE:

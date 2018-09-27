@@ -10,12 +10,11 @@ ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
  ,pcmdConnect(new QPushButton("Подключиться"))
  ,pcmdDisconnect(new QPushButton("Отсоединиться"))
  ,pcmdSend(new QPushButton("Отправить"))
- ,pcmdRegistration(new QPushButton("Зарегаться"))
  ,pInfo(new QTextEdit)
  ,pmsgField(new QTextEdit)
  ,phlay(new QHBoxLayout)
  ,pvlay(new QVBoxLayout)
- ,psocket(new QTcpSocket)
+ ,pserverSocket(new QTcpSocket)
  ,plogger(logger)
 {
 // foreach (const QHostAddress &address, QNetworkInterface::allAddresses())
@@ -38,7 +37,6 @@ ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
  pvlay->addWidget(pInfo);
  pvlay->addWidget(pmsgField);
  pvlay->addWidget(pcmdSend);
- pvlay->addWidget(pcmdRegistration);
 
  connect(pcmdConnect, SIGNAL(clicked()),
 				 SLOT(slotConnectToServer()));
@@ -46,14 +44,11 @@ ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
 				 SLOT(slotDisconnectFromServer()));
  connect(pcmdSend, SIGNAL(clicked())
 				 ,SLOT(slotSendToServer()));
- connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
- connect(psocket, SIGNAL(error(QAbstractSocket::SocketError))
+ connect(pserverSocket, SIGNAL(connected()), SLOT(slotConnected()));
+ connect(pserverSocket, SIGNAL(error(QAbstractSocket::SocketError))
 				 ,SLOT(slotError(QAbstractSocket::SocketError)));
- connect(psocket, SIGNAL(readyRead())
+ connect(pserverSocket, SIGNAL(readyRead())
 				 ,SLOT(slotReadyRead()));
- connect(pcmdRegistration, SIGNAL(clicked())
-				 ,SLOT(slotRegistration()));
-
 
  setLayout(pvlay);
  resize(640, 480);
@@ -61,15 +56,14 @@ ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
 
 void ClientWidget::slotConnectToServer()
 {
- psocket->connectToHost(pleAddress->text(),
+ pserverSocket->connectToHost(pleAddress->text(),
 												static_cast<quint16>(plePort->text()
 																						 .toInt()));
  pcmdDisconnect->setEnabled(true);
  pcmdConnect->setEnabled(false);
 
- qDebug()<<"Sizeof QTcpSocket "<<sizeof(psocket)<< " "<<sizeof(*psocket);
+ qDebug()<<"Sizeof QTcpSocket "<<sizeof(pserverSocket)<< " "<<sizeof(*pserverSocket);
  qDebug()<<"Sizeof QString "<<sizeof(QString);
-
 }
 
 void ClientWidget::slotConnected()
@@ -78,13 +72,26 @@ void ClientWidget::slotConnected()
 							 +"Соединение с сервером установлено.");
  qInfo()<<"Соединение с сервером установлено.";
 
- qDebug()<<psocket->localPort();
- qDebug()<<psocket->localAddress();
+ //запрос серверу чтобы тот прислал список клиентов
+ QByteArray arrBlock;
+ QDataStream out(&arrBlock, QIODevice::WriteOnly);
+
+ out.setVersion(QDataStream::Qt_5_11);
+
+ out<<quint16(0)<<static_cast<int>(DATATYPE::CONNECT);
+ out.device()->seek(0);
+ out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
+
+ pserverSocket->write(arrBlock);
+ pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+							 +"Отправлен запрос на получение списка клиентов.");
+ qInfo()<<"Отправлен запрос на получение списка";
+
 }
 
 void ClientWidget::slotDisconnectFromServer()
 {
- psocket->close();
+ pserverSocket->close();
  pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
 							 +"Отсоединение от сервера.");
  pcmdConnect->setEnabled(true);
@@ -94,27 +101,51 @@ void ClientWidget::slotDisconnectFromServer()
 
 void ClientWidget::slotReadyRead()
 {
- QDataStream in(psocket) ;
+ QDataStream in(pserverSocket) ;
  in.setVersion(QDataStream::Qt_5_11);
  forever
  {
 	if(!mnNextBlockSize)
 	 {
-		if(static_cast<size_t>(psocket->bytesAvailable())<sizeof(quint16))
+		if(static_cast<size_t>(pserverSocket->bytesAvailable())<sizeof(quint16))
 		 break;
 
 		in>>mnNextBlockSize;
 	 }
 
-	if(psocket->bytesAvailable()<mnNextBlockSize)
+	if(pserverSocket->bytesAvailable()<mnNextBlockSize)
 	 break;
 
 	QTime time;
 	QString msg;
 
-	in>>time>>msg;
+	DATATYPE type;
+	in>>type;
 
-	pInfo->append(time.toString()+" "+msg);
+	switch (type) {
+	 case DATATYPE::CONNECT:
+	 {
+		 //получение списка пользователей от сервера
+		 in>>clients;
+
+		 qDebug()<<"Received client's list";
+		 for(auto a:clients)
+			qDebug()<<a->nickname();
+		 break;
+	 }
+	 case DATATYPE::MESSAGE:
+	 {
+		 //новое сообщение
+		 in>>time>>msg;
+		 msg=time.toString("[hh:mm:ss] ")+"Новое сообщение: "+msg;
+		 pInfo->append(msg);
+		 break;
+	 }
+	 default:
+		//что-то пошло не так, клиент не может получить иную команду
+		qCritical()<<"Неизвестная ошибка при получении сообщения.";
+	 }
+
 	mnNextBlockSize=0;
  }
 }
@@ -144,7 +175,7 @@ void ClientWidget::slotError(QAbstractSocket::SocketError nerr)
  pcmdDisconnect->setEnabled(false);
  pcmdConnect->setEnabled(true);
 
-	qCritical()<<"Ошибка соединения с сервером: "<<psocket->errorString();
+	qCritical()<<"Ошибка соединения с сервером: "<<pserverSocket->errorString();
 }
 
 void ClientWidget::slotSendToServer()
@@ -164,24 +195,7 @@ void ClientWidget::slotSendToServer()
  out.device()->seek(0);
  out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
 
- psocket->write(arrBlock);
-}
-
-void ClientWidget::slotRegistration()
-{
- qDebug()<<"slotRegistratoin()";
-
- QByteArray arrBlock;
- QDataStream out(&arrBlock, QIODevice::WriteOnly);
-
- out.setVersion(QDataStream::Qt_5_11);
- out<<quint16(0)<<static_cast<int>(DATATYPE::REGISTRATION);
- out<<QString("testuser");
- out<<QString("My fullname");
- out.device()->seek(0);
- out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
-
- psocket->write(arrBlock);
+ pserverSocket->write(arrBlock);
 }
 
 ClientWidget::~ClientWidget()

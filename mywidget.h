@@ -47,6 +47,10 @@ private:
 
  QMap<QString, ClientInfo*> clientbase;
 
+ //for clients identification by socket
+ //also it can serve as a list of online clients
+ QMap<QTcpSocket*, QString> binder;
+
 public:
  MyWidget(QWidget* parent=nullptr);
  ~MyWidget();

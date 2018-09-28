@@ -129,8 +129,8 @@ void ClientWidget::slotReadyRead()
 		 in>>clients;
 
 		 qDebug()<<"Received client's list";
-		 for(auto a:clients)
-			qDebug()<<a->nickname();
+//		 for(auto a:clients)
+//			qDebug()<<
 		 break;
 	 }
 	 case DATATYPE::MESSAGE:

@@ -71,27 +71,27 @@ void MyWidget::sendToClient(QTcpSocket* psocket,
  psocket->write(byteArr);
 }
 
-void MyWidget::updateClientBase(ClientInfo& pinfo)
+void MyWidget::updateClientBase(ClientInfo& )
 {
- ClientInfo* temp=dynamic_cast<ClientInfo*>(&pinfo);
- if(temp) //means need to register a new user
-	{
-	 addNewUser(*temp);
-	 return;
-	}
+// ClientInfo* temp=dynamic_cast<ClientInfo*>(&pinfo);
+// if(temp) //means need to register a new user
+//	{
+//	 addNewUser(*temp);
+//	 return;
+//	}
 
- //else we just need only update client's ip and port
- auto it=clientbase.find(pinfo.nickname());
- (*it)->address()=pinfo.address();
- (*it)->port()=pinfo.port();
+// //else we just need only update client's ip and port
+// auto it=clientbase.find(pinfo.nickname());
+// (*it)->address()=pinfo.address();
+// (*it)->port()=pinfo.port();
 }
 
-void MyWidget::addNewUser(ClientInfo& pclient)
+void MyWidget::addNewUser(ClientInfo& )
 {
- ClientInfo* temp =new ClientInfo(
-		dynamic_cast<ClientInfo&>(pclient));
+// ClientInfo* temp =new ClientInfo(
+//		dynamic_cast<ClientInfo&>(pclient));
 
- clientbase.insert(temp->nickname(), std::move(temp));
+// clientbase.insert(temp->nickname(), std::move(temp));
 }
 
 void MyWidget::removeUser(QString nickname)
@@ -191,6 +191,8 @@ void MyWidget::slotDisconnection()
  QTcpSocket* pclient
 	 =static_cast<QTcpSocket*>(sender());
 
+ binder.remove(pclient);
+
  pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
 							 +"Клиент отсоединился.");
  pclient->deleteLater();
@@ -236,7 +238,11 @@ void MyWidget::slotReadClient()
 		 if(res!=clientbase.end())
 			answer="false";
 
-		 clientbase.insert(nick, new ClientInfo(nick, pclient, fullname));
+		 clientbase.insert(nick, new ClientInfo(fullname,
+																						pclient->localAddress().toString()
+																						,pclient->localAddress().toString()
+																						,true));
+		 binder.insert(pclient, nick);
 
 		 sendToClient(pclient, answer);
 		 break;
@@ -246,6 +252,7 @@ void MyWidget::slotReadClient()
 		 QString nick;
 		 in>>nick;
 		 clientbase.remove(nick);
+		 //also need to remove from binder;
 		 break;
 	 }
 	 case DATATYPE::CONNECT:
@@ -255,7 +262,8 @@ void MyWidget::slotReadClient()
 		 auto client=clientbase.find(nick);
 		 if(client!=clientbase.end())
 			{
-			 *client.value()->socket()=pclient; //update socket info
+			 client.value()->status()=true; //set to client "online"
+			 binder.insert(pclient, nick);
 			}
 
 		 //send to client clientbase

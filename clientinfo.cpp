@@ -1,5 +1,47 @@
 #include "clientinfo.h"
 
+ClientInfo::ClientInfo(QString fullname
+											 ,QString address,
+											 QString port,
+											 bool status)
+ :mfullName(fullname)
+ ,maddress(address)
+ ,mport(port)
+ ,mstatus(status)
+ {}
+
+ClientInfo::~ClientInfo(){}
+
+const QString& ClientInfo::fullName()const{return mfullName;}
+QString& ClientInfo::fullName(){return mfullName;}
+
+const QString& ClientInfo::address()const{return maddress;}
+QString& ClientInfo::address(){return maddress;}
+
+const QString& ClientInfo::port()const{return mport;}
+QString& ClientInfo::port(){return mport;}
+
+const bool &ClientInfo::status() const
+{
+ return mstatus;
+}
+
+bool &ClientInfo::status()
+{
+ return mstatus;
+}
+
+QDataStream &operator>>(QDataStream &out, ClientInfo *&cinfo)
+{
+ cinfo=new ClientInfo;
+ return out>>cinfo->fullName()>>cinfo->address()>>cinfo->port()>>cinfo->status();
+}
+
+QDataStream &operator<<(QDataStream &out, const ClientInfo *const&cinfo)
+{
+ return out<<cinfo->fullName()<<cinfo->address()<<cinfo->port()<<cinfo->status();
+}
+
 QDataStream& operator<<(QDataStream& out, DATATYPE& type)
 {
  int i=static_cast<int>(type);
@@ -12,39 +54,4 @@ QDataStream& operator>>(QDataStream& out, DATATYPE& type)
  out>>c;
  type=DATATYPE(static_cast<char>(c));
  return out;
-}
-
-ClientInfo::ClientInfo(QString nick
-											 ,QTcpSocket* sock
-											 ,QString info)
- :mnickname(nick)
- ,psocket(sock)
- ,mfullName(info)
- {}
-
-ClientInfo::~ClientInfo(){}
-
-const QString& ClientInfo::nickname()const{return mnickname;}
-QString& ClientInfo::nickname(){return mnickname;}
-
-QTcpSocket** ClientInfo::socket(){return &psocket;}
-
-const QString& ClientInfo::address()const{return maddress;}
-QString& ClientInfo::address(){return maddress;}
-
-int ClientInfo::port()const{return mport;}
-int& ClientInfo::port(){return mport;}
-
-const QString& ClientInfo::fullName()const{return mfullName;}
-QString& ClientInfo::fullName(){return mfullName;}
-
-QDataStream &operator>>(QDataStream &out, ClientInfo *&cinfo)
-{
- cinfo=new ClientInfo;
- return out>>cinfo->nickname()>>cinfo->fullName();
-}
-
-QDataStream &operator<<(QDataStream &out, const ClientInfo *const&cinfo)
-{
- return out<<cinfo->nickname()<<cinfo->fullName();
 }

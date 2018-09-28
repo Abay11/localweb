@@ -15,30 +15,29 @@ enum class DATATYPE:char{
 class ClientInfo
 {
 private:
- QString mnickname;
- QTcpSocket* psocket;
  QString mfullName;
  QString maddress;
- int mport;
+ QString mport;
+ bool mstatus=false;
 
 public:
- ClientInfo(QString nickname=QString(),
-						QTcpSocket* psocket=nullptr,
-						QString info=QString());
+ ClientInfo(QString fullname=QString(),
+						QString addr=QString(),
+						QString mport=QString(),
+						bool status=false);
  virtual ~ClientInfo();
 
  const QString& nickname() const;
  QString& nickname();
 
- QTcpSocket** socket();
-
- const QString& address()const;
- QString& address();
- int port() const;
- int& port();
- DATATYPE type() const;
  const QString& fullName()const;
  QString& fullName();
+ const QString& address()const;
+ QString& address();
+ const QString& port() const;
+ QString& port();
+ const bool& status() const;
+ bool& status();
 };
 
 QDataStream& operator>>(QDataStream& out, ClientInfo *&cinfo);

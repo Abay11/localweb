@@ -4,36 +4,28 @@
 
 Registration::Registration(MyLogger *logger, QWidget *parent)
  :QWidget (parent)
- ,pnick(new QLabel("Псевдоним"))
- ,pname(new QLabel("Имя"))
  ,pleNick(new QLineEdit)
  ,pleName(new QLineEdit)
  ,pcmdRegister(new QPushButton("Ок"))
  ,pcmdExit(new QPushButton("Выход"))
  ,phlay(new QHBoxLayout)
- ,pvlay(new QVBoxLayout)
- ,pglay(new QGridLayout)
+ ,pflay(new QFormLayout)
  ,plogger(logger)
  ,psocket(new QTcpSocket)
 {
  pcmdRegister->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
  pcmdExit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
- pleNick->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
- pleName->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
- pglay->addWidget(new QLabel("<H1>Зарегистрироваться</H1><BR>"),
-									0,0,1,2, Qt::AlignCenter);
- pglay->addWidget(pnick,1,0);
- pglay->addWidget(pleNick,1,1);
- pglay->addWidget(pname,2,0);
- pglay->addWidget(pleName,2,1);
- pglay->addWidget(pcmdRegister,3,0);
- pglay->addWidget(pcmdExit,3,1);
 
- pglay->setColumnStretch(0, 1);
- pglay->setColumnStretch(1, 1);
+ pflay->addRow(new QLabel("Псевдоним"), pleNick);
+ pflay->addRow(new QLabel("Имя"), pleName);
+ phlay->addWidget(pcmdRegister);
+ phlay->addWidget(pcmdExit);
+ pflay->addRow(phlay);
+ pflay->setAlignment(Qt::AlignVCenter);
 
- setLayout(pglay);
+ setLayout(pflay);
+ setWindowTitle("Регистрация");
 
  connect(pcmdRegister, SIGNAL(clicked()), SLOT(slotRegister()));
 }

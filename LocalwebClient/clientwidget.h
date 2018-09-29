@@ -13,9 +13,13 @@
 #include <QVBoxLayout>
 #include <QTime>
 #include <QMap>
+#include <QSplitter>
+#include <QListWidgetItem>
+#include <QListWidget>
 
 #include <QTcpSocket>
 #include <QNetworkInterface>
+#include <QMessageBox>
 
 
 class ClientWidget : public QWidget
@@ -35,11 +39,14 @@ private:
  QPushButton *pcmdConnect;
  QPushButton *pcmdDisconnect;
  QPushButton *pcmdSend;
- QTextEdit *pInfo;
+ QPushButton *pcmdClear;
+ QTextEdit *pinfo;
  QTextEdit *pmsgField;
 
  QHBoxLayout *phlay;
  QVBoxLayout *pvlay;
+ QSplitter *psplitter;
+ QListWidget *plist;
 
  QTcpSocket *pserverSocket;
 
@@ -57,6 +64,8 @@ public slots:
  void slotError(QAbstractSocket::SocketError);
  void slotSendToServer();
  void slotConnected();
+ void slotMsgChanged();
+ void slotClearMsg();
 };
 
 #endif // CLIENTWIDGET_H

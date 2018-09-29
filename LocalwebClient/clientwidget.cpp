@@ -10,10 +10,13 @@ ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
  ,pcmdConnect(new QPushButton("Подключиться"))
  ,pcmdDisconnect(new QPushButton("Отсоединиться"))
  ,pcmdSend(new QPushButton("Отправить"))
- ,pInfo(new QTextEdit)
+ ,pcmdClear(new QPushButton("Очистить"))
+ ,pinfo(new QTextEdit)
  ,pmsgField(new QTextEdit)
  ,phlay(new QHBoxLayout)
  ,pvlay(new QVBoxLayout)
+ ,psplitter(new QSplitter(this))
+ ,plist(new QListWidget(this))
  ,pserverSocket(new QTcpSocket)
  ,plogger(logger)
 {
@@ -23,9 +26,24 @@ ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
 //		maddress=address.toString();
 //	}
 
- pleAddress->setText(pleAddress->text());
+	pleAddress->setText(pleAddress->text());
  pmsgField->setPlaceholderText("Введите сообщение...");
  pcmdDisconnect->setEnabled(false);
+ pcmdSend->setEnabled(false);
+ pinfo->setReadOnly(true);
+
+ plist->addItem(new QListWidgetItem("Николай Петренко"));
+
+ psplitter->addWidget(new QWidget(psplitter));
+ psplitter->addWidget(new QWidget(psplitter));
+ psplitter->setStretchFactor(0, 1);
+ psplitter->setStretchFactor(1, 2);
+
+ QVBoxLayout *ptemplayout0 = new QVBoxLayout(psplitter);
+ ptemplayout0->addWidget(new QLabel("Пользователи"));
+ ptemplayout0->addWidget(plist);
+
+ psplitter->widget(0)->setLayout(ptemplayout0);
 
  phlay->addWidget(plblAddress);
  phlay->addWidget(pleAddress);
@@ -34,23 +52,34 @@ ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
  phlay->addWidget(pcmdConnect);
  phlay->addWidget(pcmdDisconnect);
  pvlay->addLayout(phlay);
- pvlay->addWidget(pInfo);
+ pvlay->addWidget(pinfo);
  pvlay->addWidget(pmsgField);
- pvlay->addWidget(pcmdSend);
+ QHBoxLayout *ptemplayout1=new QHBoxLayout;
+ ptemplayout1->addWidget(pcmdSend);
+ ptemplayout1->addWidget(pcmdClear);
+ pvlay->addLayout(ptemplayout1);
 
+ psplitter->widget(1)->setLayout(pvlay);
+
+
+ connect(pmsgField, SIGNAL(textChanged()), SLOT(slotMsgChanged()));
  connect(pcmdConnect, SIGNAL(clicked()),
 				 SLOT(slotConnectToServer()));
  connect(pcmdDisconnect, SIGNAL(clicked()),
 				 SLOT(slotDisconnectFromServer()));
  connect(pcmdSend, SIGNAL(clicked())
 				 ,SLOT(slotSendToServer()));
+ connect(pcmdClear, SIGNAL(clicked()),
+				 SLOT(slotClearMsg()));
  connect(pserverSocket, SIGNAL(connected()), SLOT(slotConnected()));
  connect(pserverSocket, SIGNAL(error(QAbstractSocket::SocketError))
 				 ,SLOT(slotError(QAbstractSocket::SocketError)));
  connect(pserverSocket, SIGNAL(readyRead())
 				 ,SLOT(slotReadyRead()));
 
- setLayout(pvlay);
+ QHBoxLayout *ptemplayout2=new QHBoxLayout;
+ ptemplayout2->addWidget(psplitter);
+ setLayout(ptemplayout2);
  resize(640, 480);
 }
 
@@ -61,14 +90,11 @@ void ClientWidget::slotConnectToServer()
 																						 .toInt()));
  pcmdDisconnect->setEnabled(true);
  pcmdConnect->setEnabled(false);
-
- qDebug()<<"Sizeof QTcpSocket "<<sizeof(pserverSocket)<< " "<<sizeof(*pserverSocket);
- qDebug()<<"Sizeof QString "<<sizeof(QString);
 }
 
 void ClientWidget::slotConnected()
 {
- pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+ pinfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
 							 +"Соединение с сервером установлено.");
  qInfo()<<"Соединение с сервером установлено.";
 
@@ -83,16 +109,27 @@ void ClientWidget::slotConnected()
  out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
 
  pserverSocket->write(arrBlock);
- pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+ pinfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
 							 +"Отправлен запрос на получение списка клиентов.");
  qInfo()<<"Отправлен запрос на получение списка";
 
 }
 
+void ClientWidget::slotMsgChanged()
+{
+ pcmdSend->setEnabled(!pmsgField->toPlainText().isEmpty()
+											&&pserverSocket->isOpen());
+}
+
+void ClientWidget::slotClearMsg()
+{
+ pmsgField->clear();
+}
+
 void ClientWidget::slotDisconnectFromServer()
 {
  pserverSocket->close();
- pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+ pinfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
 							 +"Отсоединение от сервера.");
  pcmdConnect->setEnabled(true);
  pcmdDisconnect->setEnabled(false);
@@ -138,7 +175,7 @@ void ClientWidget::slotReadyRead()
 		 //новое сообщение
 		 in>>time>>msg;
 		 msg=time.toString("[hh:mm:ss] ")+"Новое сообщение: "+msg;
-		 pInfo->append(msg);
+		 pinfo->append(msg);
 		 break;
 	 }
 	 default:
@@ -152,7 +189,7 @@ void ClientWidget::slotReadyRead()
 
 void ClientWidget::slotError(QAbstractSocket::SocketError nerr)
 {
- QString info("Произошла ошибка при подключении к серверу: ");
+ QString info;
  switch(nerr)
 	{
 	case QAbstractSocket::HostNotFoundError:
@@ -171,11 +208,13 @@ void ClientWidget::slotError(QAbstractSocket::SocketError nerr)
 	 info.append("Произошла критическая ошибка. "
 							 "Обратитесь к администратору сети.");
 	}
- pInfo->append(info);
+ QMessageBox::critical(this, "Ошибка подключения к серверу",
+											 info);
  pcmdDisconnect->setEnabled(false);
  pcmdConnect->setEnabled(true);
 
 	qCritical()<<"Ошибка соединения с сервером: "<<pserverSocket->errorString();
+	pserverSocket->close();
 }
 
 void ClientWidget::slotSendToServer()
@@ -188,7 +227,7 @@ void ClientWidget::slotSendToServer()
  out<<quint16(0)<<static_cast<int>(DATATYPE::MESSAGE)<<QTime::currentTime();
 
  out<<pmsgField->toPlainText();
- pInfo->append(QDateTime::currentDateTime().toString("[hh:MM:ss] Вы: ")
+ pinfo->append(QDateTime::currentDateTime().toString("[hh:MM:ss] Вы: ")
 							 + pmsgField->toPlainText());
  pmsgField->clear();
 

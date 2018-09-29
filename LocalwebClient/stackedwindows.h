@@ -8,6 +8,8 @@
 #include <QMenuBar>
 #include <QToolBar>
 #include <QAction>
+#include <QIcon>
+#include <QStyle>
 
 #include "clientwidget.h"
 #include "registration.h"
@@ -22,7 +24,9 @@ private:
  ClientWidget* pwidget;
  Registration* preg;
 
- QAction *pexit;
+ QAction *pactConnect;
+ QAction *pactDisconnect;
+ QAction *pactHide;
 public:
  StackedWindows(QWidget *parent=nullptr);
 };

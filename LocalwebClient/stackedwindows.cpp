@@ -19,13 +19,37 @@ StackedWindows::StackedWindows(QWidget *parent):QMainWindow(parent)
 	{
 	 pstackWidgets->setCurrentIndex(1);
 	 connect(preg, SIGNAL(registered(int)),
-				 this,
+				 pstackWidgets,
 				 SLOT(setCurrentIndex(int)));
 	 connect(preg->cmdExit(), SIGNAL(clicked()), SLOT(close()));
 	}
 
- QMenu *pfileMenu=new QMenu("Файл", this);
- pfileMenu->addAction("Скрыть", this, SLOT(hide()));
+
+ pactConnect=new QAction("Подключиться", this);
+ pactConnect->setIcon(QIcon(":/Icons/connect.png"));
+ connect(pactConnect, SIGNAL(triggered()),
+				 pwidget, SLOT(slotConnectToServer()));
+
+ pactDisconnect=new QAction("Отключиться", this);
+ pactDisconnect->setIcon(QIcon(":/Icons/disconnect.ico"));
+ connect(pactDisconnect, SIGNAL(triggered()),
+				 pwidget, SLOT(slotDisconnectFromServer()));
+
+ QToolBar *toolbar=new QToolBar(this);
+ toolbar->addAction(pactConnect);
+ toolbar->addAction(pactDisconnect);
+
+ addToolBar(toolbar);
+
+ QMenu *pfileMenu=new QMenu("Меню", this);
+ pfileMenu->addAction(pactConnect);
+ pfileMenu->addAction(pactDisconnect);
+
+ pactHide=new QAction("Скрыть", this);
+ pactHide->setIcon(QIcon(":/Icons/hide.png"));
+ connect(pactHide, SIGNAL(triggered()), SLOT(hide()));
+ pfileMenu->addAction(pactHide);
+
  pfileMenu->addAction("Выход", this, SLOT(close()));
  menuBar()->addMenu(pfileMenu);
 

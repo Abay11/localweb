@@ -8,8 +8,10 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QFormLayout>
 #include <QGridLayout>
 #include <QMessageBox>
+#include <QLayoutItem>
 
 #include <QTcpSocket>
 #include <QTime>
@@ -22,12 +24,12 @@ class Registration:public QWidget
 {
  Q_OBJECT
 private:
- QLabel *pnick, *pname;
  QLineEdit *pleNick, *pleName;
  QPushButton *pcmdRegister, *pcmdExit;
  QHBoxLayout *phlay;
  QVBoxLayout *pvlay;
  QGridLayout *pglay;
+ QFormLayout *pflay;
 
  MyLogger *plogger;
 

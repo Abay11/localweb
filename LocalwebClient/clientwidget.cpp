@@ -1,6 +1,9 @@
 #include "clientwidget.h"
 
-ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
+ClientWidget::ClientWidget(MyLogger *logger,
+													 QDockWidget *&ponline,
+													 QDockWidget *&poffline,
+													 QWidget *parent)
  : QWidget(parent)
  ,mnNextBlockSize(0)
  ,plblAddress(new QLabel("IP адрес сервера"))
@@ -16,7 +19,8 @@ ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
  ,phlay(new QHBoxLayout)
  ,pvlay(new QVBoxLayout)
  ,psplitter(new QSplitter(this))
- ,plist(new QListWidget(this))
+ ,ponlineList(new QListWidget(this))
+ ,pofflineList(new QListWidget(this))
  ,pserverSocket(new QTcpSocket)
  ,plogger(logger)
 {
@@ -26,24 +30,26 @@ ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
 //		maddress=address.toString();
 //	}
 
-	pleAddress->setText(pleAddress->text());
+ readBase();
+
+ pleAddress->setText(pleAddress->text());
  pmsgField->setPlaceholderText("Введите сообщение...");
  pcmdDisconnect->setEnabled(false);
  pcmdSend->setEnabled(false);
  pinfo->setReadOnly(true);
 
- plist->addItem(new QListWidgetItem("Николай Петренко"));
+ ponline->setWidget(ponlineList);
+ poffline->setWidget(pofflineList);
+// psplitter->addWidget(new QWidget(psplitter));
+// psplitter->addWidget(new QWidget(psplitter));
+// psplitter->setStretchFactor(0, 1);
+// psplitter->setStretchFactor(1, 2);
 
- psplitter->addWidget(new QWidget(psplitter));
- psplitter->addWidget(new QWidget(psplitter));
- psplitter->setStretchFactor(0, 1);
- psplitter->setStretchFactor(1, 2);
+// QVBoxLayout *ptemplayout0 = new QVBoxLayout(psplitter);
+// ptemplayout0->addWidget(new QLabel("Пользователи"));
+// ptemplayout0->addWidget(plist);
 
- QVBoxLayout *ptemplayout0 = new QVBoxLayout(psplitter);
- ptemplayout0->addWidget(new QLabel("Пользователи"));
- ptemplayout0->addWidget(plist);
-
- psplitter->widget(0)->setLayout(ptemplayout0);
+// psplitter->widget(0)->setLayout(ptemplayout0);
 
  phlay->addWidget(plblAddress);
  phlay->addWidget(pleAddress);
@@ -59,7 +65,7 @@ ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
  ptemplayout1->addWidget(pcmdClear);
  pvlay->addLayout(ptemplayout1);
 
- psplitter->widget(1)->setLayout(pvlay);
+// psplitter->widget(1)->setLayout(pvlay);
 
 
  connect(pmsgField, SIGNAL(textChanged()), SLOT(slotMsgChanged()));
@@ -77,9 +83,9 @@ ClientWidget::ClientWidget(MyLogger *logger, QWidget *parent)
  connect(pserverSocket, SIGNAL(readyRead())
 				 ,SLOT(slotReadyRead()));
 
- QHBoxLayout *ptemplayout2=new QHBoxLayout;
- ptemplayout2->addWidget(psplitter);
- setLayout(ptemplayout2);
+// QHBoxLayout *ptemplayout2=new QHBoxLayout;
+// ptemplayout2->addWidget(psplitter);
+ setLayout(pvlay);
  resize(640, 480);
 }
 
@@ -162,12 +168,27 @@ void ClientWidget::slotReadyRead()
 	switch (type) {
 	 case DATATYPE::CONNECT:
 	 {
+		 qDebug()<<"Received client's list";
 		 //получение списка пользователей от сервера
 		 in>>clients;
 
-		 qDebug()<<"Received client's list";
-//		 for(auto a:clients)
-//			qDebug()<<
+		 //нужно удалить полученного клиента из недоступных в сети
+		 for(auto iter=clients.begin(), end=clients.end(); iter!=end; ++iter)
+			{
+			 const QString &key=iter.key();
+
+			 if(key!=usernick)
+			 ponlineList->addItem(key);
+
+			for(int i=0, e=pofflineList->count(); i<e;++i)
+				if(key==pofflineList->item(i)->text())
+				 {
+					auto take=pofflineList->takeItem(i);
+					delete take;
+				 }
+			}
+
+
 		 break;
 	 }
 	 case DATATYPE::MESSAGE:
@@ -239,5 +260,50 @@ void ClientWidget::slotSendToServer()
 
 ClientWidget::~ClientWidget()
 {
+ saveBase();
  delete plogger;
+}
+
+void ClientWidget::readBase()
+{
+ qDebug()<<"Reading base";
+ QFile file("data.bin");
+ if(file.open(QFile::ReadOnly))
+	{
+	 QDataStream in(&file);
+	 //at first read current user info
+	 in>>usernick>>username;
+	 //then other clients
+	 in>>clients;
+	 file.close();
+
+//	 if(!usernick.isEmpty())
+		ponlineList->addItem(QString("Вы: %1").arg(usernick));
+
+	 for(auto iter=clients.begin(), end=clients.end(); iter!=end; ++iter)
+		if(usernick!=iter.key())
+			pofflineList->addItem(iter.key());
+	}
+ else
+	qCritical()<<"Error restoring clients base";
+}
+
+void ClientWidget::saveBase()
+{
+ qDebug()<<"Savaving base";
+ QFile file("data.bin");
+ if(file.open(QFile::WriteOnly))
+	{
+	 QDataStream out(&file);
+	 //at first save current user info
+	 out<<usernick<<username;
+
+	 //then if clientbase is not empty save it too
+	 if(!clients.isEmpty())
+		out<<clients;
+
+	 file.close();
+	}
+ else
+	qCritical()<<"Error saving clients base";
 }

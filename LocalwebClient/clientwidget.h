@@ -16,6 +16,7 @@
 #include <QSplitter>
 #include <QListWidgetItem>
 #include <QListWidget>
+#include <QDockWidget>
 
 #include <QTcpSocket>
 #include <QNetworkInterface>
@@ -46,16 +47,26 @@ private:
  QHBoxLayout *phlay;
  QVBoxLayout *pvlay;
  QSplitter *psplitter;
- QListWidget *plist;
+ QListWidget *ponlineList;
+ QListWidget *pofflineList;
 
  QTcpSocket *pserverSocket;
 
  MyLogger *plogger;
+ QString usernick;
+ QString username;
  QMap<QString, ClientInfo*> clients;
 
 public:
- ClientWidget(MyLogger *logger, QWidget *parent = nullptr);
+ ClientWidget(MyLogger *logger,
+							QDockWidget *&ponline,
+							QDockWidget *&poffline,
+							QWidget *parent = nullptr);
  ~ClientWidget();
+ void readBase();
+ void saveBase();
+
+signals:
 
 public slots:
  void slotConnectToServer();

@@ -2,7 +2,10 @@
 
 #include <QSizePolicy>
 
-Registration::Registration(MyLogger *logger, QWidget *parent)
+Registration::Registration(MyLogger *logger,
+													 QDockWidget *ponline,
+													 QDockWidget *poffline,
+													 QWidget *parent)
  :QWidget (parent)
  ,pleNick(new QLineEdit)
  ,pleName(new QLineEdit)
@@ -11,6 +14,8 @@ Registration::Registration(MyLogger *logger, QWidget *parent)
  ,phlay(new QHBoxLayout)
  ,pflay(new QFormLayout)
  ,plogger(logger)
+ ,pmonline(ponline)
+ ,pmoffline(poffline)
  ,psocket(new QTcpSocket)
 {
  pcmdRegister->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -90,12 +95,14 @@ void Registration::slotRegister()
 		break;
 	 }
 
-	 QFile file("date.bin");
+	 QFile file("data.bin");
 	 file.open(QIODevice::WriteOnly);
 	 QDataStream fileout(&file);
-	 fileout<<pleNick<<pleName;
+	 fileout<<pleNick->text()<<pleName->text();
 	 file.close();
 	 emit(registered(0));
+	 pmonline->setVisible(true);
+	 pmoffline->setVisible(true);
 
 	 psocket->close();
 

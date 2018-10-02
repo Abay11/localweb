@@ -12,6 +12,7 @@
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QLayoutItem>
+#include <QDockWidget>
 
 #include <QTcpSocket>
 #include <QTime>
@@ -32,12 +33,17 @@ private:
  QFormLayout *pflay;
 
  MyLogger *plogger;
+ QDockWidget *pmonline;
+ QDockWidget *pmoffline;
 
  QTcpSocket *psocket;
 
  bool mstatus;
 public:
- Registration(MyLogger *logger, QWidget *parent=nullptr);
+ Registration(MyLogger *logger,
+							QDockWidget *ponline,
+							QDockWidget *poffline,
+							QWidget *parent=nullptr);
 
  QPushButton* cmdExit();
 public slots:

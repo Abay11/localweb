@@ -1,7 +1,7 @@
 #include "mywidget.h"
 
 MyWidget::MyWidget(QWidget *parent)
- :QWidget(parent)
+ :QMainWindow(parent)
  ,plblAddress(new QLabel("IP адрес:"))
  ,plblPort(new QLabel("Номер порта:"))
  ,pleAddress(new QLineEdit)
@@ -12,6 +12,8 @@ MyWidget::MyWidget(QWidget *parent)
  ,phlay(new QHBoxLayout)
  ,pvlay(new QVBoxLayout)
  ,pvalidator(new QIntValidator(1000, 65535, plePort))
+ ,pdock(new QDockWidget("Пользователи", this))
+ ,plist(new QListWidget())
  ,pserver(new QTcpServer(this))
  ,logger(new MyLogger)
  ,m_nextBlockSize(0)
@@ -45,10 +47,13 @@ MyWidget::MyWidget(QWidget *parent)
  connect(pcmdOn, SIGNAL(clicked()), SLOT(slotStartServer()));
  connect(pcmdOff, SIGNAL(clicked()), SLOT(slotStopServer()));
 
+ addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, pdock);
  readBase();
+ pdock->setWidget(plist);
 
- setLayout(pvlay);
- resize(640, 480);
+ setCentralWidget(new QWidget(this));
+ centralWidget()->setLayout(pvlay);
+ resize(800, 480);
 }
 
 MyWidget::~MyWidget()
@@ -105,7 +110,7 @@ qDebug()<<"File saving";
  if(clientbase.isEmpty())
 	return;
 
- QFile file("clientbase.dat");
+ QFile file("clientbase.bin");
  if(file.open(QFile::WriteOnly))
 	{
 	 QDataStream out(&file);
@@ -118,15 +123,20 @@ qDebug()<<"File saving";
 
 void MyWidget::readBase()
 {
- QFile file("clientbase.dat");
+ QFile file("clientbase.bin");
  if(file.open(QFile::ReadOnly))
 	{
-	 QDataStream out(&file);
-	 out>>clientbase;
+	 QDataStream in(&file);
+	 in>>clientbase;
+
+	 for(auto iter=clientbase.begin(), end=clientbase.end();
+			 iter!=end;++iter)
+		plist->addItem(iter.key());
+
 	 file.close();
 	}
  else
-	qDebug()<<"Error restoring clients base";
+	qCritical()<<"Error restoring clients base";
 }
 
 void MyWidget::slotStartServer()

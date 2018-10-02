@@ -10,6 +10,7 @@
 #include <QAction>
 #include <QIcon>
 #include <QStyle>
+#include <QDockWidget>
 
 #include "clientwidget.h"
 #include "registration.h"
@@ -27,6 +28,8 @@ private:
  QAction *pactConnect;
  QAction *pactDisconnect;
  QAction *pactHide;
+ QDockWidget *ponline;
+ QDockWidget *poffline;
 public:
  StackedWindows(QWidget *parent=nullptr);
 };

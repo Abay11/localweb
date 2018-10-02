@@ -5,8 +5,8 @@
 #include "clientinfo.h"
 
 #include <QMap>
-
-#include <QWidget>
+#include <QListWidget>
+#include <QMainWindow>
 #include <QLabel>
 #include <QLineEdit>
 #include <QTextEdit>
@@ -15,6 +15,7 @@
 #include <QVBoxLayout>
 #include <QDateTime>
 #include <QIntValidator>
+#include <QDockWidget>
 
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -22,7 +23,7 @@
 
 
 
-class MyWidget : public QWidget
+class MyWidget : public QMainWindow
 {
  Q_OBJECT
 private:
@@ -36,12 +37,13 @@ private:
  QHBoxLayout* phlay;
  QVBoxLayout* pvlay;
  QValidator* pvalidator;
+ QDockWidget *pdock;
+ QListWidget *plist;
 
  QTcpServer* pserver;
 
  MyLogger* logger;
 
- QList<QTcpSocket*> clients;
  QString m_address;
  quint16 m_nextBlockSize;
 

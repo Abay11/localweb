@@ -2,15 +2,17 @@
 
 StackedWindows::StackedWindows(QWidget *parent):QMainWindow(parent)
 ,pstackWidgets(new QStackedWidget(this))
+,ponline(new QDockWidget("В сети", this))
+,poffline(new QDockWidget("Вне сети", this))
 {
  plogger=new MyLogger;
- preg=new Registration(plogger, this);
- pwidget=new ClientWidget(plogger, this);
+ preg=new Registration(plogger, ponline, poffline, this);
+ pwidget=new ClientWidget(plogger, ponline, poffline, this);
 
  pstackWidgets->addWidget(pwidget);
  pstackWidgets->addWidget(preg);
 
- if(QFile::exists("date.bin"))
+ if(QFile::exists("data.bin"))
 	{
 	pstackWidgets->setCurrentIndex(0);
 	delete preg;
@@ -22,6 +24,8 @@ StackedWindows::StackedWindows(QWidget *parent):QMainWindow(parent)
 				 pstackWidgets,
 				 SLOT(setCurrentIndex(int)));
 	 connect(preg->cmdExit(), SIGNAL(clicked()), SLOT(close()));
+	 ponline->setVisible(false);
+	 poffline->setVisible(false);
 	}
 
 
@@ -61,5 +65,9 @@ StackedWindows::StackedWindows(QWidget *parent):QMainWindow(parent)
  menuBar()->addMenu(new QMenu("Помощь", this));
  menuBar()->addMenu(new QMenu("О приложении", this));
 
+ addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, ponline);
+ addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, poffline);
  setCentralWidget(pstackWidgets);
+
+ resize(1000, 600);
 }

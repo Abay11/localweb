@@ -129,7 +129,13 @@ void ClientWidget::slotMsgChanged()
 
 void ClientWidget::slotClearMsg()
 {
- pmsgField->clear();
+ pinfo->clear();
+}
+
+void ClientWidget::slotReloadBase()
+{
+ qDebug()<<"reloadBase called";
+ readBase();
 }
 
 void ClientWidget::slotDisconnectFromServer()
@@ -139,6 +145,17 @@ void ClientWidget::slotDisconnectFromServer()
 							 +"Отсоединение от сервера.");
  pcmdConnect->setEnabled(true);
  pcmdDisconnect->setEnabled(false);
+
+ ponlineList->clear();
+ pofflineList->clear();
+ ponlineList->addItem(QString("Вы: %1").arg(usernick));
+
+//перекидываем доступных пользователей к недоступным после отсоединения
+ for(auto it=clients.begin(), end=clients.end();
+		 it!=end; ++it)
+	if(it.key()!=usernick)
+	 pofflineList->addItem(it.key());
+
 	qInfo()<<"Соединение с сервером разорвано.";
 }
 
@@ -178,17 +195,15 @@ void ClientWidget::slotReadyRead()
 			 const QString &key=iter.key();
 
 			 if(key!=usernick)
-			 ponlineList->addItem(key);
+				ponlineList->addItem(key);
 
-			for(int i=0, e=pofflineList->count(); i<e;++i)
+			for(int i=0; i<pofflineList->count();++i)
 				if(key==pofflineList->item(i)->text())
 				 {
 					auto take=pofflineList->takeItem(i);
 					delete take;
 				 }
 			}
-
-
 		 break;
 	 }
 	 case DATATYPE::MESSAGE:
@@ -266,13 +281,13 @@ ClientWidget::~ClientWidget()
 
 void ClientWidget::readBase()
 {
- qDebug()<<"Reading base";
  QFile file("data.bin");
  if(file.open(QFile::ReadOnly))
 	{
 	 QDataStream in(&file);
 	 //at first read current user info
 	 in>>usernick>>username;
+	 qDebug()<<"usernick: "<<usernick;
 	 //then other clients
 	 in>>clients;
 	 file.close();
@@ -290,7 +305,9 @@ void ClientWidget::readBase()
 
 void ClientWidget::saveBase()
 {
- qDebug()<<"Savaving base";
+ if(usernick.isEmpty())
+	return;
+
  QFile file("data.bin");
  if(file.open(QFile::WriteOnly))
 	{

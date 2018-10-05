@@ -77,6 +77,7 @@ public slots:
  void slotConnected();
  void slotMsgChanged();
  void slotClearMsg();
+ void slotReloadBase();
 };
 
 #endif // CLIENTWIDGET_H

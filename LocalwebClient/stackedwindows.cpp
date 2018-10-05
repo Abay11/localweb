@@ -2,20 +2,20 @@
 
 StackedWindows::StackedWindows(QWidget *parent):QMainWindow(parent)
 ,pstackWidgets(new QStackedWidget(this))
-,ponline(new QDockWidget("В сети", this))
-,poffline(new QDockWidget("Вне сети", this))
+,ponline(new QDockWidget("Доступные", this))
+,poffline(new QDockWidget("Недоступные", this))
 {
  plogger=new MyLogger;
- preg=new Registration(plogger, ponline, poffline, this);
  pwidget=new ClientWidget(plogger, ponline, poffline, this);
+ preg=new Registration(plogger, ponline, poffline, this);
 
  pstackWidgets->addWidget(pwidget);
  pstackWidgets->addWidget(preg);
 
  if(QFile::exists("data.bin"))
 	{
-	pstackWidgets->setCurrentIndex(0);
-	delete preg;
+	 pstackWidgets->setCurrentIndex(0);
+	 delete preg;
 	}
  else
 	{
@@ -24,6 +24,8 @@ StackedWindows::StackedWindows(QWidget *parent):QMainWindow(parent)
 				 pstackWidgets,
 				 SLOT(setCurrentIndex(int)));
 	 connect(preg->cmdExit(), SIGNAL(clicked()), SLOT(close()));
+	 connect(pstackWidgets, SIGNAL(currentChanged(int)),
+					 pwidget, SLOT(slotReloadBase())); //необходимо чтобы заново вычитать базу
 	 ponline->setVisible(false);
 	 poffline->setVisible(false);
 	}

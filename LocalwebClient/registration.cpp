@@ -42,6 +42,20 @@ QPushButton *Registration::cmdExit()
 
 void Registration::slotRegister()
 {
+ if(pleNick->text().isEmpty())
+	{
+	 QMessageBox::warning(this, "Заполните данные",
+												"Поле \"Псевдоним\" не может быть пустым");
+	 return;
+	}
+
+ if(pleName->text().isEmpty())
+	{
+	 QMessageBox::warning(this, "Заполните данные",
+												"Поле \"Имя\" не может быть пустым");
+	 return;
+	}
+
  psocket=new QTcpSocket;
  psocket->connectToHost("localhost", 7165);
  if(psocket->waitForConnected())

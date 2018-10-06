@@ -245,17 +245,24 @@ void MyWidget::slotReadClient()
 		 in>>nick>>fullname;
 		 nick=nick.toLower();
 
-		 auto res = clientbase.find(nick);
-		 QString answer="true";
-		 if(res!=clientbase.end())
-			answer="false";
-
+		 auto pos = clientbase.find(nick);
+		 QString answer="false";
+		 if(pos==clientbase.end())
+			{
+			answer="true";
 		 clientbase.insert(nick,
 											 new ClientInfo(fullname,
 																			pclient->localAddress().toString()
 																			,pclient->localAddress().toString()
 																			,true));
 		 binder.insert(pclient, nick);
+		 plist->addItem(nick);
+		 plist->sortItems();
+		 pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
+									 + "Зарегистрирован новый пользователь " + nick);
+		 qInfo()<<"Зарегистрирован новый пользователь " + nick;
+			}
+
 
 		 sendToClient(pclient, answer);
 		 break;

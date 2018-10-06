@@ -40,16 +40,6 @@ ClientWidget::ClientWidget(MyLogger *logger,
 
  ponline->setWidget(ponlineList);
  poffline->setWidget(pofflineList);
-// psplitter->addWidget(new QWidget(psplitter));
-// psplitter->addWidget(new QWidget(psplitter));
-// psplitter->setStretchFactor(0, 1);
-// psplitter->setStretchFactor(1, 2);
-
-// QVBoxLayout *ptemplayout0 = new QVBoxLayout(psplitter);
-// ptemplayout0->addWidget(new QLabel("Пользователи"));
-// ptemplayout0->addWidget(plist);
-
-// psplitter->widget(0)->setLayout(ptemplayout0);
 
  phlay->addWidget(plblAddress);
  phlay->addWidget(pleAddress);
@@ -110,7 +100,9 @@ void ClientWidget::slotConnected()
 
  out.setVersion(QDataStream::Qt_5_11);
 
- out<<quint16(0)<<static_cast<int>(DATATYPE::CONNECT);
+ out<<quint16(0)<<static_cast<int>(DATATYPE::CONNECT)
+	 <<usernick
+	<<clients.size();
  out.device()->seek(0);
  out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
 
@@ -156,6 +148,8 @@ void ClientWidget::slotDisconnectFromServer()
 	if(it.key()!=usernick)
 	 pofflineList->addItem(it.key());
 
+ onlines.clear();
+
 	qInfo()<<"Соединение с сервером разорвано.";
 }
 
@@ -181,34 +175,57 @@ void ClientWidget::slotReadyRead()
 
 	DATATYPE type;
 	in>>type;
+	qDebug()<<"новое событие ";
 
 	switch (type) {
 	 case DATATYPE::CONNECT:
 	 {
-		 qDebug()<<"Received client's list";
+		 qDebug()<<"Receiving client's list";
 		 //получение списка пользователей от сервера
-		 in>>clients;
 
-		 //нужно удалить полученного клиента из недоступных в сети
-		 for(auto iter=clients.begin(), end=clients.end(); iter!=end; ++iter)
+		 int serverBaseSize;
+		 in>>serverBaseSize;
+		 //если база у сервера не совпадает с нашим,
+		 //получаем актуальную базу
+		 if(serverBaseSize!=clients.size())
 			{
-			 const QString &key=iter.key();
-
-			 if(key!=usernick)
-				ponlineList->addItem(key);
-
-			for(int i=0; i<pofflineList->count();++i)
-				if(key==pofflineList->item(i)->text())
-				 {
-					auto take=pofflineList->takeItem(i);
-					delete take;
-				 }
+			 qDebug()<<"короче тут у нас база не сошлась, поэтому ждем новый";
+			in>>clients;
 			}
+
+		 //нужно получить количество доступных
+		 int count=0;
+		 in>>count;
+
+		 for(int i=0; i<count; ++i)
+			{
+			 QString nick;
+			 in>>nick;
+			 onlines.push_back(nick);
+			}
+
+		 //кидаем полученный список онлайнов в список доступных
+		 for(auto i : onlines)
+			 if(i!=usernick)
+				ponlineList->addItem(i);
+
+
+		 //очищаем список недоступных
+		 //и начинаем заного добавлять туда
+		 //только не имеющихся в полученном списке-онлайн
+			 pofflineList->clear();
+			 for(auto iter=clients.begin(),
+					 end=clients.end(); iter!=end; ++iter)
+				if(usernick!=iter.key()
+					 && !onlines.contains(iter.key()))
+				 pofflineList->addItem(iter.key());
+
 		 break;
 	 }
 	 case DATATYPE::MESSAGE:
 	 {
 		 //новое сообщение
+		 qDebug()<<"новое  сообщение";
 		 in>>time>>msg;
 		 msg=time.toString("[hh:mm:ss] ")+"Новое сообщение: "+msg;
 		 pinfo->append(msg);
@@ -216,6 +233,10 @@ void ClientWidget::slotReadyRead()
 	 }
 	 default:
 		//что-то пошло не так, клиент не может получить иную команду
+		 qDebug()<<"что-то пошло не так я полагаю";
+		 qDebug()<<"но что?!?!";
+		 qDebug()<<"но это уже не моя забота";
+
 		qCritical()<<"Неизвестная ошибка при получении сообщения.";
 	 }
 

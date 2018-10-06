@@ -54,6 +54,8 @@ MyWidget::MyWidget(QWidget *parent)
  setCentralWidget(new QWidget(this));
  centralWidget()->setLayout(pvlay);
  resize(800, 480);
+
+ binder.insert(new QTcpSocket, "nick1");
 }
 
 MyWidget::~MyWidget()
@@ -248,10 +250,11 @@ void MyWidget::slotReadClient()
 		 if(res!=clientbase.end())
 			answer="false";
 
-		 clientbase.insert(nick, new ClientInfo(fullname,
-																						pclient->localAddress().toString()
-																						,pclient->localAddress().toString()
-																						,true));
+		 clientbase.insert(nick,
+											 new ClientInfo(fullname,
+																			pclient->localAddress().toString()
+																			,pclient->localAddress().toString()
+																			,true));
 		 binder.insert(pclient, nick);
 
 		 sendToClient(pclient, answer);
@@ -268,7 +271,10 @@ void MyWidget::slotReadClient()
 	 case DATATYPE::CONNECT:
 	 {
 		 QString nick;
-		 in>>nick;
+		 int clientBaseSize;
+		 in>>nick>>clientBaseSize;
+		 qDebug()<<"подсоединен клиент, с ником и размером"<<nick<<" "<<clientBaseSize;
+
 		 auto client=clientbase.find(nick);
 		 if(client!=clientbase.end())
 			{
@@ -276,16 +282,36 @@ void MyWidget::slotReadClient()
 			 binder.insert(pclient, nick);
 			}
 
-		 //send to client clientbase
+
+		 //send to client clientsbase
 		 QByteArray arrBlock;
 		 QDataStream out(&arrBlock, QIODevice::WriteOnly);
-		 out<<quint16(0)<<static_cast<int>(DATATYPE::CONNECT)
-			 <<clientbase;
+		 out<<quint16(0)<<static_cast<int>(DATATYPE::CONNECT);
+		 qDebug()<<"Ща отправлю клиенту базу";
+
+		 out<<clientbase.size();
+		 if(clientBaseSize!=clientbase.size())
+			{
+			out<<clientbase;
+			qDebug()<<"размеры не сошлись, отправка всей базы";
+			}
+
+		 //тут скинем колво доступных
+		 //и клиент уже будет знать сколько принимать
+		 qDebug()<<"размер binder: "<<binder.size();
+		 out<<binder.size();
+
+		 for(auto nick:binder)
+			{
+//			 находим в базе инфу для текущего ника и отправляем
+			 out<<nick;
+//			 in<<nick;
+//			 in<<*clientbase.find(nick);
+			}
 		 out.device()->seek(0);
 		 out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
 		 pclient->write(arrBlock);
 
-		 qDebug()<<"Отправка клиенту базы";
 		 break;
 	 }
 	 case DATATYPE::MESSAGE:

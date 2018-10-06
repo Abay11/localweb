@@ -56,6 +56,7 @@ private:
  QString usernick;
  QString username;
  QMap<QString, ClientInfo*> clients;
+ QVector<QString> onlines;
 
 public:
  ClientWidget(MyLogger *logger,

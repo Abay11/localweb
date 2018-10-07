@@ -222,6 +222,26 @@ void ClientWidget::slotReadyRead()
 
 		 break;
 	 }
+	 case DATATYPE::DISCONNECTION:
+		{
+		 QString disconnected;
+		 in>>disconnected;
+		 qDebug()<<disconnected<<" отсоединился";
+		 onlines.removeOne(disconnected);
+
+//		 ponlineList->findItems(disconnected, Qt::MatchExactly).first();
+		 for(auto i=0, s=ponlineList->count();
+				 i<s; ++i)
+			{
+			 if(ponlineList->item(i)->text()==disconnected)
+				delete ponlineList->takeItem(i);
+			}
+
+		 pofflineList->addItem(disconnected);
+		 pofflineList->sortItems();
+
+		 break;
+		}
 	 case DATATYPE::MESSAGE:
 	 {
 		 //новое сообщение

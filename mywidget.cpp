@@ -203,7 +203,20 @@ void MyWidget::slotDisconnection()
  QTcpSocket* pclient
 	 =static_cast<QTcpSocket*>(sender());
 
+ QString disconnected=*binder.find(pclient);
  binder.remove(pclient);
+ for(auto iter=binder.begin(), end=binder.end();
+		 iter!=end;
+		 ++iter)
+	{
+	 QByteArray byteArray;
+	 QDataStream out(&byteArray, QIODevice::WriteOnly);
+	 out<<quint16(0)<<static_cast<int>(DATATYPE::DISCONNECTION)
+		 <<disconnected;
+	 out.device()->seek(0);
+	 out<<quint16(static_cast<size_t>(byteArray.size())-sizeof(quint16));
+	 iter.key()->write(byteArray);
+	}
 
  pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
 							 +"Клиент отсоединился.");

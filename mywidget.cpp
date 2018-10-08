@@ -54,8 +54,6 @@ MyWidget::MyWidget(QWidget *parent)
  setCentralWidget(new QWidget(this));
  centralWidget()->setLayout(pvlay);
  resize(800, 480);
-
- binder.insert(new QTcpSocket, "nick1");
 }
 
 MyWidget::~MyWidget()
@@ -211,6 +209,7 @@ void MyWidget::slotDisconnection()
 	{
 	 QByteArray byteArray;
 	 QDataStream out(&byteArray, QIODevice::WriteOnly);
+	 out.setVersion(QDataStream::Qt_5_11);
 	 out<<quint16(0)<<static_cast<int>(DATATYPE::DISCONNECTION)
 		 <<disconnected;
 	 out.device()->seek(0);
@@ -299,6 +298,21 @@ void MyWidget::slotReadClient()
 		 if(client!=clientbase.end())
 			{
 			 client.value()->status()=true; //set to client "online"
+			 //рассылка онлайн-пользователям о новом подключении
+			 for(auto iter=binder.begin(), end=binder.end();
+					 iter!=end;
+					 ++iter)
+				{
+				 QByteArray byteArray;
+				 QDataStream out(&byteArray, QIODevice::WriteOnly);
+				 out.setVersion(QDataStream::Qt_5_11);
+				 out<<quint16(0)<<static_cast<int>(DATATYPE::NOTIFYING)
+					 <<nick;
+				 out.device()->seek(0);
+				 out<<quint16(static_cast<size_t>(byteArray.size())-sizeof(quint16));
+				 iter.key()->write(byteArray);
+				}
+
 			 binder.insert(pclient, nick);
 			}
 
@@ -341,6 +355,9 @@ void MyWidget::slotReadClient()
 		 pInfo->append(str);
 		 break;
 	 }
+	 default:
+		qCritical()<<"Ошибка при получении типа сообщения";
+		break;
 	 }
 
 	m_nextBlockSize=0;

@@ -224,6 +224,7 @@ void ClientWidget::slotReadyRead()
 	 }
 	 case DATATYPE::DISCONNECTION:
 		{
+		 qDebug()<<"кто-то отсоединился";
 		 QString disconnected;
 		 in>>disconnected;
 		 qDebug()<<disconnected<<" отсоединился";
@@ -234,12 +235,36 @@ void ClientWidget::slotReadyRead()
 				 i<s; ++i)
 			{
 			 if(ponlineList->item(i)->text()==disconnected)
-				delete ponlineList->takeItem(i);
+				{
+				 delete ponlineList->takeItem(i);
+				 break;
+				}
 			}
 
 		 pofflineList->addItem(disconnected);
 		 pofflineList->sortItems();
 
+		 break;
+		}
+	 case DATATYPE::NOTIFYING:
+		{
+		 qDebug()<<"есть новый подсоединившийся";
+		 QString connected;
+		 in>>connected;
+		 //убираем из недоступных подсоединившегося
+		 for(auto i=0;
+				 i<pofflineList->count(); ++i)
+			{
+			 if(pofflineList->item(i)->text()==connected)
+				{
+				delete pofflineList->takeItem(i);
+				 break;
+				}
+			}
+
+		 //и добавляем к доступным
+		 ponlineList->addItem(connected);
+		 ponlineList->sortItems();
 		 break;
 		}
 	 case DATATYPE::MESSAGE:

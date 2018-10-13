@@ -3,6 +3,7 @@
 
 #include "../mylogger.h"
 #include "../clientinfo.h"
+#include "../popup.h"
 
 #include <QWidget>
 #include <QLineEdit>
@@ -57,6 +58,8 @@ private:
  QString username;
  QMap<QString, ClientInfo*> clients;
  QVector<QString> onlines;
+
+ PopUp *popup;
 
 public:
  ClientWidget(MyLogger *logger,

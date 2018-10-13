@@ -23,6 +23,7 @@ ClientWidget::ClientWidget(MyLogger *logger,
  ,pofflineList(new QListWidget(this))
  ,pserverSocket(new QTcpSocket)
  ,plogger(logger)
+ ,popup(new PopUp(this))
 {
 // foreach (const QHostAddress &address, QNetworkInterface::allAddresses())
 //	{
@@ -31,6 +32,7 @@ ClientWidget::ClientWidget(MyLogger *logger,
 //	}
 
  readBase();
+
 
  pleAddress->setText(pleAddress->text());
  pmsgField->setPlaceholderText("Введите сообщение...");
@@ -73,8 +75,6 @@ ClientWidget::ClientWidget(MyLogger *logger,
  connect(pserverSocket, SIGNAL(readyRead())
 				 ,SLOT(slotReadyRead()));
 
-// QHBoxLayout *ptemplayout2=new QHBoxLayout;
-// ptemplayout2->addWidget(psplitter);
  setLayout(pvlay);
  resize(640, 480);
 }
@@ -265,6 +265,7 @@ void ClientWidget::slotReadyRead()
 		 //и добавляем к доступным
 		 ponlineList->addItem(connected);
 		 ponlineList->sortItems();
+
 		 break;
 		}
 	 case DATATYPE::MESSAGE:

@@ -4,4 +4,7 @@
         <file>hide.png</file>
         <file>connect.png</file>
     </qresource>
+    <qresource prefix="/Sounds">
+        <file>definite.mp3</file>
+    </qresource>
 </RCC>

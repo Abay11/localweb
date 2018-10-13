@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets network
+QT       += core gui widgets network multimedia
 
 TARGET = LocalwebClient
 TEMPLATE = app
@@ -29,14 +29,16 @@ SOURCES += \
     ../mylogger.cpp \
     ../clientinfo.cpp \
     registration.cpp \
-    stackedwindows.cpp
+    stackedwindows.cpp \
+    ../popup.cpp
 
 HEADERS += \
         clientwidget.h\
     ../mylogger.h \
     ../clientinfo.h \
     registration.h \
-    stackedwindows.h
+    stackedwindows.h \
+    ../popup.h
 
 
 # Default rules for deployment.

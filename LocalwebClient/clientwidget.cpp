@@ -57,9 +57,6 @@ ClientWidget::ClientWidget(MyLogger *logger,
  ptemplayout1->addWidget(pcmdClear);
  pvlay->addLayout(ptemplayout1);
 
-// psplitter->widget(1)->setLayout(pvlay);
-
-
  connect(pmsgField, SIGNAL(textChanged()), SLOT(slotMsgChanged()));
  connect(pcmdConnect, SIGNAL(clicked()),
 				 SLOT(slotConnectToServer()));
@@ -140,13 +137,13 @@ void ClientWidget::slotDisconnectFromServer()
 
  ponlineList->clear();
  pofflineList->clear();
- ponlineList->addItem(QString("Вы: %1").arg(usernick));
+ ponlineList->addItem(new QListWidgetItem(QIcon(":Icons/online.png"), QString("Вы: %1").arg(usernick)));
 
 //перекидываем доступных пользователей к недоступным после отсоединения
  for(auto it=clients.begin(), end=clients.end();
 		 it!=end; ++it)
 	if(it.key()!=usernick)
-	 pofflineList->addItem(it.key());
+	 pofflineList->addItem(new QListWidgetItem(QIcon(":Icons/offline.png"), it.key()));
 
  onlines.clear();
 
@@ -207,7 +204,7 @@ void ClientWidget::slotReadyRead()
 		 //кидаем полученный список онлайнов в список доступных
 		 for(auto i : onlines)
 			 if(i!=usernick)
-				ponlineList->addItem(i);
+				ponlineList->addItem(new QListWidgetItem(QIcon(":/Icons/online.png"),i));
 
 
 		 //очищаем список недоступных
@@ -218,7 +215,7 @@ void ClientWidget::slotReadyRead()
 					 end=clients.end(); iter!=end; ++iter)
 				if(usernick!=iter.key()
 					 && !onlines.contains(iter.key()))
-				 pofflineList->addItem(iter.key());
+				 pofflineList->addItem(new QListWidgetItem(QIcon(":/Icons/offline.png"), iter.key()));
 
 		 break;
 	 }
@@ -241,8 +238,12 @@ void ClientWidget::slotReadyRead()
 				}
 			}
 
-		 pofflineList->addItem(disconnected);
+		 pofflineList->addItem(new QListWidgetItem(QIcon(":/Icons/offline.png"),disconnected));
 		 pofflineList->sortItems();
+
+		 QString msg=disconnected;
+		 msg+=" вышел";
+		 popup->showNotify(std::move(msg), mapToGlobal(pos()));
 
 		 break;
 		}
@@ -263,8 +264,12 @@ void ClientWidget::slotReadyRead()
 			}
 
 		 //и добавляем к доступным
-		 ponlineList->addItem(connected);
+		 ponlineList->addItem(new QListWidgetItem(QIcon(":/Icons/online.png"), connected));
 		 ponlineList->sortItems();
+
+		 QString msg=connected;
+		 msg+=" доступен";
+		 popup->showNotify(std::move(msg), mapToGlobal(pos()));
 
 		 break;
 		}
@@ -360,11 +365,11 @@ void ClientWidget::readBase()
 	 file.close();
 
 //	 if(!usernick.isEmpty())
-		ponlineList->addItem(QString("Вы: %1").arg(usernick));
+		ponlineList->addItem(new QListWidgetItem(QIcon(":/Icons/online.png"), QString("Вы: %1").arg(usernick)));
 
 	 for(auto iter=clients.begin(), end=clients.end(); iter!=end; ++iter)
 		if(usernick!=iter.key())
-			pofflineList->addItem(iter.key());
+			pofflineList->addItem(new QListWidgetItem(QIcon(":/Icons/offline.png"), iter.key()));
 	}
  else
 	qCritical()<<"Error restoring clients base";

@@ -3,6 +3,8 @@
         <file>disconnect.ico</file>
         <file>hide.png</file>
         <file>connect.png</file>
+        <file>online.png</file>
+        <file>offline.png</file>
     </qresource>
     <qresource prefix="/Sounds">
         <file>definite.mp3</file>

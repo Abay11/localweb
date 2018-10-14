@@ -57,7 +57,9 @@ public:
  MyWidget(QWidget* parent=nullptr);
  ~MyWidget();
 
- void sendToClient(QTcpSocket*, const QString&);
+ void sendToClient(QTcpSocket*,
+									 const QString&,
+									 const QTime &curTime=QTime::currentTime());
  void updateClientBase(ClientInfo&);
  void addNewUser(ClientInfo&);
  void removeUser(QString);

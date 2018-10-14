@@ -62,14 +62,18 @@ MyWidget::~MyWidget()
  saveBase();
 }
 
-void MyWidget::sendToClient(QTcpSocket* psocket,
-									const QString& msg)
+void MyWidget::sendToClient(
+	QTcpSocket* psocket,
+	const QString& msg,
+	const QTime &curTime)
 {
  QByteArray byteArr;
  QDataStream out(&byteArr, QIODevice::WriteOnly);
  out.setVersion(QDataStream::Qt_5_11);
 
- out<<quint16(0)<<QTime::currentTime()<<msg;
+ out<<quint16(0)
+	 <<static_cast<int>(DATATYPE::MESSAGE)
+	 <<curTime<<msg;
  out.device()->seek(0);
  out<<quint16(static_cast<size_t>(byteArr.size())-sizeof (quint16));
 
@@ -203,22 +207,24 @@ void MyWidget::slotDisconnection()
 
  QString disconnected=*binder.find(pclient);
  binder.remove(pclient);
+
+ QByteArray byteArray;
+ QDataStream out(&byteArray, QIODevice::WriteOnly);
+ out.setVersion(QDataStream::Qt_5_11);
+ out<<quint16(0)<<static_cast<int>(DATATYPE::DISCONNECTION)
+	 <<disconnected;
+ out.device()->seek(0);
+ out<<quint16(static_cast<size_t>(byteArray.size())-sizeof(quint16));
+
  for(auto iter=binder.begin(), end=binder.end();
 		 iter!=end;
 		 ++iter)
 	{
-	 QByteArray byteArray;
-	 QDataStream out(&byteArray, QIODevice::WriteOnly);
-	 out.setVersion(QDataStream::Qt_5_11);
-	 out<<quint16(0)<<static_cast<int>(DATATYPE::DISCONNECTION)
-		 <<disconnected;
-	 out.device()->seek(0);
-	 out<<quint16(static_cast<size_t>(byteArray.size())-sizeof(quint16));
 	 iter.key()->write(byteArray);
 	}
 
  pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
-							 +"Клиент отсоединился.");
+							 +disconnected+" отсоединился.");
  pclient->deleteLater();
 }
 
@@ -292,7 +298,6 @@ void MyWidget::slotReadClient()
 		 QString nick;
 		 int clientBaseSize;
 		 in>>nick>>clientBaseSize;
-		 qDebug()<<"подсоединен клиент, с ником и размером"<<nick<<" "<<clientBaseSize;
 
 		 auto client=clientbase.find(nick);
 		 if(client!=clientbase.end())
@@ -313,6 +318,8 @@ void MyWidget::slotReadClient()
 				 iter.key()->write(byteArray);
 				}
 
+			 pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
+							 +nick+" присоединился.");
 			 binder.insert(pclient, nick);
 			}
 
@@ -351,8 +358,12 @@ void MyWidget::slotReadClient()
 	 case DATATYPE::MESSAGE:
 	 {
 		 in>>time>>str;
-		 str=time.toString("[hh:mm:ss] ")+"Сообщение от пользователя: "+str;
-		 pInfo->append(str);
+
+		 for(auto iter=binder.begin(), end=binder.end();
+				 iter!=end; ++iter)
+			 if(iter.key()!=pclient)
+				 sendToClient(iter.key(), str, time);
+
 		 break;
 	 }
 	 default:

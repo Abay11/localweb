@@ -104,8 +104,6 @@ void ClientWidget::slotConnected()
  out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
 
  pserverSocket->write(arrBlock);
- pinfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
-							 +"Отправлен запрос на получение списка клиентов.");
  qInfo()<<"Отправлен запрос на получение списка";
 
 }
@@ -278,8 +276,11 @@ void ClientWidget::slotReadyRead()
 		 //новое сообщение
 		 qDebug()<<"новое  сообщение";
 		 in>>time>>msg;
-		 msg=time.toString("[hh:mm:ss] ")+"Новое сообщение: "+msg;
+		 msg.prepend(time.toString("[hh:mm:ss] "));
+//		 msg=time.toString("[hh:mm:ss] ")+"Новое сообщение: "+msg;
 		 pinfo->append(msg);
+
+		 popup->showNotify("***Новое сообщение***", mapToGlobal(pos()));
 		 break;
 	 }
 	 default:
@@ -334,8 +335,18 @@ void ClientWidget::slotSendToServer()
 
  out<<quint16(0)<<static_cast<int>(DATATYPE::MESSAGE)<<QTime::currentTime();
 
- out<<pmsgField->toPlainText();
- pinfo->append(QDateTime::currentDateTime().toString("[hh:MM:ss] Вы: ")
+ //когда общая рассылка, другой клиент не сможет узнать,
+ //кто прислал мсг, т.к. получит от сервера, поэтому отправителю
+ //нужно приписать, что это он.
+ //Если это будет Р2Р, возможно это будет не обяз. Нужно еще раз обдумать...
+ //а пока так.
+ QString msg=pmsgField->toPlainText();
+ msg.prepend(usernick+": ");
+
+ out<<msg;
+
+ //вывод у себя
+ pinfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] Вы: ")
 							 + pmsgField->toPlainText());
  pmsgField->clear();
 

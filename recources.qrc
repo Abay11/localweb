@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/Res">
+        <file>Icons/connect.png</file>
+        <file>Icons/start.png</file>
+        <file>Icons/show.png</file>
+        <file>Icons/on.png</file>
+        <file>Icons/off.png</file>
+        <file>Icons/hide.png</file>
+        <file>Icons/exit.png</file>
+    </qresource>
+</RCC>

@@ -1,14 +1,14 @@
 #include "mywidget.h"
 
-MyWidget::MyWidget(QWidget *parent)
+MyWidget::MyWidget(QApplication *pa,QWidget *parent)
  :QMainWindow(parent)
  ,plblAddress(new QLabel("IP адрес:"))
  ,plblPort(new QLabel("Номер порта:"))
  ,pleAddress(new QLineEdit)
  ,plePort(new QLineEdit("7165"))
  ,pInfo(new QTextEdit)
- ,pcmdOn(new QPushButton("Пуск"))
- ,pcmdOff(new QPushButton("Стоп"))
+ ,pcmdOn(new QPushButton("Запуск"))
+ ,pcmdOff(new QPushButton("Остановка"))
  ,phlay(new QHBoxLayout)
  ,pvlay(new QVBoxLayout)
  ,pvalidator(new QIntValidator(1000, 65535, plePort))
@@ -17,6 +17,8 @@ MyWidget::MyWidget(QWidget *parent)
  ,pserver(new QTcpServer(this))
  ,logger(new MyLogger)
  ,m_nextBlockSize(0)
+ ,ptray(new QSystemTrayIcon)
+ ,papp(pa)
 {
  plePort->setValidator(pvalidator);
 
@@ -45,11 +47,15 @@ MyWidget::MyWidget(QWidget *parent)
  pvlay->addWidget(pInfo);
 
  connect(pcmdOn, SIGNAL(clicked()), SLOT(slotStartServer()));
+ connect(pcmdOn, SIGNAL(clicked()), SLOT(slotOnOff()));
  connect(pcmdOff, SIGNAL(clicked()), SLOT(slotStopServer()));
+ connect(pcmdOff, SIGNAL(clicked()), SLOT(slotOnOff()));
 
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, pdock);
  readBase();
  pdock->setWidget(plist);
+
+ setMenuAndIcons();
 
  setCentralWidget(new QWidget(this));
  centralWidget()->setLayout(pvlay);
@@ -143,8 +149,51 @@ void MyWidget::readBase()
 	qCritical()<<"Error restoring clients base";
 }
 
+void MyWidget::setMenuAndIcons()
+{
+ setAttribute(Qt::WA_QuitOnClose, false);
+
+ QMenu *pmenu=new QMenu(this);
+ pmenu->setTitle("Меню");
+
+ paonOff=new QAction(QIcon(":/Res/Icons/on.png"), "Запуск");
+ connect(paonOff, SIGNAL(triggered()), SLOT(slotOnOff()));
+ QAction *pashow=new QAction(QIcon(":/Res/Icons/show.png"), "Показать");
+ connect(pashow, SIGNAL(triggered()), SLOT(show()));
+ QAction *pahide=new QAction(QIcon(":/Res/Icons/hide.png"), "Скрыть");
+ connect(pahide, SIGNAL(triggered()), SLOT(hide()));
+ QAction *paexit=new QAction(QIcon(":/Res/Icons/exit.png"),"Выйти");
+ connect(paexit, SIGNAL(triggered()), papp, SLOT(quit()));
+
+ QMenuBar *pmenuBar=new QMenuBar(this);
+ pmenu->addAction(paonOff);
+ pmenu->addAction(pashow);
+ pmenu->addAction(pahide);
+ pmenu->addAction(paexit);
+ pmenuBar->addMenu(pmenu);
+
+ QIcon *picon=new QIcon(":/Res/Icons/connect.png");
+ ptray->show();
+ ptray->setContextMenu(pmenu);
+
+ QToolBar *ptoolbar=new QToolBar("Title");
+ ptoolbar->addAction(paonOff);
+ ptoolbar->addAction(pashow);
+ ptoolbar->addAction(pahide);
+ ptoolbar->addAction(paexit);
+
+ ptray->setIcon(*picon);
+ setMenuBar(pmenuBar);
+ setWindowIcon(*picon);
+ addToolBar(ptoolbar);
+}
+
 void MyWidget::slotStartServer()
 {
+
+ if(pserver->isListening())
+	return;
+
  QString nPort=plePort->text();
  int pos=0;
  if(pvalidator->validate(nPort, pos)!=QValidator::Acceptable)
@@ -157,11 +206,6 @@ void MyWidget::slotStartServer()
 	 return;
 	}
 
- pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
-							 +"Сервер запущен.");
-
- pcmdOff->setEnabled(true);
- pcmdOn->setEnabled(false);
 
  if(!pserver->listen(QHostAddress::Any,
 								 static_cast<quint16>(plePort->text().toInt())))
@@ -171,11 +215,17 @@ void MyWidget::slotStartServer()
 	 return;
 	}
 
+ pcmdOff->setEnabled(true);
+ pcmdOn->setEnabled(false);
  plePort->setEnabled(false);
 
+ pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+							 +"Сервер запущен.");
 
  connect(pserver, SIGNAL(newConnection()),
 				 SLOT(slotNewConnection()));
+
+ ptray->showMessage("Новое событие", "Сервер запущен", QSystemTrayIcon::Information, 3000);
 
  qInfo()<<QString("Сервер запущен. IP адрес: %1. Порт: %2")
 					 .arg(m_address).arg(pserver->serverPort());
@@ -183,13 +233,19 @@ void MyWidget::slotStartServer()
 
 void MyWidget::slotStopServer()
 {
- pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
-							 +"Сервер остановлен.");
+ if(!pserver->isListening())
+	return;
+
  pcmdOn->setEnabled(true);
  pcmdOff->setEnabled(false);
 
  plePort->setEnabled(true);
  pserver->close();
+
+ pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+							 +"Сервер остановлен.");
+
+ ptray->showMessage("Новое событие", "Сервер остановлен", QSystemTrayIcon::Information, 3000);
  qInfo()<<"Сервер остановлен.";
 }
 
@@ -373,4 +429,22 @@ void MyWidget::slotReadClient()
 
 	m_nextBlockSize=0;
  }
+}
+
+void MyWidget::slotOnOff()
+{
+ if(paonOff->text()=="Запуск")
+	{
+	 paonOff->setText("Остановка");
+	 paonOff->setIcon(QIcon(":/Res/Icons/off.png"));
+	 if(!pserver->isListening())
+		slotStartServer();
+	}
+ else
+	{
+	 paonOff->setText("Запуск");
+	 paonOff->setIcon(QIcon(":/Res/Icons/on.png"));
+	 if(pserver->isListening())
+		slotStopServer();
+	}
 }

@@ -16,6 +16,11 @@
 #include <QDateTime>
 #include <QIntValidator>
 #include <QDockWidget>
+#include <QSystemTrayIcon>
+#include <QMenu>
+#include <QMenuBar>
+#include <QToolBar>
+#include <QApplication>
 
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -47,14 +52,20 @@ private:
  QString m_address;
  quint16 m_nextBlockSize;
 
+
  QMap<QString, ClientInfo*> clientbase;
 
  //for clients identification by socket
  //also it can serve as a list of online clients
  QMap<QTcpSocket*, QString> binder;
 
+ QSystemTrayIcon *ptray;
+ QAction *paonOff;
+
+ QApplication *papp;
+
 public:
- MyWidget(QWidget* parent=nullptr);
+ MyWidget(QApplication *papp, QWidget* parent=nullptr);
  ~MyWidget();
 
  void sendToClient(QTcpSocket*,
@@ -66,12 +77,16 @@ public:
  void saveBase();
  void readBase();
 
+ void setMenuAndIcons();
+
 private slots:
  void slotStartServer();
  void slotStopServer();
  void slotNewConnection();
  void slotDisconnection();
  void slotReadClient();
+
+ void slotOnOff();
 };
 
 #endif // MYWIDGET_H

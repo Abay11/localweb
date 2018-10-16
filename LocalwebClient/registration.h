@@ -33,16 +33,12 @@ private:
  QFormLayout *pflay;
 
  MyLogger *plogger;
- QDockWidget *pmonline;
- QDockWidget *pmoffline;
 
  QTcpSocket *psocket;
 
  bool mstatus;
 public:
  Registration(MyLogger *logger,
-							QDockWidget *ponline,
-							QDockWidget *poffline,
 							QWidget *parent=nullptr);
 
  QPushButton* cmdExit();

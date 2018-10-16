@@ -5,7 +5,7 @@
 #include "../clientinfo.h"
 #include "../popup.h"
 
-#include <QWidget>
+#include <QMainWindow>
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QPushButton>
@@ -18,13 +18,17 @@
 #include <QListWidgetItem>
 #include <QListWidget>
 #include <QDockWidget>
+#include <QAction>
+#include <QToolBar>
+#include <QMenu>
+#include <QMenuBar>
 
 #include <QTcpSocket>
 #include <QNetworkInterface>
 #include <QMessageBox>
 
 
-class ClientWidget : public QWidget
+class ClientWidget : public QMainWindow
 {
  Q_OBJECT
 
@@ -58,17 +62,19 @@ private:
  QString username;
  QMap<QString, ClientInfo*> clients;
  QVector<QString> onlines;
+ QDockWidget *ponline;
+ QDockWidget *poffline;
 
  PopUp *popup;
 
 public:
  ClientWidget(MyLogger *logger,
-							QDockWidget *&ponline,
-							QDockWidget *&poffline,
 							QWidget *parent = nullptr);
  ~ClientWidget();
  void readBase();
  void saveBase();
+
+ void setUI();
 
 signals:
 

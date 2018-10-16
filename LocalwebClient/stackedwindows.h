@@ -25,11 +25,6 @@ private:
  ClientWidget* pwidget;
  Registration* preg;
 
- QAction *pactConnect;
- QAction *pactDisconnect;
- QAction *pactHide;
- QDockWidget *ponline;
- QDockWidget *poffline;
 public:
  StackedWindows(QWidget *parent=nullptr);
 };

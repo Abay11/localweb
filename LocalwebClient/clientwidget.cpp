@@ -1,10 +1,8 @@
 #include "clientwidget.h"
 
 ClientWidget::ClientWidget(MyLogger *logger,
-													 QDockWidget *&ponline,
-													 QDockWidget *&poffline,
 													 QWidget *parent)
- : QWidget(parent)
+ : QMainWindow (parent)
  ,mnNextBlockSize(0)
  ,plblAddress(new QLabel("IP адрес сервера"))
  ,pleAddress(new QLineEdit("127.0.0.1"))
@@ -23,6 +21,8 @@ ClientWidget::ClientWidget(MyLogger *logger,
  ,pofflineList(new QListWidget(this))
  ,pserverSocket(new QTcpSocket)
  ,plogger(logger)
+ ,ponline(new QDockWidget("Доступные", this))
+ ,poffline(new QDockWidget("Недоступные", this))
  ,popup(new PopUp(this))
 {
 // foreach (const QHostAddress &address, QNetworkInterface::allAddresses())
@@ -72,8 +72,14 @@ ClientWidget::ClientWidget(MyLogger *logger,
  connect(pserverSocket, SIGNAL(readyRead())
 				 ,SLOT(slotReadyRead()));
 
- setLayout(pvlay);
- resize(640, 480);
+	addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, ponline);
+	addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, poffline);
+
+	QWidget *pcentral=new QWidget(this);
+	pcentral->setLayout(pvlay);
+	setCentralWidget(pcentral);
+	setUI();
+	resize(640, 480);
 }
 
 void ClientWidget::slotConnectToServer()
@@ -406,4 +412,47 @@ void ClientWidget::saveBase()
 	}
  else
 	qCritical()<<"Error saving clients base";
+}
+
+void ClientWidget::setUI()
+{
+ QAction *paconnect=new QAction("Подключиться", this);
+ paconnect->setIcon(QIcon(":/Icons/connect.png"));
+ connect(paconnect, SIGNAL(triggered()),
+				 SLOT(slotConnectToServer()));
+
+ QAction *padisconnect=new QAction("Отключиться", this);
+ padisconnect->setIcon(QIcon(":/Icons/disconnect.ico"));
+ connect(padisconnect, SIGNAL(triggered()),
+				 SLOT(slotDisconnectFromServer()));
+
+ QToolBar *toolbar=new QToolBar(this);
+ toolbar->addAction(paconnect);
+ toolbar->addAction(padisconnect);
+
+
+ QMenu *pfileMenu=new QMenu("Меню", this);
+ pfileMenu->addAction(paconnect);
+ pfileMenu->addAction(padisconnect);
+
+ QAction *pahide=new QAction("Скрыть", this);
+ pahide->setIcon(QIcon(":/Icons/hide.png"));
+ connect(pahide, SIGNAL(triggered()), SLOT(hide()));
+
+ pfileMenu->addAction(pahide);
+ pfileMenu->addAction("Выход", this, SLOT(close()));
+
+ QMenu *psettingMenu=new QMenu("Настройки", this);
+ psettingMenu->addAction("Настроить адреса");
+ psettingMenu->addAction("Изменить информацию");
+
+ QMenuBar *pmenuBar=new QMenuBar(this);
+ pmenuBar->addMenu(pfileMenu);
+ pmenuBar->addMenu(psettingMenu);
+ pmenuBar->addMenu(new QMenu("Помощь", this));
+ pmenuBar->addMenu(new QMenu("О приложении", this));
+
+
+ addToolBar(toolbar);
+ setMenuBar(pmenuBar);
 }

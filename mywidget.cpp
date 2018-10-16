@@ -165,11 +165,12 @@ void MyWidget::setMenuAndIcons()
  QAction *paexit=new QAction(QIcon(":/Res/Icons/exit.png"),"Выйти");
  connect(paexit, SIGNAL(triggered()), papp, SLOT(quit()));
 
- QMenuBar *pmenuBar=new QMenuBar(this);
  pmenu->addAction(paonOff);
  pmenu->addAction(pashow);
  pmenu->addAction(pahide);
  pmenu->addAction(paexit);
+
+ QMenuBar *pmenuBar=new QMenuBar(this);
  pmenuBar->addMenu(pmenu);
 
  QIcon *picon=new QIcon(":/Res/Icons/connect.png");

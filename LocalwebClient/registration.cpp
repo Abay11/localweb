@@ -3,8 +3,6 @@
 #include <QSizePolicy>
 
 Registration::Registration(MyLogger *logger,
-													 QDockWidget *ponline,
-													 QDockWidget *poffline,
 													 QWidget *parent)
  :QWidget (parent)
  ,pleNick(new QLineEdit)
@@ -14,8 +12,6 @@ Registration::Registration(MyLogger *logger,
  ,phlay(new QHBoxLayout)
  ,pflay(new QFormLayout)
  ,plogger(logger)
- ,pmonline(ponline)
- ,pmoffline(poffline)
  ,psocket(new QTcpSocket)
 {
  pcmdRegister->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -115,8 +111,6 @@ void Registration::slotRegister()
 	 fileout<<pleNick->text()<<pleName->text();
 	 file.close();
 	 emit(registered(0));
-	 pmonline->setVisible(true);
-	 pmoffline->setVisible(true);
 
 	 psocket->close();
 

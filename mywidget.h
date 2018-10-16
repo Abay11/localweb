@@ -62,10 +62,8 @@ private:
  QSystemTrayIcon *ptray;
  QAction *paonOff;
 
- QApplication *papp;
-
 public:
- MyWidget(QApplication *papp, QWidget* parent=nullptr);
+ MyWidget(QWidget* parent=nullptr);
  ~MyWidget();
 
  void sendToClient(QTcpSocket*,
@@ -87,6 +85,7 @@ private slots:
  void slotReadClient();
 
  void slotOnOff();
+ void slotQuit();
 };
 
 #endif // MYWIDGET_H

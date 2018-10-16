@@ -1,6 +1,6 @@
 #include "mywidget.h"
 
-MyWidget::MyWidget(QApplication *pa,QWidget *parent)
+MyWidget::MyWidget(QWidget *parent)
  :QMainWindow(parent)
  ,plblAddress(new QLabel("IP адрес:"))
  ,plblPort(new QLabel("Номер порта:"))
@@ -18,7 +18,6 @@ MyWidget::MyWidget(QApplication *pa,QWidget *parent)
  ,logger(new MyLogger)
  ,m_nextBlockSize(0)
  ,ptray(new QSystemTrayIcon)
- ,papp(pa)
 {
  plePort->setValidator(pvalidator);
 
@@ -163,7 +162,7 @@ void MyWidget::setMenuAndIcons()
  QAction *pahide=new QAction(QIcon(":/Res/Icons/hide.png"), "Скрыть");
  connect(pahide, SIGNAL(triggered()), SLOT(hide()));
  QAction *paexit=new QAction(QIcon(":/Res/Icons/exit.png"),"Выйти");
- connect(paexit, SIGNAL(triggered()), papp, SLOT(quit()));
+ connect(paexit, SIGNAL(triggered()), SLOT(slotQuit()));
 
  pmenu->addAction(paonOff);
  pmenu->addAction(pashow);
@@ -448,4 +447,9 @@ void MyWidget::slotOnOff()
 	 if(pserver->isListening())
 		slotStopServer();
 	}
+}
+
+void MyWidget::slotQuit()
+{
+ QApplication::quit();
 }

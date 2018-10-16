@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/Res">
+        <file>Icons/show.png</file>
+        <file>Icons/online.png</file>
+        <file>Icons/offline.png</file>
+        <file>Icons/hide.png</file>
+        <file>Icons/disconnect.png</file>
+        <file>Icons/connect.png</file>
+        <file>Icons/client.png</file>
+        <file>Sounds/definite.mp3</file>
+        <file>Icons/exit.png</file>
+    </qresource>
+</RCC>

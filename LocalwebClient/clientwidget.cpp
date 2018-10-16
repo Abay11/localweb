@@ -141,13 +141,13 @@ void ClientWidget::slotDisconnectFromServer()
 
  ponlineList->clear();
  pofflineList->clear();
- ponlineList->addItem(new QListWidgetItem(QIcon(":Icons/online.png"), QString("Вы: %1").arg(usernick)));
+ ponlineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/online.png"), QString("Вы: %1").arg(usernick)));
 
 //перекидываем доступных пользователей к недоступным после отсоединения
  for(auto it=clients.begin(), end=clients.end();
 		 it!=end; ++it)
 	if(it.key()!=usernick)
-	 pofflineList->addItem(new QListWidgetItem(QIcon(":Icons/offline.png"), it.key()));
+	 pofflineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/offline.png"), it.key()));
 
  onlines.clear();
 
@@ -208,7 +208,7 @@ void ClientWidget::slotReadyRead()
 		 //кидаем полученный список онлайнов в список доступных
 		 for(auto i : onlines)
 			 if(i!=usernick)
-				ponlineList->addItem(new QListWidgetItem(QIcon(":/Icons/online.png"),i));
+				ponlineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/online.png"),i));
 
 
 		 //очищаем список недоступных
@@ -219,7 +219,7 @@ void ClientWidget::slotReadyRead()
 					 end=clients.end(); iter!=end; ++iter)
 				if(usernick!=iter.key()
 					 && !onlines.contains(iter.key()))
-				 pofflineList->addItem(new QListWidgetItem(QIcon(":/Icons/offline.png"), iter.key()));
+				 pofflineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/offline.png"), iter.key()));
 
 		 break;
 	 }
@@ -242,12 +242,17 @@ void ClientWidget::slotReadyRead()
 				}
 			}
 
-		 pofflineList->addItem(new QListWidgetItem(QIcon(":/Icons/offline.png"),disconnected));
+		 pofflineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/offline.png"),disconnected));
 		 pofflineList->sortItems();
 
 		 QString msg=disconnected;
 		 msg+=" вышел";
-		 popup->showNotify(std::move(msg), mapToGlobal(pos()));
+
+		 if(parentWidget()->parentWidget()->isMinimized()
+				|| parentWidget()->parentWidget()->isHidden())
+			ptray->showMessage("Новое событие", msg, QSystemTrayIcon::Information, 3000);
+		 else
+			popup->showNotify(std::move(msg), mapToGlobal(pos()));
 
 		 break;
 		}
@@ -268,12 +273,18 @@ void ClientWidget::slotReadyRead()
 			}
 
 		 //и добавляем к доступным
-		 ponlineList->addItem(new QListWidgetItem(QIcon(":/Icons/online.png"), connected));
+		 ponlineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/online.png"), connected));
 		 ponlineList->sortItems();
 
 		 QString msg=connected;
 		 msg+=" доступен";
-		 popup->showNotify(std::move(msg), mapToGlobal(pos()));
+
+		 if(parentWidget()->parentWidget()->isMinimized()
+				|| parentWidget()->parentWidget()->isHidden())
+			ptray->showMessage("Новое событие", msg, QSystemTrayIcon::Information, 3000);
+		 else
+			popup->showNotify(std::move(msg), mapToGlobal(pos()));
+
 
 		 break;
 		}
@@ -286,7 +297,12 @@ void ClientWidget::slotReadyRead()
 //		 msg=time.toString("[hh:mm:ss] ")+"Новое сообщение: "+msg;
 		 pinfo->append(msg);
 
-		 popup->showNotify("***Новое сообщение***", mapToGlobal(pos()));
+		 if(parentWidget()->parentWidget()->isMinimized()
+				|| parentWidget()->parentWidget()->isHidden())
+			ptray->showMessage("Новое событие", "Новое сообщение", QSystemTrayIcon::Information, 3000);
+		 else
+			popup->showNotify("***Новое сообщение***", mapToGlobal(pos()));
+
 		 break;
 	 }
 	 default:
@@ -382,11 +398,11 @@ void ClientWidget::readBase()
 	 file.close();
 
 //	 if(!usernick.isEmpty())
-		ponlineList->addItem(new QListWidgetItem(QIcon(":/Icons/online.png"), QString("Вы: %1").arg(usernick)));
+		ponlineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/online.png"), QString("Вы: %1").arg(usernick)));
 
 	 for(auto iter=clients.begin(), end=clients.end(); iter!=end; ++iter)
 		if(usernick!=iter.key())
-			pofflineList->addItem(new QListWidgetItem(QIcon(":/Icons/offline.png"), iter.key()));
+			pofflineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/offline.png"), iter.key()));
 	}
  else
 	qCritical()<<"Error restoring clients base";
@@ -416,31 +432,47 @@ void ClientWidget::saveBase()
 
 void ClientWidget::setUI()
 {
+ QApplication::setQuitOnLastWindowClosed(false);
+ QApplication::setWindowIcon(QIcon(":/Res/Icons/client.png"));
+
  QAction *paconnect=new QAction("Подключиться", this);
- paconnect->setIcon(QIcon(":/Icons/connect.png"));
+ paconnect->setIcon(QIcon(":/Res/Icons/connect.png"));
  connect(paconnect, SIGNAL(triggered()),
 				 SLOT(slotConnectToServer()));
 
  QAction *padisconnect=new QAction("Отключиться", this);
- padisconnect->setIcon(QIcon(":/Icons/disconnect.ico"));
+ padisconnect->setIcon(QIcon(":/Res/Icons/disconnect.png"));
  connect(padisconnect, SIGNAL(triggered()),
 				 SLOT(slotDisconnectFromServer()));
+
+ QAction *pashow=new QAction("Показать", this);
+ pashow->setIcon(QIcon(":/Res/Icons/show.png"));
+ connect(pashow, SIGNAL(triggered()),
+				parentWidget(), SLOT(show()));
+
+ QAction *pahide=new QAction("Скрыть", this);
+ pahide->setIcon(QIcon(":/Res/Icons/hide.png"));
+ connect(pahide, SIGNAL(triggered()),
+				parentWidget(), SLOT(hide()));
+
+ QAction *paexit=new QAction("Выход", this);
+ paexit->setIcon(QIcon(":/Res/Icons/exit.png"));
+ connect(paexit, SIGNAL(triggered()), SLOT(quit()));
 
  QToolBar *toolbar=new QToolBar(this);
  toolbar->addAction(paconnect);
  toolbar->addAction(padisconnect);
+ toolbar->addAction(pashow);
+ toolbar->addAction(pahide);
+ toolbar->addAction(paexit);
 
 
  QMenu *pfileMenu=new QMenu("Меню", this);
  pfileMenu->addAction(paconnect);
  pfileMenu->addAction(padisconnect);
-
- QAction *pahide=new QAction("Скрыть", this);
- pahide->setIcon(QIcon(":/Icons/hide.png"));
- connect(pahide, SIGNAL(triggered()), SLOT(hide()));
-
+ pfileMenu->addAction(pashow);
  pfileMenu->addAction(pahide);
- pfileMenu->addAction("Выход", this, SLOT(close()));
+ pfileMenu->addAction(paexit);
 
  QMenu *psettingMenu=new QMenu("Настройки", this);
  psettingMenu->addAction("Настроить адреса");
@@ -452,7 +484,16 @@ void ClientWidget::setUI()
  pmenuBar->addMenu(new QMenu("Помощь", this));
  pmenuBar->addMenu(new QMenu("О приложении", this));
 
+ ptray=new QSystemTrayIcon(this);
+ ptray->setIcon(QIcon(":/Res/Icons/client.png"));
+ ptray->setContextMenu(pfileMenu);
+ ptray->show();
 
  addToolBar(toolbar);
  setMenuBar(pmenuBar);
+}
+
+void ClientWidget::quit()
+{
+ QApplication::quit();
 }

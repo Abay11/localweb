@@ -5,6 +5,7 @@
 #include "../clientinfo.h"
 #include "../popup.h"
 
+#include <QApplication>
 #include <QMainWindow>
 #include <QLineEdit>
 #include <QTextEdit>
@@ -22,6 +23,7 @@
 #include <QToolBar>
 #include <QMenu>
 #include <QMenuBar>
+#include <QSystemTrayIcon>
 
 #include <QTcpSocket>
 #include <QNetworkInterface>
@@ -33,6 +35,7 @@ class ClientWidget : public QMainWindow
  Q_OBJECT
 
 private:
+
  QString maddress;
  QString mserverAddress;
  QString mserverPort;
@@ -67,6 +70,10 @@ private:
 
  PopUp *popup;
 
+ QApplication *papp;
+
+ QSystemTrayIcon *ptray;
+
 public:
  ClientWidget(MyLogger *logger,
 							QWidget *parent = nullptr);
@@ -77,6 +84,9 @@ public:
  void setUI();
 
 signals:
+
+private slots:
+ void quit();
 
 public slots:
  void slotConnectToServer();

@@ -68,16 +68,17 @@ MyWidget::~MyWidget()
 }
 
 void MyWidget::sendToClient(
-	QTcpSocket* psocket,
-	const QString& msg,
-	const QTime &curTime)
+	QTcpSocket* psocket
+	,const QString& msg
+	,DATATYPE type
+	,const QTime &curTime)
 {
  QByteArray byteArr;
  QDataStream out(&byteArr, QIODevice::WriteOnly);
  out.setVersion(QDataStream::Qt_5_11);
 
  out<<quint16(0)
-	 <<static_cast<int>(DATATYPE::MESSAGE)
+	 <<static_cast<int>(type)
 	 <<curTime<<msg;
  out.device()->seek(0);
  out<<quint16(static_cast<size_t>(byteArr.size())-sizeof (quint16));
@@ -338,7 +339,7 @@ void MyWidget::slotReadClient()
 			}
 
 
-		 sendToClient(pclient, answer);
+		 sendToClient(pclient, answer, DATATYPE::REGISTRATION);
 		 break;
 	 }
 	 case DATATYPE::DELETION:
@@ -418,7 +419,7 @@ void MyWidget::slotReadClient()
 		 for(auto iter=binder.begin(), end=binder.end();
 				 iter!=end; ++iter)
 			 if(iter.key()!=pclient)
-				 sendToClient(iter.key(), str, time);
+				 sendToClient(iter.key(), str, DATATYPE::MESSAGE, time);
 
 		 break;
 	 }

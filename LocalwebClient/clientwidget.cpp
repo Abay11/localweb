@@ -125,10 +125,13 @@ void ClientWidget::slotClearMsg()
  pinfo->clear();
 }
 
-void ClientWidget::slotReloadBase()
+void ClientWidget::slotSwitchBetweenWidgets()
 {
  qDebug()<<"reloadBase called";
+ //reload base
  readBase();
+ QApplication::setQuitOnLastWindowClosed(false);
+ ptray->show();
 }
 
 void ClientWidget::slotDisconnectFromServer()
@@ -492,6 +495,14 @@ void ClientWidget::setUI()
  addToolBar(toolbar);
  setMenuBar(pmenuBar);
 }
+
+void ClientWidget::hideSystemtray(bool value)
+{
+ value?
+ ptray->hide()
+	: ptray->show();
+}
+
 
 void ClientWidget::quit()
 {

@@ -12,10 +12,6 @@ StackedWindows::StackedWindows(QWidget *parent)
  if(QFile::exists("data.bin"))
 	{
 	 pstackWidgets->setCurrentIndex(0);
-
-	 //если мы вернулись из второй ветки, удаляем лишнее окно
-	 if(preg)
-		delete preg;
 	}
  else
 	{
@@ -23,11 +19,12 @@ StackedWindows::StackedWindows(QWidget *parent)
 	 pstackWidgets->addWidget(preg);
 	 pstackWidgets->setCurrentIndex(1);
 	 connect(preg, SIGNAL(registered(int)),
-				 this,
+				 pstackWidgets,
 				 SLOT(setCurrentIndex(int)));
-	 connect(preg->cmdExit(), SIGNAL(clicked()), SLOT(close()));
-	 connect(this, SIGNAL(currentChanged(int)),
-					 pwidget, SLOT(slotReloadBase())); //необходимо чтобы заново вычитать базу
+	 connect(pstackWidgets, SIGNAL(currentChanged(int)),
+					 pwidget, SLOT(slotSwitchBetweenWidgets())); //необходимо чтобы заново вычитать базу
+
+	 pwidget->hideSystemtray(true);
 	}
 
  setCentralWidget(pstackWidgets);

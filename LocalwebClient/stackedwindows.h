@@ -23,7 +23,7 @@ private:
 
  MyLogger *plogger;
  ClientWidget* pwidget;
- Registration* preg=nullptr;
+ Registration* preg;
 
 public:
  StackedWindows(QWidget *parent=nullptr);

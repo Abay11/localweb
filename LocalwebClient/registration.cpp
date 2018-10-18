@@ -9,31 +9,33 @@ Registration::Registration(MyLogger *logger,
  ,pleName(new QLineEdit)
  ,pcmdRegister(new QPushButton("Ок"))
  ,pcmdExit(new QPushButton("Выход"))
+ ,pcmdSettings(new QPushButton("Настройки подключения"))
+ ,pcmdHelp(new QPushButton("Помощь"))
  ,phlay(new QHBoxLayout)
  ,pflay(new QFormLayout)
  ,plogger(logger)
  ,psocket(new QTcpSocket)
 {
- pcmdRegister->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
- pcmdExit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+ pcmdSettings->setToolTip("Задать настройки");
 
-
- pflay->addRow(new QLabel("Псевдоним"), pleNick);
- pflay->addRow(new QLabel("Имя"), pleName);
  phlay->addWidget(pcmdRegister);
+ phlay->addWidget(pcmdSettings);
  phlay->addWidget(pcmdExit);
+ phlay->addWidget(pcmdHelp);
+ phlay->setAlignment(Qt::AlignRight);
+
+ pflay->addRow(new QLabel("Введите псевдоним"), pleNick);
+ pflay->addRow(new QLabel("Введите Ваше имя"), pleName);
  pflay->addRow(phlay);
- pflay->setAlignment(Qt::AlignVCenter);
 
  setLayout(pflay);
  setWindowTitle("Регистрация");
 
  connect(pcmdRegister, SIGNAL(clicked()), SLOT(slotRegister()));
-}
+ connect(pcmdExit, SIGNAL(clicked()), SLOT(slotExit()));
+ connect(pcmdSettings, SIGNAL(clicked()), SLOT(slotSettings()));
 
-QPushButton *Registration::cmdExit()
-{
- return pcmdExit;
+ QApplication::setQuitOnLastWindowClosed(true);
 }
 
 void Registration::slotRegister()
@@ -87,9 +89,13 @@ void Registration::slotRegister()
 		 continue;
 		 }
 
+		DATATYPE type;
 		QString res;
 		QTime time;
-		stream>>time>>res;
+		stream>>type>>time>>res;
+
+		if(type!=DATATYPE::REGISTRATION)
+		 qCritical()<<"Ожидалась регистрация, вышло что-то другое";
 
 		qInfo()<<time.toString("[hh:mm:ss] ")
 					<<"Registration attempt. Result: "<<res;
@@ -123,6 +129,8 @@ void Registration::slotRegister()
 	 psocket->close();
 	 slotError(psocket->error());
 	}
+
+ deleteLater();
 }
 
 void Registration::slotError(QAbstractSocket::SocketError nerr)
@@ -149,4 +157,15 @@ void Registration::slotError(QAbstractSocket::SocketError nerr)
 
  QMessageBox::critical(this, "Ошибка соединения к серверу", info);
  qCritical()<<"Ошибка соединения с сервером: "<<psocket->errorString();
+}
+
+void Registration::slotExit()
+{
+ QApplication::quit();
+}
+
+void Registration::slotSettings()
+{
+ SettingsDialog sd;
+ sd.show();
 }

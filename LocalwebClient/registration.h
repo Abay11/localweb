@@ -12,12 +12,13 @@
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QLayoutItem>
-#include <QDockWidget>
+#include <QApplication>
 
 #include <QTcpSocket>
 #include <QTime>
 
 #include "../clientinfo.h"
+#include "../settingsdialog.h"
 
 class MyLogger;
 
@@ -26,7 +27,7 @@ class Registration:public QWidget
  Q_OBJECT
 private:
  QLineEdit *pleNick, *pleName;
- QPushButton *pcmdRegister, *pcmdExit;
+ QPushButton *pcmdRegister, *pcmdExit, *pcmdSettings, *pcmdHelp;
  QHBoxLayout *phlay;
  QVBoxLayout *pvlay;
  QGridLayout *pglay;
@@ -41,10 +42,12 @@ public:
  Registration(MyLogger *logger,
 							QWidget *parent=nullptr);
 
- QPushButton* cmdExit();
 public slots:
  void slotRegister();
  void slotError(QAbstractSocket::SocketError);
+ void slotExit();
+ void slotSettings();
+
 signals:
  void registered(int index);
 

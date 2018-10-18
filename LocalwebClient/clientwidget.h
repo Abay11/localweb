@@ -82,6 +82,7 @@ public:
  void saveBase();
 
  void setUI();
+ void hideSystemtray(bool);
 
 signals:
 
@@ -97,7 +98,7 @@ public slots:
  void slotConnected();
  void slotMsgChanged();
  void slotClearMsg();
- void slotReloadBase();
+ void slotSwitchBetweenWidgets();
 };
 
 #endif // CLIENTWIDGET_H

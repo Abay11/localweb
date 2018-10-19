@@ -9,6 +9,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QDebug>
+#include <QIntValidator>
 
 class SettingsWidget : public QDialog
 {

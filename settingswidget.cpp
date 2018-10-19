@@ -9,6 +9,13 @@ SettingsWidget::SettingsWidget(QWidget *prnt)
  ,pflay(new QFormLayout)
 {
 
+ //установка формата и проверка ввода
+ pleAddress->setInputMask("000.000.000.000");
+ pleAddress->setValidator(
+		new QRegExpValidator(QRegExp("")));
+ plePort->setInputMask("00000");
+ plePort->setValidator(new QIntValidator(1000, 65535));
+
  QHBoxLayout *phlay=new QHBoxLayout;
  phlay->addWidget(pcmdOk);
  phlay->addWidget(pcmdCancel);
@@ -36,21 +43,23 @@ void SettingsWidget::setCurrentAddress(QString addr, QString port )
  mcurrentAddress=addr;
  mcurrentPort=port;
 
+ pleAddress->setText(mcurrentAddress);
+ plePort->setText(mcurrentPort);
+
  pflay->addRow(new QLabel(
-								QString("Текущий адрес и порт: %1:%2")
-								.arg(mcurrentAddress)
-								.arg(mcurrentPort)));
+                   QString("Текущий адрес и порт: %1:%2")
+                   .arg(mcurrentAddress)
+                   .arg(mcurrentPort)));
 }
 
 void SettingsWidget::slotOK()
 {
- qDebug()<<"OOOOKKKKKK";
  emit addressChanged(pleAddress->text(), plePort->text());
  done(QDialog::Accepted);
+
 }
 
 void SettingsWidget::slotCancel()
 {
  done(QDialog::Rejected);
- qDebug()<<"CANCEEEEEEEEEEEL";
 }

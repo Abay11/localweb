@@ -134,6 +134,12 @@ void ClientWidget::slotSwitchBetweenWidgets()
  ptray->show();
 }
 
+void ClientWidget::slotSetAddress(QString addr, QString port)
+{
+ pleAddress->setText(addr);
+ plePort->setText(port);
+}
+
 void ClientWidget::slotDisconnectFromServer()
 {
  pserverSocket->close();

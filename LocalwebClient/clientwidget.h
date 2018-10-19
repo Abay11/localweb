@@ -99,6 +99,8 @@ public slots:
  void slotMsgChanged();
  void slotClearMsg();
  void slotSwitchBetweenWidgets();
+
+ void slotSetAddress(QString addr, QString port);
 };
 
 #endif // CLIENTWIDGET_H

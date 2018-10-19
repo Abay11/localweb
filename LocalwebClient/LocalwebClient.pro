@@ -30,7 +30,8 @@ SOURCES += \
     ../clientinfo.cpp \
     registration.cpp \
     stackedwindows.cpp \
-    ../popup.cpp
+    ../popup.cpp \
+    ../settingswidget.cpp
 
 HEADERS += \
         clientwidget.h\
@@ -38,7 +39,8 @@ HEADERS += \
     ../clientinfo.h \
     registration.h \
     stackedwindows.h \
-    ../popup.h
+    ../popup.h \
+    ../settingswidget.h
 
 
 # Default rules for deployment.

@@ -18,7 +18,7 @@
 #include <QTime>
 
 #include "../clientinfo.h"
-#include "../settingsdialog.h"
+#include "../settingswidget.h"
 
 class MyLogger;
 
@@ -37,7 +37,8 @@ private:
 
  QTcpSocket *psocket;
 
- bool mstatus;
+ QString maddress="127.0.0.1";
+ QString mport="7165";
 public:
  Registration(MyLogger *logger,
 							QWidget *parent=nullptr);
@@ -47,9 +48,11 @@ public slots:
  void slotError(QAbstractSocket::SocketError);
  void slotExit();
  void slotSettings();
+ void slotAddressChanged(QString, QString);
 
 signals:
  void registered(int index);
+// void addressChanged(QString address, QString port);
 
 };
 

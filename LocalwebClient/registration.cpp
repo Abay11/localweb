@@ -27,7 +27,6 @@ Registration::Registration(MyLogger *logger,
  pflay->addRow(new QLabel("Введите псевдоним"), pleNick);
  pflay->addRow(new QLabel("Введите Ваше имя"), pleName);
  pflay->addRow(phlay);
-
  setLayout(pflay);
  setWindowTitle("Регистрация");
 
@@ -55,7 +54,9 @@ void Registration::slotRegister()
 	}
 
  psocket=new QTcpSocket;
- psocket->connectToHost("localhost", 7165);
+ psocket->connectToHost(maddress,
+												static_cast<quint16>(mport.toInt()));
+
  if(psocket->waitForConnected())
 	{
 	 QByteArray arrBlock;
@@ -123,14 +124,14 @@ void Registration::slotRegister()
 	 QMessageBox::information(this, "Регистрация прошла успешно",
 														"Вы успешно зарегистрировались в сети. "
 														"Теперь можете подключиться к серверу");
+
+	 deleteLater();
 	}
  else
 	{
 	 psocket->close();
 	 slotError(psocket->error());
 	}
-
- deleteLater();
 }
 
 void Registration::slotError(QAbstractSocket::SocketError nerr)
@@ -166,6 +167,18 @@ void Registration::slotExit()
 
 void Registration::slotSettings()
 {
- SettingsDialog sd;
- sd.show();
+ SettingsWidget *sd=new SettingsWidget;
+ sd->setCurrentAddress(maddress, mport);
+ sd->show();
+ connect(sd, SIGNAL(addressChanged(QString, QString)),
+				 SLOT(slotAddressChanged(QString, QString)));
+}
+
+void Registration::slotAddressChanged(QString addr, QString port)
+{
+ qDebug()<<"SIGNAL ABOUT ADDRESS CHANGING RECEIVED";
+ maddress=addr;
+ mport=port;
+
+
 }

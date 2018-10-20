@@ -4,10 +4,12 @@ ClientWidget::ClientWidget(MyLogger *logger,
 													 QWidget *parent)
  : QMainWindow (parent)
  ,mnNextBlockSize(0)
+ ,pserverAddress(new QString)
+ ,pserverPort(new QString)
  ,plblAddress(new QLabel("IP адрес сервера"))
- ,pleAddress(new QLineEdit("127.0.0.1"))
+ ,pleAddress(new QLineEdit)
  ,plblPort(new QLabel("Номер порта сервера"))
- ,plePort(new QLineEdit("7165"))
+ ,plePort(new QLineEdit)
  ,pcmdConnect(new QPushButton("Подключиться"))
  ,pcmdDisconnect(new QPushButton("Отсоединиться"))
  ,pcmdSend(new QPushButton("Отправить"))
@@ -34,7 +36,7 @@ ClientWidget::ClientWidget(MyLogger *logger,
  readBase();
 
 
- pleAddress->setText(pleAddress->text());
+// pleAddress->setText(pleAddress->text());
  pmsgField->setPlaceholderText("Введите сообщение...");
  pcmdDisconnect->setEnabled(false);
  pcmdSend->setEnabled(false);
@@ -71,6 +73,9 @@ ClientWidget::ClientWidget(MyLogger *logger,
 				 ,SLOT(slotError(QAbstractSocket::SocketError)));
  connect(pserverSocket, SIGNAL(readyRead())
 				 ,SLOT(slotReadyRead()));
+
+ connect(pleAddress, SIGNAL(textChanged(QString)), SLOT(slotAddressChanged(QString)));
+ connect(plePort, SIGNAL(textChanged(QString)), SLOT(slotPortChanged(QString)));
 
 	addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, ponline);
 	addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, poffline);
@@ -132,12 +137,24 @@ void ClientWidget::slotSwitchBetweenWidgets()
  readBase();
  QApplication::setQuitOnLastWindowClosed(false);
  ptray->show();
+
+}
+
+void ClientWidget::slotAddressChanged(QString newAddress)
+{
+ *pserverAddress=newAddress;
+}
+
+void ClientWidget::slotPortChanged(QString newPort)
+{
+ *pserverPort=newPort;
 }
 
 void ClientWidget::slotSetAddress(QString addr, QString port)
 {
  pleAddress->setText(addr);
  plePort->setText(port);
+ qDebug()<<"receive address info: "<<*pserverAddress<<" "<<*pserverPort;
 }
 
 void ClientWidget::slotDisconnectFromServer()
@@ -401,33 +418,53 @@ void ClientWidget::readBase()
 	 QDataStream in(&file);
 	 //at first read current user info
 	 in>>usernick>>username;
-	 qDebug()<<"usernick: "<<usernick;
+
+	 //then read server address and port
+	 //and update only if they not null (after registration they may be null)
+	 QString addr, port;
+	 in>>addr>>port;
+	 if(addr!="")
+		{
+		 *pserverAddress=addr;
+		pleAddress->setText(*pserverAddress);
+		}
+	 if(port!="")
+		{
+		 *pserverPort=port;
+		 plePort->setText(port);
+		}
+
 	 //then other clients
 	 in>>clients;
 	 file.close();
 
-//	 if(!usernick.isEmpty())
 		ponlineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/online.png"), QString("Вы: %1").arg(usernick)));
 
 	 for(auto iter=clients.begin(), end=clients.end(); iter!=end; ++iter)
 		if(usernick!=iter.key())
 			pofflineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/offline.png"), iter.key()));
 	}
- else
-	qCritical()<<"Error restoring clients base";
+ //сразу после регистрации не создается файл сохранения
+ //поэтому, чтобы лишний раз не выбрасывать ошибку
+ //сперва проверяется существует ли вообще сохранения
+ //и только если оно существует, и не удалось ее прочитать
+ //кидать ошибку
+ else if(QFile::exists(file.fileName()))
+	qWarning()<<"Error restoring clients base";
 }
 
 void ClientWidget::saveBase()
 {
- if(usernick.isEmpty())
-	return;
-
  QFile file("data.bin");
  if(file.open(QFile::WriteOnly))
 	{
 	 QDataStream out(&file);
 	 //at first save current user info
 	 out<<usernick<<username;
+
+	 //then save server address and port
+	 out<<*pserverAddress<<*pserverPort;
+	 qDebug()<<"saving address info: "<<*pserverAddress<<" "<<*pserverPort;
 
 	 //then if clientbase is not empty save it too
 	 if(!clients.isEmpty())

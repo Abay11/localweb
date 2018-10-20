@@ -2,10 +2,11 @@
 
 MyWidget::MyWidget(QWidget *parent)
  :QMainWindow(parent)
+ ,pport(new QString("6175"))
  ,plblAddress(new QLabel("IP адрес:"))
  ,plblPort(new QLabel("Номер порта:"))
  ,pleAddress(new QLineEdit)
- ,plePort(new QLineEdit("7165"))
+ ,plePort(new QLineEdit(*pport))
  ,pInfo(new QTextEdit)
  ,pcmdOn(new QPushButton("Запуск"))
  ,pcmdOff(new QPushButton("Остановка"))
@@ -16,7 +17,7 @@ MyWidget::MyWidget(QWidget *parent)
  ,plist(new QListWidget())
  ,pserver(new QTcpServer(this))
  ,logger(new MyLogger)
- ,m_nextBlockSize(0)
+ ,mnextBlockSize(0)
  ,ptray(new QSystemTrayIcon)
 {
  plePort->setValidator(pvalidator);
@@ -30,11 +31,14 @@ MyWidget::MyWidget(QWidget *parent)
  foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
 	 if (address.protocol() == QAbstractSocket::IPv4Protocol
 			 && address != QHostAddress(QHostAddress::LocalHost))
-		m_address=address.toString();
+		maddress=address.toString();
 	}
 
- pleAddress->setText(m_address);
+ pleAddress->setInputMask("000.000.000.000");
+ pleAddress->setText(maddress);
  pleAddress->setReadOnly(true);
+ plePort->setInputMask("00000");
+
  phlay->addWidget(plblAddress);
  phlay->addWidget(pleAddress);
  phlay->addWidget(plblPort);
@@ -49,6 +53,8 @@ MyWidget::MyWidget(QWidget *parent)
  connect(pcmdOn, SIGNAL(clicked()), SLOT(slotOnOff()));
  connect(pcmdOff, SIGNAL(clicked()), SLOT(slotStopServer()));
  connect(pcmdOff, SIGNAL(clicked()), SLOT(slotOnOff()));
+
+ connect(plePort, SIGNAL(textChanged(QString)), SLOT(slotPortChanged(QString)));
 
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, pdock);
  readBase();
@@ -117,14 +123,12 @@ void MyWidget::removeUser(QString nickname)
 void MyWidget::saveBase()
 {
 qDebug()<<"File saving";
- if(clientbase.isEmpty())
-	return;
 
  QFile file("clientbase.bin");
  if(file.open(QFile::WriteOnly))
 	{
 	 QDataStream out(&file);
-	 out<<clientbase;
+	 out<<*pport<<clientbase;
 	 file.close();
 	}
  else
@@ -137,6 +141,17 @@ void MyWidget::readBase()
  if(file.open(QFile::ReadOnly))
 	{
 	 QDataStream in(&file);
+
+	 //read port value
+	 QString port;
+	 in>>port;
+	 qDebug()<<port;
+	 if(port!="")
+		{
+		*pport=port;
+		 plePort->setText(port);
+		}
+
 	 in>>clientbase;
 
 	 for(auto iter=clientbase.begin(), end=clientbase.end();
@@ -145,7 +160,7 @@ void MyWidget::readBase()
 
 	 file.close();
 	}
- else
+ else if(QFile::exists(file.fileName()))
 	qCritical()<<"Error restoring clients base";
 }
 
@@ -229,7 +244,7 @@ void MyWidget::slotStartServer()
  ptray->showMessage("Новое событие", "Сервер запущен", QSystemTrayIcon::Information, 3000);
 
  qInfo()<<QString("Сервер запущен. IP адрес: %1. Порт: %2")
-					 .arg(m_address).arg(pserver->serverPort());
+					 .arg(maddress).arg(pserver->serverPort());
 }
 
 void MyWidget::slotStopServer()
@@ -293,16 +308,16 @@ void MyWidget::slotReadClient()
 
  forever
  {
-	if(!m_nextBlockSize)
+	if(!mnextBlockSize)
 	 {
 		if(pclient->bytesAvailable()<static_cast<qint64>(sizeof(quint16)))
 		 break;
 
-		in>>m_nextBlockSize;
+		in>>mnextBlockSize;
 	 }
 
 
-	if(pclient->bytesAvailable()<m_nextBlockSize)
+	if(pclient->bytesAvailable()<mnextBlockSize)
 	 break;
 
 	QString str;
@@ -428,7 +443,7 @@ void MyWidget::slotReadClient()
 		break;
 	 }
 
-	m_nextBlockSize=0;
+	mnextBlockSize=0;
  }
 }
 
@@ -453,4 +468,9 @@ void MyWidget::slotOnOff()
 void MyWidget::slotQuit()
 {
  QApplication::quit();
+}
+
+void MyWidget::slotPortChanged(QString newPort)
+{
+ *pport=newPort;
 }

@@ -36,10 +36,11 @@ class ClientWidget : public QMainWindow
 
 private:
 
- QString maddress;
- QString mserverAddress;
- QString mserverPort;
  quint16 mnNextBlockSize;
+
+ QString maddress;
+ QString *pserverAddress;
+ QString *pserverPort;
 
  QLabel *plblAddress;
  QLineEdit *pleAddress;
@@ -99,6 +100,9 @@ public slots:
  void slotMsgChanged();
  void slotClearMsg();
  void slotSwitchBetweenWidgets();
+
+ void slotAddressChanged(QString);
+ void slotPortChanged(QString);
 
  void slotSetAddress(QString addr, QString port);
 };

@@ -32,6 +32,8 @@ class MyWidget : public QMainWindow
 {
  Q_OBJECT
 private:
+ QString *pport;
+
  QLabel* plblAddress;
  QLabel* plblPort;
  QLineEdit* pleAddress;
@@ -49,8 +51,8 @@ private:
 
  MyLogger* logger;
 
- QString m_address;
- quint16 m_nextBlockSize;
+ QString maddress;
+ quint16 mnextBlockSize;
 
 
  QMap<QString, ClientInfo*> clientbase;
@@ -87,6 +89,8 @@ private slots:
 
  void slotOnOff();
  void slotQuit();
+
+ void slotPortChanged(QString);
 };
 
 #endif // MYWIDGET_H

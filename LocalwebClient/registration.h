@@ -52,8 +52,7 @@ public slots:
 
 signals:
  void registered(int index);
-// void addressChanged(QString address, QString port);
-
+ void addressChanged(QString address, QString port);
 };
 
 #endif // REGISTRATION_H

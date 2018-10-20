@@ -24,8 +24,8 @@ StackedWindows::StackedWindows(QWidget *parent)
 	 connect(pstackWidgets, SIGNAL(currentChanged(int)),
 					 pwidget, SLOT(slotSwitchBetweenWidgets())); //необходимо чтобы заново вычитать базу
 
-//	 connect(preg, SIGNAL(addressChanged(QString, QString)),
-//					 pwidget, SLOT(slotSetAddress(QString, QString)));
+	 connect(preg, SIGNAL(addressChanged(QString, QString)),
+					 pwidget, SLOT(slotSetAddress(QString, QString)));
 
 	 pwidget->hideSystemtray(true);
 	}

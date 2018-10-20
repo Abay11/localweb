@@ -176,9 +176,7 @@ void Registration::slotSettings()
 
 void Registration::slotAddressChanged(QString addr, QString port)
 {
- qDebug()<<"SIGNAL ABOUT ADDRESS CHANGING RECEIVED";
  maddress=addr;
  mport=port;
-
-
+ emit addressChanged(addr, port);
 }

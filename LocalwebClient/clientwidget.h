@@ -75,6 +75,7 @@ private:
 
  QSystemTrayIcon *ptray;
 
+
 public:
  ClientWidget(MyLogger *logger,
 							QWidget *parent = nullptr);
@@ -85,9 +86,8 @@ public:
  void setUI();
  void hideSystemtray(bool);
 
-signals:
-
 private slots:
+ void slotSetListContextMenu(const QPoint &pos);
  void quit();
 
 public slots:
@@ -105,6 +105,8 @@ public slots:
  void slotPortChanged(QString);
 
  void slotSetAddress(QString addr, QString port);
+
+ void slotOpenConversion();
 };
 
 #endif // CLIENTWIDGET_H

@@ -59,6 +59,10 @@ ClientWidget::ClientWidget(MyLogger *logger,
  ptemplayout1->addWidget(pcmdClear);
  pvlay->addLayout(ptemplayout1);
 
+ ponlineList->setContextMenuPolicy(Qt::CustomContextMenu);
+ connect(ponlineList, SIGNAL(customContextMenuRequested(const QPoint &)),
+				 SLOT(slotSetListContextMenu(const QPoint &)));
+
  connect(pmsgField, SIGNAL(textChanged()), SLOT(slotMsgChanged()));
  connect(pcmdConnect, SIGNAL(clicked()),
 				 SLOT(slotConnectToServer()));
@@ -155,6 +159,11 @@ void ClientWidget::slotSetAddress(QString addr, QString port)
  pleAddress->setText(addr);
  plePort->setText(port);
  qDebug()<<"receive address info: "<<*pserverAddress<<" "<<*pserverPort;
+}
+
+void ClientWidget::slotOpenConversion()
+{
+
 }
 
 void ClientWidget::slotDisconnectFromServer()
@@ -544,6 +553,18 @@ void ClientWidget::hideSystemtray(bool value)
  value?
  ptray->hide()
 	: ptray->show();
+}
+
+void ClientWidget::slotSetListContextMenu(const QPoint &pos)
+{
+ QPoint gpos=ponlineList->mapToGlobal(pos);
+
+ QMenu menu;
+ menu.addAction("Открыть переписку");
+ menu.addAction("Аудиозвонок");
+ menu.addAction("Видеозвонок");
+ menu.addAction("Показать информацию");
+ menu.exec(gpos);
 }
 
 

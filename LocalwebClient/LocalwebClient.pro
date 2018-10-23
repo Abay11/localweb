@@ -28,19 +28,19 @@ SOURCES += \
         clientwidget.cpp \
     ../mylogger.cpp \
     ../clientinfo.cpp \
-    registration.cpp \
-    stackedwindows.cpp \
     ../popup.cpp \
-    ../settingswidget.cpp
+    ../settingswidget.cpp \
+    mainwindow.cpp \
+    registrationwidget.cpp
 
 HEADERS += \
-        clientwidget.h\
     ../mylogger.h \
     ../clientinfo.h \
-    registration.h \
-    stackedwindows.h \
     ../popup.h \
-    ../settingswidget.h
+    ../settingswidget.h \
+    mainwindow.h \
+    registrationwidget.h \
+    clientwidget.h
 
 
 # Default rules for deployment.

@@ -1,4 +1,4 @@
-#include "registration.h"
+#include "registrationwidget.h"
 
 #include <QSizePolicy>
 

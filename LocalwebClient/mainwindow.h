@@ -13,20 +13,20 @@
 #include <QDockWidget>
 
 #include "clientwidget.h"
-#include "registration.h"
+#include "registrationwidget.h"
 #include "../mylogger.h"
 
-class StackedWindows:public QMainWindow
+class MainWindow:public QMainWindow
 {
 private:
- QStackedWidget *pstackWidgets;
+ QStackedWidget *pwidgetsStack;
 
  MyLogger *plogger;
- ClientWidget* pwidget;
+ ClientWidget* pclientWidget;
  Registration* preg;
 
 public:
- StackedWindows(QWidget *parent=nullptr);
+ MainWindow(QWidget *parent=nullptr);
 };
 
 #endif // STACKEDWIDGET_H

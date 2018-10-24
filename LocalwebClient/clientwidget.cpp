@@ -26,6 +26,8 @@ ClientWidget::ClientWidget(MyLogger *logger,
  ,ponline(new QDockWidget("Доступные", this))
  ,poffline(new QDockWidget("Недоступные", this))
  ,popup(new PopUp(this))
+
+ ,plistdock(new ListDock(this))
 {
 // foreach (const QHostAddress &address, QNetworkInterface::allAddresses())
 //	{
@@ -44,6 +46,8 @@ ClientWidget::ClientWidget(MyLogger *logger,
 
  ponline->setWidget(ponlineList);
  poffline->setWidget(pofflineList);
+ ponline->hide();
+ poffline->hide();
 
  phlay->addWidget(plblAddress);
  phlay->addWidget(pleAddress);
@@ -81,8 +85,9 @@ ClientWidget::ClientWidget(MyLogger *logger,
  connect(pleAddress, SIGNAL(textChanged(QString)), SLOT(slotAddressChanged(QString)));
  connect(plePort, SIGNAL(textChanged(QString)), SLOT(slotPortChanged(QString)));
 
-	addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, ponline);
-	addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, poffline);
+//	addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, ponline);
+//	addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, poffline);
+ addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 
 	QWidget *pcentral=new QWidget(this);
 	pcentral->setLayout(pvlay);

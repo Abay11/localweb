@@ -4,6 +4,7 @@
 #include "../mylogger.h"
 #include "../clientinfo.h"
 #include "../popup.h"
+#include "listdock.h"
 
 #include <QApplication>
 #include <QMainWindow>
@@ -75,6 +76,7 @@ private:
 
  QSystemTrayIcon *ptray;
 
+ ListDock *plistdock;
 
 public:
  ClientWidget(MyLogger *logger,

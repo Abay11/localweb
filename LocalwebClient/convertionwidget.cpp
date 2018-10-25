@@ -12,19 +12,21 @@ ConvertionWidget::ConvertionWidget(QString name,
 
  QVBoxLayout *pvlay=new QVBoxLayout;
  pvlay->addWidget(new QLabel(name));
- pvlay->addWidget(pdisplay);
- pvlay->addWidget(pmsgField);
+ pvlay->addWidget(pdisplay, 6);
+ pvlay->addWidget(pmsgField, 1);
 
  QHBoxLayout *phlay=new QHBoxLayout;
  phlay->addWidget(pcmdSend);
  phlay->addWidget(pcmdClr);
  pvlay->addLayout(phlay);
 
- connect(pcmdSend, SIGNAL(clicked()), SLOT(sendClicked()));
- connect(pcmdClr, SIGNAL(clicked()), SLOT(slotClearDisplay()));
+ setLayout(pvlay);
+
+ connect(pcmdSend, SIGNAL(clicked()), SIGNAL(sendClicked()));
+ connect(pcmdClr, SIGNAL(clicked()), SLOT(slotClrDisplay()));
 }
 
-void ConvertionWidget::slotClrDispay()
+void ConvertionWidget::slotClrDisplay()
 {
  pmsgField->clear();
 }

@@ -24,9 +24,9 @@ private:
 
 public:
  ClientInfo(QString fullname=QString(),
-						QString addr=QString(),
-						QString mport=QString(),
-						bool status=false);
+            QString addr=QString(),
+            QString mport=QString(),
+            bool status=false);
  virtual ~ClientInfo();
 
  const QString& nickname() const;

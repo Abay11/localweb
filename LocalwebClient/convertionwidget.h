@@ -20,7 +20,7 @@ public:
 									QWidget *parent=nullptr);
 
 private slots:
- void slotClrDispay();
+ void slotClrDisplay();
 
 signals:
  void sendClicked();

@@ -26,15 +26,8 @@ ClientWidget::ClientWidget(MyLogger *logger,
  ,ponline(new QDockWidget("Доступные", this))
  ,poffline(new QDockWidget("Недоступные", this))
  ,popup(new PopUp(this))
-
  ,plistdock(new ListDock(this))
 {
-// foreach (const QHostAddress &address, QNetworkInterface::allAddresses())
-//	{
-//	 if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
-//		maddress=address.toString();
-//	}
-
  readBase();
 
 

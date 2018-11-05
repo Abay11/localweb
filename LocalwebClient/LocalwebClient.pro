@@ -33,7 +33,8 @@ SOURCES += \
     mainwindow.cpp \
     registrationwidget.cpp \
     convertionwidget.cpp \
-    listdock.cpp
+    listdock.cpp \
+    clientservice.cpp
 
 HEADERS += \
     ../mylogger.h \
@@ -44,7 +45,8 @@ HEADERS += \
     registrationwidget.h \
     clientwidget.h \
     convertionwidget.h \
-    listdock.h
+    listdock.h \
+    clientservice.h
 
 
 # Default rules for deployment.

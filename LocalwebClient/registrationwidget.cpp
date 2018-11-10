@@ -2,8 +2,7 @@
 
 #include <QSizePolicy>
 
-Registration::Registration(MyLogger *logger,
-													 QWidget *parent)
+Registration::Registration(QWidget *parent)
  :QWidget (parent)
  ,pleNick(new QLineEdit)
  ,pleName(new QLineEdit)
@@ -13,7 +12,6 @@ Registration::Registration(MyLogger *logger,
  ,pcmdHelp(new QPushButton("Помощь"))
  ,phlay(new QHBoxLayout)
  ,pflay(new QFormLayout)
- ,plogger(logger)
  ,psocket(new QTcpSocket)
 {
  pcmdSettings->setToolTip("Задать настройки");

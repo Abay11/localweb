@@ -7,8 +7,7 @@
 int main(int argc, char *argv[])
 {
  QApplication a(argc, argv);
-// MainWindow w;
- ConvertionWidget w("General");
+ MainWindow w;
  w.show();
 
  return a.exec();

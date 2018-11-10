@@ -33,15 +33,12 @@ private:
  QGridLayout *pglay;
  QFormLayout *pflay;
 
- MyLogger *plogger;
-
  QTcpSocket *psocket;
 
  QString maddress="127.0.0.1";
  QString mport="7165";
 public:
- Registration(MyLogger *logger,
-							QWidget *parent=nullptr);
+ Registration(QWidget *parent=nullptr);
 
 public slots:
  void slotRegister();

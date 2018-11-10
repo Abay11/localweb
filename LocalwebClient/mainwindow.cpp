@@ -4,8 +4,8 @@ MainWindow::MainWindow(QWidget *parent)
  :QMainWindow(parent)
 ,pwidgetsStack(new QStackedWidget(this))
 {
- plogger=new MyLogger;
- pclientWidget=new ClientWidget(plogger, this);
+// plogger=new MyLogger;
+ pclientWidget=new ClientWidget(this);
 
  pwidgetsStack->addWidget(pclientWidget);
 
@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 	}
  else
 	{
-	 preg=new Registration(plogger, this);
+	 preg=new Registration(this);
 	 pwidgetsStack->addWidget(preg);
 	 pwidgetsStack->setCurrentIndex(1);
 	 connect(preg, SIGNAL(registered(int)),

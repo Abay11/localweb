@@ -7,20 +7,29 @@
 #include <QNetworkInterface>
 #include <QMessageBox>
 #include <QStringListModel>
+#include <QMessageBox>
+
+#include "../clientinfo.h"
 
 class ClientService : public QObject
 {
  Q_OBJECT
 
 private:
+ QWidget *pparent;
+
  quint16 mnNextBlockSize=0;
  QTcpSocket *psocket;
  QString *pserverAddress, *pserverPort;
 
  QStringListModel *ponline, *poffline;
+ QMap<QString, ClientInfo*> clients;
+
+ void save();
+ void restore();
 
 public:
- ClientService(QObject *parent=nullptr);
+ ClientService(QWidget *parent=nullptr);
 
 private slots:
  void slotConnected();
@@ -30,7 +39,7 @@ private slots:
 public slots:
  void slotConnectToServer();
  void slotDisconnectFromServer();
- void slotSendToServer();
+ void slotSentToServer(QString);
  void slotSetAddress(QString addr, QString port);
 };
 

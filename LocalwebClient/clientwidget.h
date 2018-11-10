@@ -5,6 +5,8 @@
 #include "../clientinfo.h"
 #include "../popup.h"
 #include "listdock.h"
+#include "convertionwidget.h"
+#include "clientservice.h"
 
 #include <QApplication>
 #include <QMainWindow>
@@ -37,8 +39,6 @@ class ClientWidget : public QMainWindow
 
 private:
 
- quint16 mnNextBlockSize;
-
  QString maddress;
  QString *pserverAddress;
  QString *pserverPort;
@@ -49,58 +49,34 @@ private:
  QLineEdit *plePort;
  QPushButton *pcmdConnect;
  QPushButton *pcmdDisconnect;
- QPushButton *pcmdSend;
- QPushButton *pcmdClear;
- QTextEdit *pinfo;
- QTextEdit *pmsgField;
 
  QHBoxLayout *phlay;
+ QHBoxLayout *pconvertionLay;
  QVBoxLayout *pvlay;
- QSplitter *psplitter;
- QListWidget *ponlineList;
- QListWidget *pofflineList;
-
- QTcpSocket *pserverSocket;
-
- MyLogger *plogger;
- QString usernick;
- QString username;
- QMap<QString, ClientInfo*> clients;
- QVector<QString> onlines;
- QDockWidget *ponline;
- QDockWidget *poffline;
 
  PopUp *popup;
-
- QApplication *papp;
 
  QSystemTrayIcon *ptray;
 
  ListDock *plistdock;
 
+ ConvertionWidget *pgeneralConvertion;
+
+ ClientService *pservice;
+
 public:
- ClientWidget(MyLogger *logger,
-							QWidget *parent = nullptr);
+ ClientWidget(QWidget *parent = nullptr);
  ~ClientWidget();
- void readBase();
- void saveBase();
 
  void setUI();
  void hideSystemtray(bool);
 
 private slots:
- void slotSetListContextMenu(const QPoint &pos);
- void quit();
+ void slotConnectClicked();
+ void slotQuit();
 
 public slots:
- void slotConnectToServer();
- void slotDisconnectFromServer();
- void slotReadyRead();
- void slotError(QAbstractSocket::SocketError);
- void slotSendToServer();
- void slotConnected();
  void slotMsgChanged();
- void slotClearMsg();
  void slotSwitchBetweenWidgets();
 
  void slotAddressChanged(QString);

@@ -7,6 +7,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
+#include "../clientinfo.h"
+
 class ConvertionWidget:public QWidget
 {
  Q_OBJECT
@@ -21,16 +23,19 @@ public:
  ConvertionWidget(QString name,
 									QWidget *parent=nullptr);
 
+ void setSocketState(bool);
+ void setSentEnabled(bool);
+
+
 private slots:
  void slotSentClicked();
  void slotClrDisplay();
  void slotMsgChanged();
 
 public slots:
- void slotSocketIsOpen(bool);
 
 signals:
- void sentClicked(QString msg);
+ void sentClicked(DATATYPE type, QString msg);
 };
 
 #endif // CONVERTIONWIDGET_H

@@ -76,37 +76,29 @@ ClientService::ClientService(QWidget *prnt)
  ,poffline(new QStringListModel)
 {
  connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
+ connect(psocket, SIGNAL(connected()), SIGNAL(connected()));
+ connect(psocket, SIGNAL(disconnected()), SIGNAL(disconnected()));
  connect(psocket, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(slotError(QAbstractSocket::SocketError)));
+ psocket->connected();
 
 
 }
 
 void ClientService::slotConnected()
 {
- // pinfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")
- //							 +"Соединение с сервером установлено.");
- // qInfo()<<"Соединение с сервером установлено.";
+	qInfo()<<"Соединение с сервером установлено.";
 
-	//запрос серверу чтобы тот прислал список клиентов
-//	QByteArray arrBlock;
-//	QDataStream out(&arrBlock, QIODevice::WriteOnly);
+	//говорим серверу что мы только что подключились и нам нужно сверить базу
+	slotSentToServer(DATATYPE::CONNECT);
 
-//	out.setVersion(QDataStream::Qt_5_11);
-
-//	out<<quint16(0)<<static_cast<int>(DATATYPE::CONNECT)
-//		<<usernick
-//	 <<clients.size();
-//	out.device()->seek(0);
-//	out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
-
-//	pserverSocket->write(arrBlock);
-//	qInfo()<<"Отправлен запрос на получение списка";
+	qInfo()<<"Отправлен запрос на получение списка";
 }
 
 void ClientService::slotReadyRead()
 {
  QDataStream in(psocket) ;
  in.setVersion(QDataStream::Qt_5_11);
+
  forever
  {
 	if(!mnNextBlockSize)
@@ -130,16 +122,15 @@ void ClientService::slotReadyRead()
 	switch (type) {
 	 case DATATYPE::CONNECT:
 	 {
-		 qDebug()<<"Receiving client's list";
-		 //получение списка пользователей от сервера
+		 qDebug()<<"Receiving list of clients";
 
+		 //если база сервера не совпадает с нашим,
+		 //ждем актуальную базу
 		 int serverBaseSize;
 		 in>>serverBaseSize;
-		 //если база у сервера не совпадает с нашим,
-		 //получаем актуальную базу
 		 if(serverBaseSize!=clients.size())
 			{
-			 qDebug()<<"короче тут у нас база не сошлась, поэтому ждем новый";
+			 qDebug()<<"база не сошлась, ждем новый";
 			in>>clients;
 			}
 
@@ -292,9 +283,6 @@ void ClientService::slotError(QAbstractSocket::SocketError nerr)
 	QMessageBox::critical(pparent,
 											 "Ошибка подключения к серверу", info);
 
-// pcmdDisconnect->setEnabled(false);
-// pcmdConnect->setEnabled(true);
-
 	qCritical()<<"Ошибка соединения с сервером: "<<psocket->errorString();
 	psocket->close();
 }
@@ -308,32 +296,37 @@ void ClientService::slotConnectToServer()
 void ClientService::slotDisconnectFromServer()
 {
  psocket->close();
-
-// ponline->removeRows(0, ponline->rowCount()-1);
+ emit disconnected();
 }
 
-void ClientService::slotSentToServer(QString msg)
+void ClientService::slotSentToServer(DATATYPE type, QString msg)
 {
  QByteArray arrBlock;
  QDataStream out(&arrBlock, QIODevice::WriteOnly);
 
  out.setVersion(QDataStream::Qt_5_11);
 
- out<<quint16(0)
-	 <<static_cast<int>(DATATYPE::MESSAGE)
-	<<QTime::currentTime()
- <<msg;
+ out<<quint16(0)<<type<<QTime::currentTime();
 
- //когда общая рассылка, другой клиент не сможет узнать,
+
+ switch(type)
+	{
+	case DATATYPE::MESSAGE:
+ /*//когда общая рассылка, другой клиент не сможет узнать,
  //кто прислал мсг, т.к. получит от сервера, поэтому отправителю
  //нужно приписать, что это он.
  //Если это будет Р2Р, возможно это будет не обяз. Нужно еще раз обдумать...
- //а пока так.
-// QString msg=pmsgField->toPlainText();
-// msg.prepend(usernick+": ");
+ //а пока так.*/
+	 msg.prepend(mnick+": ");
+	 out<<msg;
+	 qDebug()<<"msg send";
+	 break;
 
-
- //вывод у себя
+	case DATATYPE::CONNECT:
+	 out<<mnick<<clients.size();
+	 break;
+	default: break;
+	}
 
  out.device()->seek(0);
  out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));

@@ -76,7 +76,6 @@ private slots:
  void slotQuit();
 
 public slots:
- void slotMsgChanged();
  void slotSwitchBetweenWidgets();
 
  void slotAddressChanged(QString);
@@ -85,6 +84,9 @@ public slots:
  void slotSetAddress(QString addr, QString port);
 
  void slotOpenConversion();
+
+ void slotConnected();
+ void slotDisconnected();
 };
 
 #endif // CLIENTWIDGET_H

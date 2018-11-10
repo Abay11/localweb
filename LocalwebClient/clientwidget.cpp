@@ -37,8 +37,11 @@ ClientWidget::ClientWidget(QWidget *parent)
 				SLOT(slotConnectClicked()));
  connect(pcmdDisconnect, SIGNAL(clicked()),
 				 pservice, SLOT(slotDisconnectFromServer()));
- connect(pgeneralConvertion, SIGNAL(sentClicked(QString)),
-				 pservice, SLOT(slotSentToServer(QString)));
+ connect(pgeneralConvertion, SIGNAL(sentClicked(DATATYPE, QString)),
+				 pservice, SLOT(slotSentToServer(DATATYPE, QString)));
+
+ connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
+ connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
 
  connect(pleAddress, SIGNAL(textChanged(QString)), SLOT(slotAddressChanged(QString)));
  connect(plePort, SIGNAL(textChanged(QString)), SLOT(slotPortChanged(QString)));
@@ -50,12 +53,6 @@ ClientWidget::ClientWidget(QWidget *parent)
 	setCentralWidget(pcentral);
 	setUI();
 	resize(640, 480);
-}
-
-void ClientWidget::slotMsgChanged()
-{
-// pcmdSend->setEnabled(!pmsgField->toPlainText().isEmpty()
-//											&&pserverSocket->isOpen());
 }
 
 void ClientWidget::slotSwitchBetweenWidgets()
@@ -87,6 +84,23 @@ void ClientWidget::slotSetAddress(QString addr, QString port)
 void ClientWidget::slotOpenConversion()
 {
 
+}
+
+void ClientWidget::slotConnected()
+{
+ pcmdConnect->setEnabled(false);
+ pcmdDisconnect->setEnabled(true);
+
+ pgeneralConvertion->setSocketState(true);
+}
+
+void ClientWidget::slotDisconnected()
+{
+ pcmdConnect->setEnabled(true);
+ pcmdDisconnect->setEnabled(false);
+
+ pgeneralConvertion->setSentEnabled(false);
+ pgeneralConvertion->setSocketState(false);
 }
 
 ClientWidget::~ClientWidget()

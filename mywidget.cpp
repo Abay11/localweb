@@ -270,6 +270,7 @@ void MyWidget::slotNewConnection()
 	QTcpSocket* pclient=pserver->nextPendingConnection();
 	connect(pclient, SIGNAL(disconnected()), SLOT(slotDisconnection()));
 	connect(pclient, SIGNAL(readyRead()), SLOT(slotReadClient()));
+	qDebug()<<"New connection";
 }
 
 void MyWidget::slotDisconnection()
@@ -277,7 +278,7 @@ void MyWidget::slotDisconnection()
  QTcpSocket* pclient
 	 =static_cast<QTcpSocket*>(sender());
 
- QString disconnected=*binder.find(pclient);
+ QString disconnected=binder.find(pclient).value();
  binder.remove(pclient);
 
  QByteArray byteArray;
@@ -302,6 +303,7 @@ void MyWidget::slotDisconnection()
 
 void MyWidget::slotReadClient()
 {
+ qDebug()<<"read to client";
  QTcpSocket* pclient=static_cast<QTcpSocket*>(sender());
  QDataStream in(pclient);
  in.setVersion(QDataStream::Qt_5_11);
@@ -320,11 +322,11 @@ void MyWidget::slotReadClient()
 	if(pclient->bytesAvailable()<mnextBlockSize)
 	 break;
 
-	QString str;
+	QString msg;
 	QTime time;
 
 	DATATYPE type;
-	in>>type;
+	in>>type>>time;
 
 	switch (type) {
 	 case DATATYPE::REGISTRATION:
@@ -400,7 +402,7 @@ void MyWidget::slotReadClient()
 		 QByteArray arrBlock;
 		 QDataStream out(&arrBlock, QIODevice::WriteOnly);
 		 out<<quint16(0)<<static_cast<int>(DATATYPE::CONNECT);
-		 qDebug()<<"Ща отправлю клиенту базу";
+		 qDebug()<<"Ща кину клиенту размер базу";
 
 		 out<<clientbase.size();
 		 if(clientBaseSize!=clientbase.size())
@@ -429,12 +431,14 @@ void MyWidget::slotReadClient()
 	 }
 	 case DATATYPE::MESSAGE:
 	 {
-		 in>>time>>str;
+		 in>>msg;
 
 		 for(auto iter=binder.begin(), end=binder.end();
 				 iter!=end; ++iter)
 			 if(iter.key()!=pclient)
-				 sendToClient(iter.key(), str, DATATYPE::MESSAGE, time);
+				 sendToClient(iter.key(), msg, DATATYPE::MESSAGE, time);
+
+		 qDebug()<<"msg: "<<msg;
 
 		 break;
 	 }

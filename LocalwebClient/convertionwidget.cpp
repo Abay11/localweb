@@ -25,11 +25,25 @@ ConvertionWidget::ConvertionWidget(QString name,
 
  connect(pcmdSent, SIGNAL(clicked()), SLOT(slotSentClicked()));
  connect(pcmdClr, SIGNAL(clicked()), SLOT(slotClrDisplay()));
+
+ connect(pmsgField, SIGNAL(textChanged()), SLOT(slotMsgChanged()));
+}
+
+void ConvertionWidget::setSocketState(bool isOpen)
+{
+ socketIsOpen=isOpen;
+}
+
+void ConvertionWidget::setSentEnabled(bool value)
+{
+ pcmdSent->setEnabled(value);
 }
 
 void ConvertionWidget::slotSentClicked()
 {
- emit sentClicked(pmsgField->toPlainText());
+ emit sentClicked(DATATYPE::MESSAGE, pmsgField->toPlainText());
+ pmsgField->clear();
+ pcmdSent->setEnabled(false);
 }
 
 void ConvertionWidget::slotClrDisplay()
@@ -39,12 +53,6 @@ void ConvertionWidget::slotClrDisplay()
 
 void ConvertionWidget::slotMsgChanged()
 {
- if(socketIsOpen)
+ if(pmsgField->toPlainText()!="" && socketIsOpen)
 	pcmdSent->setEnabled(true);
-
-}
-
-void ConvertionWidget::slotSocketIsOpen(bool value)
-{
- socketIsOpen=value;
 }

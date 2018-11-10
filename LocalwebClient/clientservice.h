@@ -17,6 +17,7 @@ class ClientService : public QObject
 
 private:
  QWidget *pparent;
+ QString mnick="", mname;
 
  quint16 mnNextBlockSize=0;
  QTcpSocket *psocket;
@@ -39,8 +40,12 @@ private slots:
 public slots:
  void slotConnectToServer();
  void slotDisconnectFromServer();
- void slotSentToServer(QString);
+ void slotSentToServer(DATATYPE, QString="");
  void slotSetAddress(QString addr, QString port);
+
+signals:
+ void connected();
+ void disconnected();
 };
 
 #endif // CLIENTSERVICE_H

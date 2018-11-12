@@ -15,6 +15,7 @@
 #include "clientwidget.h"
 #include "registrationwidget.h"
 #include "../mylogger.h"
+#include "clientservice.h"
 
 class MainWindow:public QMainWindow
 {
@@ -24,6 +25,7 @@ private:
  MyLogger *plogger;
  ClientWidget* pclientWidget;
  Registration* preg;
+ ClientService *pservice;
 
 public:
  MainWindow(QWidget *parent=nullptr);

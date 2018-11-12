@@ -65,7 +65,7 @@ private:
  ClientService *pservice;
 
 public:
- ClientWidget(QWidget *parent = nullptr);
+ ClientWidget(ClientService *pservice, QWidget *parent = nullptr);
  ~ClientWidget();
 
  void setUI();

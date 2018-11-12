@@ -1,7 +1,6 @@
 #include <QApplication>
 
 #include "mainwindow.h"
-
 #include "convertionwidget.h"
 
 int main(int argc, char *argv[])

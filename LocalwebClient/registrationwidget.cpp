@@ -2,7 +2,7 @@
 
 #include <QSizePolicy>
 
-Registration::Registration(QWidget *parent)
+Registration::Registration(ClientService *pserv, QWidget *parent)
  :QWidget (parent)
  ,pleNick(new QLineEdit)
  ,pleName(new QLineEdit)
@@ -13,6 +13,7 @@ Registration::Registration(QWidget *parent)
  ,phlay(new QHBoxLayout)
  ,pflay(new QFormLayout)
  ,psocket(new QTcpSocket)
+ ,pservice(pserv)
 {
  pcmdSettings->setToolTip("Задать настройки");
 
@@ -51,55 +52,63 @@ void Registration::slotRegister()
 	 return;
 	}
 
- psocket=new QTcpSocket;
- psocket->connectToHost(maddress,
-												static_cast<quint16>(mport.toInt()));
-
- if(psocket->waitForConnected())
+ if(!pservice->socketIsOpen())
 	{
-	 QByteArray arrBlock;
-	 QDataStream stream(&arrBlock, QIODevice::WriteOnly);
-	 stream.setVersion(QDataStream::Qt_5_11);
+	 pservice->slotSetAddress(maddress, mport);
+	 pservice->slotConnectToServer();
+	}
 
-	 stream<<quint16(0)<<static_cast<int>(DATATYPE::REGISTRATION);
-	 stream<<pleNick->text();
-	 stream.device()->seek(0);
-	 stream<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
+// psocket=new QTcpSocket;
+// psocket->connectToHost(maddress,
+//												static_cast<quint16>(mport.toInt()));
 
-	 psocket->write(arrBlock);
-	 psocket->waitForBytesWritten(-1);
-	 psocket->waitForReadyRead(-1);
+ pservice->slotSentToServer(DATATYPE::REGISTRATION, pleNick->text(), QVariant(pleName->text()));
 
-	 stream.setDevice(psocket);
-	 quint16 blockSize=0;
-	 forever
-	 {
-		if(!blockSize)
-		 {
-			if(static_cast<size_t>(psocket->bytesAvailable())
-				 <sizeof(quint16))
-			 continue;
+// if(psocket->waitForConnected())
+//	{
+//	 QByteArray arrBlock;
+//	 QDataStream stream(&arrBlock, QIODevice::WriteOnly);
+//	 stream.setVersion(QDataStream::Qt_5_11);
 
-			stream>>blockSize;
-		 }
+//	 stream<<quint16(0)<<static_cast<int>(DATATYPE::REGISTRATION);
+//	 stream<<pleNick->text();
+//	 stream.device()->seek(0);
+//	 stream<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
 
-		if(psocket->bytesAvailable()!=blockSize)
-		 {
-		 continue;
-		 }
+//	 psocket->write(arrBlock);
+//	 psocket->waitForBytesWritten(-1);
+//	 psocket->waitForReadyRead(-1);
 
-		DATATYPE type;
-		QString res;
-		QTime time;
-		stream>>type>>time>>res;
+//	 stream.setDevice(psocket);
+//	 quint16 blockSize=0;
+//	 forever
+//	 {
+//		if(!blockSize)
+//		 {
+//			if(static_cast<size_t>(psocket->bytesAvailable())
+//				 <sizeof(quint16))
+//			 continue;
 
-		if(type!=DATATYPE::REGISTRATION)
-		 qCritical()<<"Ожидалась регистрация, вышло что-то другое";
+//			stream>>blockSize;
+//		 }
 
-		qInfo()<<time.toString("[hh:mm:ss] ")
-					<<"Registration attempt. Result: "<<res;
+//		if(psocket->bytesAvailable()!=blockSize)
+//		 {
+//		 continue;
+//		 }
 
-		if(res=="false")
+//		DATATYPE type;
+//		QString res;
+//		QTime time;
+//		stream>>type>>time>>res;
+
+//		if(type!=DATATYPE::REGISTRATION)
+//		 qCritical()<<"Ожидалась регистрация, вышло что-то другое";
+
+//		qInfo()<<time.toString("[hh:mm:ss] ")
+//					<<"Registration attempt. Result: "<<res;
+
+		if(!pservice->getRegistrationResult())
 		 {
 		 QMessageBox::warning(this, "Ошибка регистрации",
 													"Псевдоним уже используется другим пользователем. "
@@ -107,8 +116,8 @@ void Registration::slotRegister()
 		 return;
 		 }
 
-		break;
-	 }
+//		break;
+//	 }
 
 	 QFile file("data.bin");
 	 file.open(QIODevice::WriteOnly);
@@ -124,15 +133,15 @@ void Registration::slotRegister()
 														"Теперь можете подключиться к серверу");
 
 	 deleteLater();
-	}
- else
-	{
-	 psocket->close();
-	 slotError(psocket->error());
-	}
+//	}
+// else
+//	{
+//	 psocket->close();
+//	 slotError(psocket->error());
+//	}
 }
 
-void Registration::slotError(QAbstractSocket::SocketError nerr)
+/*void Registration::slotError(QAbstractSocket::SocketError nerr)
 {
  QString info("Произошла следующая ошибка при подключении к серверу: ");
  switch(nerr)
@@ -157,6 +166,7 @@ void Registration::slotError(QAbstractSocket::SocketError nerr)
  QMessageBox::critical(this, "Ошибка соединения к серверу", info);
  qCritical()<<"Ошибка соединения с сервером: "<<psocket->errorString();
 }
+*/
 
 void Registration::slotExit()
 {

@@ -19,6 +19,8 @@ private:
  QWidget *pparent;
  QString mnick="", mname;
 
+ bool registrationResult=false;
+
  quint16 mnNextBlockSize=0;
  QTcpSocket *psocket;
  QString *pserverAddress, *pserverPort;
@@ -31,6 +33,8 @@ private:
 
 public:
  ClientService(QWidget *parent=nullptr);
+ bool socketIsOpen();
+ bool getRegistrationResult();
 
 private slots:
  void slotConnected();
@@ -40,7 +44,7 @@ private slots:
 public slots:
  void slotConnectToServer();
  void slotDisconnectFromServer();
- void slotSentToServer(DATATYPE, QString="");
+ void slotSentToServer(DATATYPE, QString="", QVariant=0);
  void slotSetAddress(QString addr, QString port);
 
 signals:

@@ -69,7 +69,7 @@ public:
  ~MyWidget();
 
  void sendToClient(QTcpSocket*
-									 ,const QString&
+									 ,QVariant data
 									 ,DATATYPE type=DATATYPE::MESSAGE
 									 ,const QTime &curTime=QTime::currentTime());
  void updateClientBase(ClientInfo&);

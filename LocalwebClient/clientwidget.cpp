@@ -1,6 +1,6 @@
 #include "clientwidget.h"
 
-ClientWidget::ClientWidget(QWidget *parent)
+ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  : QMainWindow (parent)
  ,pserverAddress(new QString)
  ,pserverPort(new QString)
@@ -16,7 +16,7 @@ ClientWidget::ClientWidget(QWidget *parent)
  ,popup(new PopUp(this))
  ,plistdock(new ListDock(this))
  ,pgeneralConvertion(new ConvertionWidget("General"))
- ,pservice(new ClientService(this))
+ ,pservice(service)
 {
 // pleAddress->setText(pleAddress->text());
 // pmsgField->setPlaceholderText("Введите сообщение...");

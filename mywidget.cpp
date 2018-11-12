@@ -75,7 +75,7 @@ MyWidget::~MyWidget()
 
 void MyWidget::sendToClient(
 	QTcpSocket* psocket
-	,const QString& msg
+	,QVariant data
 	,DATATYPE type
 	,const QTime &curTime)
 {
@@ -85,7 +85,18 @@ void MyWidget::sendToClient(
 
  out<<quint16(0)
 	 <<static_cast<int>(type)
-	 <<curTime<<msg;
+	 <<curTime;
+
+ switch(type)
+	{
+	case DATATYPE::REGISTRATION:
+	 out<<data.toBool();
+		break;
+
+	default:
+	 out<<data.toString();
+	}
+
  out.device()->seek(0);
  out<<quint16(static_cast<size_t>(byteArr.size())-sizeof (quint16));
 
@@ -338,10 +349,9 @@ void MyWidget::slotReadClient()
 		 nick=nick.toLower();
 
 		 auto pos = clientbase.find(nick);
-		 QString answer="false";
-		 if(pos==clientbase.end())
+		 bool isRegistrationSuccess=pos==clientbase.end();
+		 if(isRegistrationSuccess)
 			{
-			answer="true";
 		 clientbase.insert(nick,
 											 new ClientInfo(fullname,
 																			pclient->localAddress().toString()
@@ -356,7 +366,7 @@ void MyWidget::slotReadClient()
 			}
 
 
-		 sendToClient(pclient, answer, DATATYPE::REGISTRATION);
+		 sendToClient(pclient, QVariant(isRegistrationSuccess), DATATYPE::REGISTRATION);
 		 break;
 	 }
 	 case DATATYPE::DELETION:
@@ -436,7 +446,7 @@ void MyWidget::slotReadClient()
 		 for(auto iter=binder.begin(), end=binder.end();
 				 iter!=end; ++iter)
 			 if(iter.key()!=pclient)
-				 sendToClient(iter.key(), msg, DATATYPE::MESSAGE, time);
+				 sendToClient(iter.key(), QVariant(msg), DATATYPE::MESSAGE, time);
 
 		 qDebug()<<"msg: "<<msg;
 

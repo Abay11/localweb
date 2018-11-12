@@ -84,6 +84,16 @@ ClientService::ClientService(QWidget *prnt)
 
 }
 
+bool ClientService::socketIsOpen()
+{
+ return psocket->isOpen();
+}
+
+bool ClientService::getRegistrationResult()
+{
+ return registrationResult;
+}
+
 void ClientService::slotConnected()
 {
 	qInfo()<<"Соединение с сервером установлено.";
@@ -120,6 +130,11 @@ void ClientService::slotReadyRead()
 	qDebug()<<"новое событие ";
 
 	switch (type) {
+	 case DATATYPE::REGISTRATION:
+		in>>time>>registrationResult;
+		qInfo()<<time.toString("[hh:mm:ss] ")
+					<<"Registration attempt. Result: "<<registrationResult;
+		break;
 	 case DATATYPE::CONNECT:
 	 {
 		 qDebug()<<"Receiving list of clients";
@@ -299,7 +314,7 @@ void ClientService::slotDisconnectFromServer()
  emit disconnected();
 }
 
-void ClientService::slotSentToServer(DATATYPE type, QString msg)
+void ClientService::slotSentToServer(DATATYPE type, QString msg, QVariant additionData)
 {
  QByteArray arrBlock;
  QDataStream out(&arrBlock, QIODevice::WriteOnly);
@@ -311,6 +326,10 @@ void ClientService::slotSentToServer(DATATYPE type, QString msg)
 
  switch(type)
 	{
+	case DATATYPE::REGISTRATION:
+	 out<<msg<<additionData.toString();
+	 break;
+
 	case DATATYPE::MESSAGE:
  /*//когда общая рассылка, другой клиент не сможет узнать,
  //кто прислал мсг, т.к. получит от сервера, поэтому отправителю

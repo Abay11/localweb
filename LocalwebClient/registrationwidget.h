@@ -19,6 +19,7 @@
 
 #include "../clientinfo.h"
 #include "../settingswidget.h"
+#include "clientservice.h"
 
 class MyLogger;
 
@@ -34,15 +35,16 @@ private:
  QFormLayout *pflay;
 
  QTcpSocket *psocket;
+ ClientService *pservice;
 
  QString maddress="127.0.0.1";
  QString mport="7165";
 public:
- Registration(QWidget *parent=nullptr);
+ Registration(ClientService *pservice, QWidget *parent=nullptr);
 
 public slots:
  void slotRegister();
- void slotError(QAbstractSocket::SocketError);
+// void slotError(QAbstractSocket::SocketError);
  void slotExit();
  void slotSettings();
  void slotAddressChanged(QString, QString);

@@ -90,6 +90,7 @@ void MyWidget::sendToClient(
  switch(type)
 	{
 	case DATATYPE::REGISTRATION:
+	 qDebug()<<"Returning registration result "<<data.toBool();
 	 out<<data.toBool();
 		break;
 

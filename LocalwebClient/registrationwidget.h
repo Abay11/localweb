@@ -37,17 +37,19 @@ private:
  QTcpSocket *psocket;
  ClientService *pservice;
 
- QString maddress="127.0.0.1";
- QString mport="7165";
+ QString address="127.0.0.1";
+ QString port="7165";
 public:
  Registration(ClientService *pservice, QWidget *parent=nullptr);
 
-public slots:
- void slotRegister();
-// void slotError(QAbstractSocket::SocketError);
+private slots:
+ void slotSentRequest();
+ void slotProcessResult(bool registrationResult);
  void slotExit();
  void slotSettings();
  void slotAddressChanged(QString, QString);
+
+public slots:
 
 signals:
  void registered(int index);

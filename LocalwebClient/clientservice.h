@@ -34,7 +34,6 @@ private:
 public:
  ClientService(QWidget *parent=nullptr);
  bool socketIsOpen();
- bool getRegistrationResult();
 
 private slots:
  void slotConnected();
@@ -50,6 +49,7 @@ public slots:
 signals:
  void connected();
  void disconnected();
+ void returnRegistrationResult(bool);
 };
 
 #endif // CLIENTSERVICE_H

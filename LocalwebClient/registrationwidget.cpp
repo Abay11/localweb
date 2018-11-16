@@ -2,7 +2,7 @@
 
 #include <QSizePolicy>
 
-Registration::Registration(ClientService *pserv, QWidget *parent)
+Registration::Registration(ClientService *pclientService, QWidget *parent)
  :QWidget (parent)
  ,pleNick(new QLineEdit)
  ,pleName(new QLineEdit)
@@ -13,7 +13,7 @@ Registration::Registration(ClientService *pserv, QWidget *parent)
  ,phlay(new QHBoxLayout)
  ,pflay(new QFormLayout)
  ,psocket(new QTcpSocket)
- ,pservice(pserv)
+ ,pservice(pclientService)
 {
  pcmdSettings->setToolTip("Задать настройки");
 
@@ -29,14 +29,17 @@ Registration::Registration(ClientService *pserv, QWidget *parent)
  setLayout(pflay);
  setWindowTitle("Регистрация");
 
- connect(pcmdRegister, SIGNAL(clicked()), SLOT(slotRegister()));
+ connect(pcmdRegister, SIGNAL(clicked()), SLOT(slotSentRequest()));
  connect(pcmdExit, SIGNAL(clicked()), SLOT(slotExit()));
  connect(pcmdSettings, SIGNAL(clicked()), SLOT(slotSettings()));
+ connect(pservice, SIGNAL(returnRegistrationResult(bool)),
+				 SLOT(slotProcessResult(bool)));
 
  QApplication::setQuitOnLastWindowClosed(true);
 }
 
-void Registration::slotRegister()
+
+void Registration::slotSentRequest()
 {
  if(pleNick->text().isEmpty())
 	{
@@ -52,72 +55,36 @@ void Registration::slotRegister()
 	 return;
 	}
 
+ //тут проверка для того чтобы мы не пытались заново подключиться к серверу,
+ //при активном соединении.
+ //такое будет возможно, нпрм, когда после первого отказа, мы будем пробоваться
+ //зарегаться еще(отказ возможен если подобранный ник уже используется)
  if(!pservice->socketIsOpen())
 	{
-	 pservice->slotSetAddress(maddress, mport);
+	 pservice->slotSetAddress(address, port);
 	 pservice->slotConnectToServer();
 	}
 
-// psocket=new QTcpSocket;
-// psocket->connectToHost(maddress,
-//												static_cast<quint16>(mport.toInt()));
+ //нужно подождать пока установится соединение,
+ //поэтому блокируемся до нужного сигнала
+ QEventLoop loop;
+ connect(pservice, SIGNAL(connected()), &loop, SLOT(quit()));
+ loop.exec();
 
  pservice->slotSentToServer(DATATYPE::REGISTRATION, pleNick->text(), QVariant(pleName->text()));
+}
 
-// if(psocket->waitForConnected())
-//	{
-//	 QByteArray arrBlock;
-//	 QDataStream stream(&arrBlock, QIODevice::WriteOnly);
-//	 stream.setVersion(QDataStream::Qt_5_11);
+void Registration::slotProcessResult(bool registrationResult)
+{
+ qDebug()<<"Processing Registration Result slot";
 
-//	 stream<<quint16(0)<<static_cast<int>(DATATYPE::REGISTRATION);
-//	 stream<<pleNick->text();
-//	 stream.device()->seek(0);
-//	 stream<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
-
-//	 psocket->write(arrBlock);
-//	 psocket->waitForBytesWritten(-1);
-//	 psocket->waitForReadyRead(-1);
-
-//	 stream.setDevice(psocket);
-//	 quint16 blockSize=0;
-//	 forever
-//	 {
-//		if(!blockSize)
-//		 {
-//			if(static_cast<size_t>(psocket->bytesAvailable())
-//				 <sizeof(quint16))
-//			 continue;
-
-//			stream>>blockSize;
-//		 }
-
-//		if(psocket->bytesAvailable()!=blockSize)
-//		 {
-//		 continue;
-//		 }
-
-//		DATATYPE type;
-//		QString res;
-//		QTime time;
-//		stream>>type>>time>>res;
-
-//		if(type!=DATATYPE::REGISTRATION)
-//		 qCritical()<<"Ожидалась регистрация, вышло что-то другое";
-
-//		qInfo()<<time.toString("[hh:mm:ss] ")
-//					<<"Registration attempt. Result: "<<res;
-
-		if(!pservice->getRegistrationResult())
+		if(!registrationResult)
 		 {
 		 QMessageBox::warning(this, "Ошибка регистрации",
 													"Псевдоним уже используется другим пользователем. "
 													"Вам нужно использовать другой");
 		 return;
 		 }
-
-//		break;
-//	 }
 
 	 QFile file("data.bin");
 	 file.open(QIODevice::WriteOnly);
@@ -126,47 +93,12 @@ void Registration::slotRegister()
 	 file.close();
 	 emit(registered(0));
 
-	 psocket->close();
-
 	 QMessageBox::information(this, "Регистрация прошла успешно",
 														"Вы успешно зарегистрировались в сети. "
 														"Теперь можете подключиться к серверу");
 
 	 deleteLater();
-//	}
-// else
-//	{
-//	 psocket->close();
-//	 slotError(psocket->error());
-//	}
 }
-
-/*void Registration::slotError(QAbstractSocket::SocketError nerr)
-{
- QString info("Произошла следующая ошибка при подключении к серверу: ");
- switch(nerr)
-	{
-	case QAbstractSocket::HostNotFoundError:
-	 info.append("Удаленный сервер не найден. "
-							 "Удостоверьте, что введен правильный адрес и порт сервера.");
-	 break;
-	case QAbstractSocket::RemoteHostClosedError:
-	 info.append("Удаленный сервер закрыл соединение. "
-							 "Обратитесь к администратору сети.");
-	 break;
-	case QAbstractSocket::ConnectionRefusedError:
-	 info.append("Удаленный сервер отказал в доступе. "
-							 "Обратитесь к администратору сети.");
-	 break;
-	default:
-	 info.append("Произошла критическая ошибка. "
-							 "Обратитесь к администратору сети.");
-	}
-
- QMessageBox::critical(this, "Ошибка соединения к серверу", info);
- qCritical()<<"Ошибка соединения с сервером: "<<psocket->errorString();
-}
-*/
 
 void Registration::slotExit()
 {
@@ -176,7 +108,7 @@ void Registration::slotExit()
 void Registration::slotSettings()
 {
  SettingsWidget *sd=new SettingsWidget;
- sd->setCurrentAddress(maddress, mport);
+ sd->setCurrentAddress(address, port);
  sd->show();
  connect(sd, SIGNAL(addressChanged(QString, QString)),
 				 SLOT(slotAddressChanged(QString, QString)));
@@ -184,7 +116,7 @@ void Registration::slotSettings()
 
 void Registration::slotAddressChanged(QString addr, QString port)
 {
- maddress=addr;
- mport=port;
+ address=addr;
+ port=port;
  emit addressChanged(addr, port);
 }

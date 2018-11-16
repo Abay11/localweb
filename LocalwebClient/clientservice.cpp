@@ -78,20 +78,13 @@ ClientService::ClientService(QWidget *prnt)
  connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
  connect(psocket, SIGNAL(connected()), SIGNAL(connected()));
  connect(psocket, SIGNAL(disconnected()), SIGNAL(disconnected()));
+ connect(psocket, SIGNAL(readyRead()), SLOT(slotReadyRead()));
  connect(psocket, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(slotError(QAbstractSocket::SocketError)));
- psocket->connected();
-
-
 }
 
 bool ClientService::socketIsOpen()
 {
  return psocket->isOpen();
-}
-
-bool ClientService::getRegistrationResult()
-{
- return registrationResult;
 }
 
 void ClientService::slotConnected()
@@ -132,6 +125,7 @@ void ClientService::slotReadyRead()
 	switch (type) {
 	 case DATATYPE::REGISTRATION:
 		in>>time>>registrationResult;
+		emit returnRegistrationResult(registrationResult);
 		qInfo()<<time.toString("[hh:mm:ss] ")
 					<<"Registration attempt. Result: "<<registrationResult;
 		break;

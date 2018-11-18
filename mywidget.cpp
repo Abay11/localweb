@@ -290,18 +290,26 @@ void MyWidget::slotDisconnection()
  QTcpSocket* pclient
 	 =static_cast<QTcpSocket*>(sender());
 
- QString disconnected=binder.find(pclient).value();
- binder.remove(pclient);
+
+ auto disconnectedIter=socketsAndNicksOfOnlines.find(pclient);
+ if(disconnectedIter==socketsAndNicksOfOnlines.end())
+	{
+	 qDebug()<<"при удалении из базы не найден подобный пользователь."
+						 "возможно отсоединение при регистрации";
+	 return;
+	}
+ QString disconnectedNick=disconnectedIter.value();
+ socketsAndNicksOfOnlines.remove(pclient);
 
  QByteArray byteArray;
  QDataStream out(&byteArray, QIODevice::WriteOnly);
  out.setVersion(QDataStream::Qt_5_11);
  out<<quint16(0)<<static_cast<int>(DATATYPE::DISCONNECTION)
-	 <<disconnected;
+	 <<disconnectedNick;
  out.device()->seek(0);
  out<<quint16(static_cast<size_t>(byteArray.size())-sizeof(quint16));
 
- for(auto iter=binder.begin(), end=binder.end();
+ for(auto iter=socketsAndNicksOfOnlines.begin(), end=socketsAndNicksOfOnlines.end();
 		 iter!=end;
 		 ++iter)
 	{
@@ -309,7 +317,7 @@ void MyWidget::slotDisconnection()
 	}
 
  pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
-							 +disconnected+" отсоединился.");
+							 +disconnectedNick+" отсоединился.");
  pclient->deleteLater();
 }
 
@@ -358,7 +366,7 @@ void MyWidget::slotReadClient()
 																			pclient->localAddress().toString()
 																			,pclient->localAddress().toString()
 																			,true));
-		 binder.insert(pclient, nick);
+		 socketsAndNicksOfOnlines.insert(pclient, nick);
 		 plist->addItem(nick);
 		 plist->sortItems();
 		 pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
@@ -389,7 +397,7 @@ void MyWidget::slotReadClient()
 			{
 			 client.value()->status()=true; //set to client "online"
 			 //рассылка онлайн-пользователям о новом подключении
-			 for(auto iter=binder.begin(), end=binder.end();
+			 for(auto iter=socketsAndNicksOfOnlines.begin(), end=socketsAndNicksOfOnlines.end();
 					 iter!=end;
 					 ++iter)
 				{
@@ -405,7 +413,7 @@ void MyWidget::slotReadClient()
 
 			 pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
 							 +nick+" присоединился.");
-			 binder.insert(pclient, nick);
+			 socketsAndNicksOfOnlines.insert(pclient, nick);
 			}
 
 
@@ -424,16 +432,19 @@ void MyWidget::slotReadClient()
 
 		 //тут скинем колво доступных
 		 //и клиент уже будет знать сколько принимать
-		 qDebug()<<"размер binder: "<<binder.size();
-		 out<<binder.size();
+		 qDebug()<<"размер онлайнов: "<<socketsAndNicksOfOnlines.size();
+//		 out<<binder.size();
 
-		 for(auto nick:binder)
-			{
-//			 находим в базе инфу для текущего ника и отправляем
-			 out<<nick;
-//			 in<<nick;
-//			 in<<*clientbase.find(nick);
-			}
+		 //также отправка списка онлайнов
+		 out<<socketsAndNicksOfOnlines.values();
+//		 binder.values();
+//		 for(auto nick:binder)
+//			{
+////			 находим в базе инфу для текущего ника и отправляем
+//			 out<<nick;
+////			 in<<nick;
+////			 in<<*clientbase.find(nick);
+//			}
 		 out.device()->seek(0);
 		 out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
 		 pclient->write(arrBlock);
@@ -444,7 +455,7 @@ void MyWidget::slotReadClient()
 	 {
 		 in>>msg;
 
-		 for(auto iter=binder.begin(), end=binder.end();
+		 for(auto iter=socketsAndNicksOfOnlines.begin(), end=socketsAndNicksOfOnlines.end();
 				 iter!=end; ++iter)
 			 if(iter.key()!=pclient)
 				 sendToClient(iter.key(), QVariant(msg), DATATYPE::MESSAGE, time);

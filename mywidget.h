@@ -59,7 +59,7 @@ private:
 
  //for clients identification by socket
  //also it can serve as a list of online clients
- QMap<QTcpSocket*, QString> binder;
+ QMap<QTcpSocket*, QString> socketsAndNicksOfOnlines;
 
  QSystemTrayIcon *ptray;
  QAction *paonOff;

@@ -32,12 +32,13 @@ private:
  QStringListModel *ponlines, *pofflines;
  QMap<QString, ClientInfo*> clients;
 
- void save();
- void restore();
+ void saveDataAndProperties();
+ void restoreDataAndProperties();
  void setDataToModels();
 
 public:
  ClientService(QWidget *parent=nullptr);
+ ~ClientService();
  bool socketIsOpen();
  QStringListModel *onlineModel();
  QStringListModel *offlineModel();

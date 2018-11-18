@@ -1,29 +1,23 @@
 #include "clientservice.h"
 
-void ClientService::save()
+void ClientService::saveDataAndProperties()
 {
-// QFile file("data.bin");
-// if(file.open(QFile::WriteOnly))
-//	{
-//	 QDataStream out(&file);
-//	 //at first save current user info
-//	 out<<usernick<<username;
+ QFile file("data.bin");
+ if(file.open(QFile::WriteOnly))
+	{
+	 QDataStream out(&file);
+	 out<<nick<<name<<*pserverAddress<<*pserverPort;
 
-//	 //then save server address and port
-//	 out<<*pserverAddress<<*pserverPort;
-//	 qDebug()<<"saving address info: "<<*pserverAddress<<" "<<*pserverPort;
+	 if(!clients.isEmpty())
+		out<<clients;
 
-//	 //then if clientbase is not empty save it too
-//	 if(!clients.isEmpty())
-//		out<<clients;
-
-//	 file.close();
-//	}
-// else
-//	qCritical()<<"Error saving clients base";
+	 file.close();
+	}
+ else
+	qCritical()<<"Error saving clients base";
 }
 
-void ClientService::restore()
+void ClientService::restoreDataAndProperties()
 {
  QFile file("data.bin");
  if(file.open(QFile::ReadOnly))
@@ -31,7 +25,7 @@ void ClientService::restore()
 	 QDataStream in(&file);
 	 in>>nick>>name;
 
-		in>>*pserverAddress>>*pserverPort;
+	 in>>*pserverAddress>>*pserverPort;
 
 	 in>>clients;
 	 file.close();
@@ -62,13 +56,18 @@ ClientService::ClientService(QWidget *prnt)
  ,ponlines(new QStringListModel)
  ,pofflines(new QStringListModel)
 {
- restore();
+ restoreDataAndProperties();
 
  connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
  connect(psocket, SIGNAL(connected()), SIGNAL(connected()));
  connect(psocket, SIGNAL(disconnected()), SIGNAL(disconnected()));
  connect(psocket, SIGNAL(readyRead()), SLOT(slotReadyRead()));
  connect(psocket, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(slotError(QAbstractSocket::SocketError)));
+}
+
+ClientService::~ClientService()
+{
+ saveDataAndProperties();
 }
 
 bool ClientService::socketIsOpen()
@@ -151,10 +150,6 @@ void ClientService::slotReadyRead()
 			in>>clients;
 			}
 
-//		 //нужно получить количество доступных
-//		 int count=0;
-//		 in>>count;
-
 		 QList<QString> onlines;
 		 in>>onlines;
 		 qDebug()<<"Приняли как онлайн: ";
@@ -162,35 +157,6 @@ void ClientService::slotReadyRead()
 			qDebug()<<s;
 
 		 setDataToModels();
-//		 ponlines
-//		 onlines.prepend(nick);
-//		 ponlines->setStringList(onlines);
-//		 ponlines->setStringList(onlines);
-
-//		 pofflines->setStringList()
-
-//		 for(int i=0; i<count; ++i)
-//			{
-//			 QString nick;
-//			 in>>nick;
-////			 onlines.push_back(nick);
-//			}
-
-		 //кидаем полученный список онлайнов в список доступных
-//		 for(auto i : onlines)
-//			 if(i!=usernick)
-//				ponlineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/online.png"),i));
-
-
-		 //очищаем список недоступных
-		 //и начинаем заного добавлять туда
-		 //только не имеющихся в полученном списке-онлайн
-//			 pofflineList->clear();
-//			 for(auto iter=clients.begin(),
-//					 end=clients.end(); iter!=end; ++iter)
-//				if(usernick!=iter.key()
-//					 && !onlines.contains(iter.key()))
-//				 pofflineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/offline.png"), iter.key()));
 
 		 break;
 	 }

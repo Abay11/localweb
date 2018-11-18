@@ -63,15 +63,15 @@ void Registration::slotSentRequest()
 	{
 	 pservice->slotSetAddress(address, port);
 	 pservice->slotConnectToServer();
+	 //нужно подождать пока установится соединение,
+	 //поэтому блокируемся до нужного сигнала
+	 QEventLoop loop;
+	 connect(pservice, SIGNAL(connected()), &loop, SLOT(quit()));
+	 loop.exec();
 	}
 
- //нужно подождать пока установится соединение,
- //поэтому блокируемся до нужного сигнала
- QEventLoop loop;
- connect(pservice, SIGNAL(connected()), &loop, SLOT(quit()));
- loop.exec();
-
  pservice->slotSentToServer(DATATYPE::REGISTRATION, pleNick->text(), QVariant(pleName->text()));
+ pservice->setNickAndName(pleNick->text(), pleName->text());
 }
 
 void Registration::slotProcessResult(bool registrationResult)
@@ -86,16 +86,15 @@ void Registration::slotProcessResult(bool registrationResult)
 		 return;
 		 }
 
-	 QFile file("data.bin");
-	 file.open(QIODevice::WriteOnly);
-	 QDataStream fileout(&file);
-	 fileout<<pleNick->text()<<pleName->text();
-	 file.close();
-	 emit(registered(0));
+//	 QFile file("data.bin");
+//	 file.open(QIODevice::WriteOnly);
+//	 QDataStream fileout(&file);
+//	 fileout<<pleNick->text()<<pleName->text();
+//	 file.close();
+	 emit(registrationFinished());
 
 	 QMessageBox::information(this, "Регистрация прошла успешно",
-														"Вы успешно зарегистрировались в сети. "
-														"Теперь можете подключиться к серверу");
+														"Вы успешно зарегистрировались в сети");
 
 	 deleteLater();
 }

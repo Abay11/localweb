@@ -52,8 +52,9 @@ private slots:
 public slots:
 
 signals:
- void registered(int index);
+ void registrationFinished();
  void addressChanged(QString address, QString port);
+ void nickAndNameChanged(QString nick, QString name);
 };
 
 #endif // REGISTRATION_H

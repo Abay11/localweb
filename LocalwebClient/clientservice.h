@@ -7,7 +7,10 @@
 #include <QNetworkInterface>
 #include <QMessageBox>
 #include <QStringListModel>
+#include <QListWidget>
 #include <QMessageBox>
+#include <QFile>
+#include <QLabel>
 
 #include "../clientinfo.h"
 
@@ -17,7 +20,8 @@ class ClientService : public QObject
 
 private:
  QWidget *pparent;
- QString mnick="", mname;
+ QString nick;
+ QString name;
 
  bool registrationResult=false;
 
@@ -25,15 +29,20 @@ private:
  QTcpSocket *psocket;
  QString *pserverAddress, *pserverPort;
 
- QStringListModel *ponline, *poffline;
+ QStringListModel *ponlines, *pofflines;
  QMap<QString, ClientInfo*> clients;
 
  void save();
  void restore();
+ void setDataToModels();
 
 public:
  ClientService(QWidget *parent=nullptr);
  bool socketIsOpen();
+ QStringListModel *onlineModel();
+ QStringListModel *offlineModel();
+
+ void setNickAndName(QString nick, QString name);
 
 private slots:
  void slotConnected();

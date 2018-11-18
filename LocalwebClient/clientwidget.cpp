@@ -18,8 +18,9 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  ,pgeneralConvertion(new ConvertionWidget("General"))
  ,pservice(service)
 {
-// pleAddress->setText(pleAddress->text());
-// pmsgField->setPlaceholderText("Введите сообщение...");
+ plistdock->setOnlineModel(pservice->onlineModel());
+ plistdock->setOfflineModel(pservice->offlineModel());
+
  pcmdDisconnect->setEnabled(false);
 
  phlay->addWidget(plblAddress);
@@ -53,15 +54,6 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 	setCentralWidget(pcentral);
 	setUI();
 	resize(640, 480);
-}
-
-void ClientWidget::slotSwitchBetweenWidgets()
-{
- qDebug()<<"reloadBase called";
- //reload base
- QApplication::setQuitOnLastWindowClosed(false);
- ptray->show();
-
 }
 
 void ClientWidget::slotAddressChanged(QString newAddress)
@@ -169,13 +161,6 @@ void ClientWidget::setUI()
 
  addToolBar(toolbar);
  setMenuBar(pmenuBar);
-}
-
-void ClientWidget::hideSystemtray(bool value)
-{
- value?
- ptray->hide()
-	: ptray->show();
 }
 
 void ClientWidget::slotConnectClicked()

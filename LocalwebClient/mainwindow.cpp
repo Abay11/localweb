@@ -1,37 +1,31 @@
 #include "mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
- :QMainWindow(parent)
- ,pwidgetsStack(new QStackedWidget(this))
- ,pservice(new ClientService(this))
+void MainWindow::setupAndShowRegistrationWidget()
 {
-// plogger=new MyLogger;
- pclientWidget=new ClientWidget(pservice, this);
+ preg=new Registration(pservice, this);
+ pstackedWidgets->addWidget(preg);
+ pstackedWidgets->setCurrentIndex(0);
+ connect(preg, SIGNAL(registrationFinished()),
+				 SLOT(slotShowClientWidget()));
+}
 
- pwidgetsStack->addWidget(pclientWidget);
-
- if(QFile::exists("data.bin"))
-	{
-	 pwidgetsStack->setCurrentIndex(0);
-	}
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+//,plogger(new MyLogger)
+,pstackedWidgets(new QStackedWidget(this))
+,pservice(new ClientService(this))
+{
+ if(!QFile::exists("data.bin"))
+	setupAndShowRegistrationWidget();
  else
-	{
-	 preg=new Registration(pservice, this);
-	 pwidgetsStack->addWidget(preg);
-	 pwidgetsStack->setCurrentIndex(1);
-	 connect(preg, SIGNAL(registered(int)),
-				 pwidgetsStack,
-				 SLOT(setCurrentIndex(int)));
-	 connect(pwidgetsStack, SIGNAL(currentChanged(int)),
-					 pclientWidget, SLOT(slotSwitchBetweenWidgets())); //необходимо чтобы заново вычитать базу
+	slotShowClientWidget();
 
-	 connect(preg, SIGNAL(addressChanged(QString, QString)),
-					 pclientWidget, SLOT(slotSetAddress(QString, QString)));
-
-	 pclientWidget->hideSystemtray(true);
-	}
-
- setCentralWidget(pwidgetsStack);
-
+ setCentralWidget(pstackedWidgets);
  resize(1000, 600);
+}
+
+void MainWindow::slotShowClientWidget()
+{
+ pclientWidget=new ClientWidget(pservice, this);
+ pstackedWidgets->addWidget(pclientWidget);
+ pstackedWidgets->setCurrentIndex(pstackedWidgets->count()-1);
 }

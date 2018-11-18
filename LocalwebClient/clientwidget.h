@@ -69,14 +69,12 @@ public:
  ~ClientWidget();
 
  void setUI();
- void hideSystemtray(bool);
 
 private slots:
  void slotConnectClicked();
  void slotQuit();
 
 public slots:
- void slotSwitchBetweenWidgets();
 
  void slotAddressChanged(QString);
  void slotPortChanged(QString);

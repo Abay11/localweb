@@ -1,5 +1,5 @@
-#ifndef STACKEDWIDGET_H
-#define STACKEDWIDGET_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 #include <QMainWindow>
 #include <QStackedWidget>
@@ -17,18 +17,24 @@
 #include "../mylogger.h"
 #include "clientservice.h"
 
-class MainWindow:public QMainWindow
+class MainWindow : public QMainWindow
 {
+ Q_OBJECT
 private:
- QStackedWidget *pwidgetsStack;
+ QStackedWidget *pstackedWidgets;
 
  MyLogger *plogger;
  ClientWidget* pclientWidget;
  Registration* preg;
  ClientService *pservice;
 
+ void setupAndShowRegistrationWidget();
+
 public:
- MainWindow(QWidget *parent=nullptr);
+ explicit MainWindow(QWidget *parent = nullptr);
+
+public slots:
+	void slotShowClientWidget();
 };
 
-#endif // STACKEDWIDGET_H
+#endif // MAINWINDOW_H

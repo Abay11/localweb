@@ -16,6 +16,7 @@ ListDock::ListDock(QWidget *parent)
  QWidget *pwidget=new QWidget(this);
  pwidget->setLayout(pvlay);
 
+ setFeatures(QDockWidget::NoDockWidgetFeatures);
  setWidget(pwidget);
 }
 

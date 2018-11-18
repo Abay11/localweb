@@ -25,45 +25,32 @@ void ClientService::save()
 
 void ClientService::restore()
 {
-// QFile file("data.bin");
-// if(file.open(QFile::ReadOnly))
-//	{
-//	 QDataStream in(&file);
-//	 //at first read current user info
-//	 in>>usernick>>username;
+ QFile file("data.bin");
+ if(file.open(QFile::ReadOnly))
+	{
+	 QDataStream in(&file);
+	 in>>nick>>name;
 
-//	 //then read server address and port
-//	 //and update only if they not null (after registration they may be null)
-//	 QString addr, port;
-//	 in>>addr>>port;
-//	 if(addr!="")
-//		{
-//		 *pserverAddress=addr;
-//		pleAddress->setText(*pserverAddress);
-//		}
-//	 if(port!="")
-//		{
-//		 *pserverPort=port;
-//		 plePort->setText(port);
-//		}
+		in>>*pserverAddress>>*pserverPort;
 
-//	 //then other clients
-//	 in>>clients;
-//	 file.close();
+	 in>>clients;
+	 file.close();
 
-//		ponlineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/online.png"), QString("Вы: %1").arg(usernick)));
+	 setDataToModels();
+	}
+// сразу после регистрации не создается файл сохранения
+// поэтому, чтобы лишний раз не выбрасывать ошибку
+// сперва проверяется существует ли вообще сохранения
+// и только если оно существует, и не удалось ее прочитать
+// кидать ошибку
+ else if(QFile::exists(file.fileName()))
+	qWarning()<<"Error restoring clients base";
+}
 
-//	 for(auto iter=clients.begin(), end=clients.end(); iter!=end; ++iter)
-//		if(usernick!=iter.key())
-//			pofflineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/offline.png"), iter.key()));
-//	}
- //сразу после регистрации не создается файл сохранения
- //поэтому, чтобы лишний раз не выбрасывать ошибку
- //сперва проверяется существует ли вообще сохранения
- //и только если оно существует, и не удалось ее прочитать
- //кидать ошибку
-// else if(QFile::exists(file.fileName()))
-//	qWarning()<<"Error restoring clients base";
+void ClientService::setDataToModels()
+{
+ ponlines->setStringList(QStringList("Вы: "+nick));
+ pofflines->setStringList(clients.keys());
 }
 
 ClientService::ClientService(QWidget *prnt)
@@ -72,9 +59,11 @@ ClientService::ClientService(QWidget *prnt)
  ,psocket(new QTcpSocket)
  ,pserverAddress(new QString)
  ,pserverPort(new QString)
- ,ponline(new QStringListModel)
- ,poffline(new QStringListModel)
+ ,ponlines(new QStringListModel)
+ ,pofflines(new QStringListModel)
 {
+ restore();
+
  connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
  connect(psocket, SIGNAL(connected()), SIGNAL(connected()));
  connect(psocket, SIGNAL(disconnected()), SIGNAL(disconnected()));
@@ -85,6 +74,22 @@ ClientService::ClientService(QWidget *prnt)
 bool ClientService::socketIsOpen()
 {
  return psocket->isOpen();
+}
+
+QStringListModel* ClientService::onlineModel()
+{
+ return ponlines;
+}
+
+QStringListModel *ClientService::offlineModel()
+{
+ return pofflines;
+}
+
+void ClientService::setNickAndName(QString nick, QString name)
+{
+ this->nick=nick;
+ this->name=name;
 }
 
 void ClientService::slotConnected()
@@ -125,6 +130,9 @@ void ClientService::slotReadyRead()
 	switch (type) {
 	 case DATATYPE::REGISTRATION:
 		in>>time>>registrationResult;
+
+		if(registrationResult) setDataToModels();
+
 		emit returnRegistrationResult(registrationResult);
 		qInfo()<<time.toString("[hh:mm:ss] ")
 					<<"Registration attempt. Result: "<<registrationResult;
@@ -143,16 +151,30 @@ void ClientService::slotReadyRead()
 			in>>clients;
 			}
 
-		 //нужно получить количество доступных
-		 int count=0;
-		 in>>count;
+//		 //нужно получить количество доступных
+//		 int count=0;
+//		 in>>count;
 
-		 for(int i=0; i<count; ++i)
-			{
-			 QString nick;
-			 in>>nick;
-//			 onlines.push_back(nick);
-			}
+		 QList<QString> onlines;
+		 in>>onlines;
+		 qDebug()<<"Приняли как онлайн: ";
+		 for(auto s : onlines)
+			qDebug()<<s;
+
+		 setDataToModels();
+//		 ponlines
+//		 onlines.prepend(nick);
+//		 ponlines->setStringList(onlines);
+//		 ponlines->setStringList(onlines);
+
+//		 pofflines->setStringList()
+
+//		 for(int i=0; i<count; ++i)
+//			{
+//			 QString nick;
+//			 in>>nick;
+////			 onlines.push_back(nick);
+//			}
 
 		 //кидаем полученный список онлайнов в список доступных
 //		 for(auto i : onlines)
@@ -330,13 +352,13 @@ void ClientService::slotSentToServer(DATATYPE type, QString msg, QVariant additi
  //нужно приписать, что это он.
  //Если это будет Р2Р, возможно это будет не обяз. Нужно еще раз обдумать...
  //а пока так.*/
-	 msg.prepend(mnick+": ");
+	 msg.prepend(nick+": ");
 	 out<<msg;
 	 qDebug()<<"msg send";
 	 break;
 
 	case DATATYPE::CONNECT:
-	 out<<mnick<<clients.size();
+	 out<<nick<<clients.size();
 	 break;
 	default: break;
 	}
@@ -352,3 +374,4 @@ void ClientService::slotSetAddress(QString addr, QString port)
  *pserverAddress=addr;
  *pserverPort=port;
 }
+

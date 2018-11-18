@@ -30,23 +30,23 @@ SOURCES += \
     ../clientinfo.cpp \
     ../popup.cpp \
     ../settingswidget.cpp \
-    mainwindow.cpp \
     registrationwidget.cpp \
     convertionwidget.cpp \
     listdock.cpp \
-    clientservice.cpp
+    clientservice.cpp \
+    mainwindow.cpp
 
 HEADERS += \
     ../mylogger.h \
     ../clientinfo.h \
     ../popup.h \
     ../settingswidget.h \
-    mainwindow.h \
     registrationwidget.h \
     clientwidget.h \
     convertionwidget.h \
     listdock.h \
-    clientservice.h
+    clientservice.h \
+    mainwindow.h
 
 
 # Default rules for deployment.

@@ -29,12 +29,14 @@ private:
  QTcpSocket *psocket;
  QString *pserverAddress, *pserverPort;
 
- QStringListModel *ponlines, *pofflines;
+ QStringListModel *ponlineModel, *pofflineModel;
  QMap<QString, ClientInfo*> clients;
 
  void saveDataAndProperties();
  void restoreDataAndProperties();
- void setDataToModels();
+ void addAllUsersToOfflineModel();
+ void removeOnlinesFromOfflines(QStringList onlines);
+ void throwOnlinesToOfflines();
 
 public:
  ClientService(QWidget *parent=nullptr);
@@ -55,6 +57,7 @@ public slots:
  void slotDisconnectFromServer();
  void slotSentToServer(DATATYPE, QString="", QVariant=0);
  void slotSetAddress(QString addr, QString port);
+
 
 signals:
  void connected();

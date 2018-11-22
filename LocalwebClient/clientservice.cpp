@@ -30,21 +30,22 @@ void ClientService::restoreDataAndProperties()
 	 in>>clients;
 	 file.close();
 
-	 setDataToModels();
+	 addAllUsersToOfflineModel();
 	}
-// сразу после регистрации не создается файл сохранения
-// поэтому, чтобы лишний раз не выбрасывать ошибку
-// сперва проверяется существует ли вообще сохранения
-// и только если оно существует, и не удалось ее прочитать
-// кидать ошибку
  else if(QFile::exists(file.fileName()))
 	qWarning()<<"Error restoring clients base";
 }
 
-void ClientService::setDataToModels()
+void ClientService::addAllUsersToOfflineModel()
 {
- ponlines->setStringList(QStringList("Вы: "+nick));
- pofflines->setStringList(clients.keys());
+ QStringList offlines(clients.keys());
+
+ QString usernick="Вы: "+nick;
+
+ offlines.prepend(usernick);
+
+ ponlineModel->setStringList(QStringList());
+ pofflineModel->setStringList(offlines);
 }
 
 ClientService::ClientService(QWidget *prnt)
@@ -53,8 +54,8 @@ ClientService::ClientService(QWidget *prnt)
  ,psocket(new QTcpSocket)
  ,pserverAddress(new QString)
  ,pserverPort(new QString)
- ,ponlines(new QStringListModel)
- ,pofflines(new QStringListModel)
+ ,ponlineModel(new QStringListModel)
+ ,pofflineModel(new QStringListModel)
 {
  restoreDataAndProperties();
 
@@ -77,12 +78,12 @@ bool ClientService::socketIsOpen()
 
 QStringListModel* ClientService::onlineModel()
 {
- return ponlines;
+ return ponlineModel;
 }
 
 QStringListModel *ClientService::offlineModel()
 {
- return pofflines;
+ return pofflineModel;
 }
 
 void ClientService::setNickAndName(QString nick, QString name)
@@ -130,7 +131,7 @@ void ClientService::slotReadyRead()
 	 case DATATYPE::REGISTRATION:
 		in>>time>>registrationResult;
 
-		if(registrationResult) setDataToModels();
+		if(registrationResult) addAllUsersToOfflineModel();
 
 		emit returnRegistrationResult(registrationResult);
 		qInfo()<<time.toString("[hh:mm:ss] ")
@@ -156,7 +157,7 @@ void ClientService::slotReadyRead()
 		 for(auto s : onlines)
 			qDebug()<<s;
 
-		 setDataToModels();
+		 removeOnlinesFromOfflines(onlines);
 
 		 break;
 	 }
@@ -293,6 +294,8 @@ void ClientService::slotConnectToServer()
 void ClientService::slotDisconnectFromServer()
 {
  psocket->close();
+ throwOnlinesToOfflines();
+
  emit disconnected();
 }
 
@@ -339,5 +342,34 @@ void ClientService::slotSetAddress(QString addr, QString port)
 {
  *pserverAddress=addr;
  *pserverPort=port;
+}
+
+void ClientService::removeOnlinesFromOfflines(QStringList onlines)
+{
+ QStringList offlines=pofflineModel->stringList();
+ offlines.pop_front();
+
+ onlines.removeOne(nick);
+ onlines.prepend("Вы: "+nick);
+
+ for(auto o:onlines)
+	if(offlines.contains(o))
+	 offlines.removeOne(o);
+
+ ponlineModel->setStringList(onlines);
+ pofflineModel->setStringList(offlines);
+}
+
+void ClientService::throwOnlinesToOfflines()
+{
+ QStringList onlines= ponlineModel->stringList();
+ QStringList offlines=pofflineModel->stringList();
+
+ onlines.pop_front();
+ offlines.append(onlines);
+ offlines.prepend("Вы: nick");
+
+ ponlineModel->setStringList(QStringList());
+ pofflineModel->setStringList(offlines);
 }
 

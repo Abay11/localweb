@@ -38,10 +38,11 @@ void ClientService::restoreDataAndProperties()
 
 void ClientService::addAllUsersToOfflineModel()
 {
- QStringList offlines(clients.keys());
+ QStringList offlines;
+ if(!clients.isEmpty())
+	offlines.append(clients.keys());
 
  QString usernick="Вы: "+nick;
-
  offlines.prepend(usernick);
 
  ponlineModel->setStringList(QStringList());
@@ -131,12 +132,11 @@ void ClientService::slotReadyRead()
 	 case DATATYPE::REGISTRATION:
 		in>>time>>registrationResult;
 
-		if(registrationResult) addAllUsersToOfflineModel();
-
 		emit returnRegistrationResult(registrationResult);
 		qInfo()<<time.toString("[hh:mm:ss] ")
 					<<"Registration attempt. Result: "<<registrationResult;
 		break;
+
 	 case DATATYPE::CONNECT:
 	 {
 		 qDebug()<<"Receiving list of clients";
@@ -148,7 +148,7 @@ void ClientService::slotReadyRead()
 		 if(serverBaseSize!=clients.size())
 			{
 			 qDebug()<<"база не сошлась, ждем новый";
-			in>>clients;
+			 in>>clients;
 			}
 
 		 QList<QString> onlines;
@@ -347,7 +347,9 @@ void ClientService::slotSetAddress(QString addr, QString port)
 void ClientService::removeOnlinesFromOfflines(QStringList onlines)
 {
  QStringList offlines=pofflineModel->stringList();
- offlines.pop_front();
+
+ if(!offlines.empty())
+	offlines.pop_front();
 
  onlines.removeOne(nick);
  onlines.prepend("Вы: "+nick);

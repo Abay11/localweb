@@ -86,11 +86,6 @@ void Registration::slotProcessResult(bool registrationResult)
 		 return;
 		 }
 
-//	 QFile file("data.bin");
-//	 file.open(QIODevice::WriteOnly);
-//	 QDataStream fileout(&file);
-//	 fileout<<pleNick->text()<<pleName->text();
-//	 file.close();
 	 emit(registrationFinished());
 
 	 QMessageBox::information(this, "Регистрация прошла успешно",

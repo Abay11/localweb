@@ -16,7 +16,7 @@ MyWidget::MyWidget(QWidget *parent)
  ,pdock(new QDockWidget("Пользователи", this))
  ,plist(new QListWidget())
  ,pserver(new QTcpServer(this))
- ,logger(new MyLogger)
+// ,logger(new MyLogger)
  ,mnextBlockSize(0)
  ,ptray(new QSystemTrayIcon)
 {
@@ -69,7 +69,7 @@ MyWidget::MyWidget(QWidget *parent)
 
 MyWidget::~MyWidget()
 {
- delete logger;
+// delete logger;
  saveBase();
 }
 

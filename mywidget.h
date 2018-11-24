@@ -49,7 +49,7 @@ private:
 
  QTcpServer* pserver;
 
- MyLogger* logger;
+// MyLogger* logger;
 
  QString maddress;
  quint16 mnextBlockSize;

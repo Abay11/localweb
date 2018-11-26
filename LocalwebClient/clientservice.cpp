@@ -374,4 +374,3 @@ void ClientService::throwOnlinesToOfflines()
  ponlineModel->setStringList(QStringList());
  pofflineModel->setStringList(offlines);
 }
-

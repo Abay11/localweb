@@ -45,7 +45,7 @@ public:
 QDataStream& operator>>(QDataStream& out, ClientInfo *&cinfo);
 QDataStream& operator<<(QDataStream& out, const ClientInfo *const&cinfo);
 
-QDataStream& operator<<(QDataStream& out, DATATYPE& type);
-QDataStream& operator>>(QDataStream& out, DATATYPE& type);
+QDataStream &operator<<(QDataStream &out, DATATYPE &type);
+QDataStream &operator>>(QDataStream &out, DATATYPE &type);
 
 #endif // CLIENTINFO_H

@@ -1,5 +1,15 @@
 #include "mywidget.h"
 
+//quint16 MyWidget::getNextBlockSize() const
+//{
+// return nextBlockSize;
+//}
+
+//void MyWidget::setMnextBlockSize(const quint16 &value)
+//{
+// nextBlockSize = value;
+//}
+
 MyWidget::MyWidget(QWidget *parent)
  :QMainWindow(parent)
  ,pport(new QString("6175"))
@@ -17,7 +27,7 @@ MyWidget::MyWidget(QWidget *parent)
  ,plist(new QListWidget())
  ,pserver(new QTcpServer(this))
 // ,logger(new MyLogger)
- ,mnextBlockSize(0)
+ ,nextBlockSize(0)
  ,ptray(new QSystemTrayIcon)
 {
  plePort->setValidator(pvalidator);
@@ -323,23 +333,23 @@ void MyWidget::slotDisconnection()
 
 void MyWidget::slotReadClient()
 {
- qDebug()<<"read to client";
+ qDebug()<<"read client";
  QTcpSocket* pclient=static_cast<QTcpSocket*>(sender());
  QDataStream in(pclient);
  in.setVersion(QDataStream::Qt_5_11);
 
  forever
  {
-	if(!mnextBlockSize)
+	if(!nextBlockSize)
 	 {
 		if(pclient->bytesAvailable()<static_cast<qint64>(sizeof(quint16)))
 		 break;
 
-		in>>mnextBlockSize;
+		in>>nextBlockSize;
 	 }
 
 
-	if(pclient->bytesAvailable()<mnextBlockSize)
+	if(pclient->bytesAvailable()<nextBlockSize)
 	 break;
 
 	QString msg;
@@ -469,7 +479,7 @@ void MyWidget::slotReadClient()
 		break;
 	 }
 
-	mnextBlockSize=0;
+	nextBlockSize=0;
  }
 }
 

@@ -52,7 +52,7 @@ private:
 // MyLogger* logger;
 
  QString maddress;
- quint16 mnextBlockSize;
+ quint16 nextBlockSize;
 
 
  QMap<QString, ClientInfo*> clientbase;

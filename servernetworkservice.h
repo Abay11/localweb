@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QString>
 #include <QTime>
+#include <QFile>
 
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -19,18 +20,28 @@ private:
  quint16 port;
  QTcpServer *ptcpServer;
 
+ QMap<QString, ClientInfo *> *clientbase;
+ QMap<QTcpSocket *, QString> *socketsAndNicksOfOnlines;
+
 public:
  explicit ServerNetworkService(quint16 port, QObject *parent = nullptr);
  quint16 serverPort();
-
+ quint16 expectedPort();
+ bool saveData(QString filename="data.bin");
+ bool restoreData(QString filename="data.bin");
+ void sendToClient();
+ bool addToBase(const QString &nick, const QString &name,
+								const QString &address, const QString &port);
+ QMap<QString, ClientInfo *> *getClientBase() const;
 signals:
- void receivedMessage(QString msg);
+// void receivedMessage(QString msg);
 public slots:
  bool slotStartServer();
  void slotStopServer();
  void slotNewConnection();
  void slotDisconnection();
  void slotReadClient();
+
 };
 
 #endif // SERVERNETWORKSERVICE_H

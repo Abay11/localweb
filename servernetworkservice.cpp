@@ -6,6 +6,9 @@ ServerNetworkService::ServerNetworkService(quint16 port, QObject *parent)
  this->port=port;
  ptcpServer=new QTcpServer(this);
 
+ clientbase=new QMap<QString, ClientInfo *>;
+ socketsAndNicksOfOnlines=new QMap<QTcpSocket *, QString>;
+
  connect(ptcpServer, SIGNAL(newConnection()),
 				 SLOT(slotNewConnection()));
 }
@@ -13,6 +16,66 @@ ServerNetworkService::ServerNetworkService(quint16 port, QObject *parent)
 quint16 ServerNetworkService::serverPort()
 {
  return ptcpServer->serverPort();
+}
+
+quint16 ServerNetworkService::expectedPort()
+{
+ return port;
+}
+
+bool ServerNetworkService::saveData(QString filename)
+{
+ QFile file(filename);
+ if(file.open(QFile::WriteOnly))
+	{
+	 QDataStream out(&file);
+	 out<<port<<*clientbase;
+	 file.close();
+
+	 return true;
+	}
+	else
+	return false;
+}
+
+bool ServerNetworkService::restoreData(QString filename)
+{
+ QFile file(filename);
+ if(file.open(QFile::ReadOnly))
+	{
+	 QDataStream in(&file);
+	 in>>port>>*clientbase;
+
+	 file.close();
+	 return true;
+	}
+ else
+	return false;
+}
+
+void ServerNetworkService::sendToClient()
+{
+
+}
+
+bool ServerNetworkService::addToBase(const QString &nick,
+																		 const QString &name,
+																		 const QString &addr,
+																		 const QString &port)
+{
+ QString lowerNick=nick.toLower();
+ if(clientbase->find(lowerNick)!=clientbase->end())
+	return false;
+
+ clientbase->insert(lowerNick,
+										new ClientInfo(name, addr,
+																	 port, true));
+ return true;
+}
+
+QMap<QString, ClientInfo *> *ServerNetworkService::getClientBase() const
+{
+ return clientbase;
 }
 
 bool ServerNetworkService::slotStartServer()
@@ -73,13 +136,13 @@ void ServerNetworkService::slotReadClient()
 	 {
 	 case DATATYPE::MESSAGE:
 	 {
-		 in>>msg;
+		 qDebug()<<"Received message";
 
-//		 emit receivedMessage(msg);
+		 in>>msg;
 		 break;
 	 }
 	 default:
-		qWarning()<<"Unknown datatype type";
+		qWarning()<<"Unknown datatype";
 		break;
 	 }
  }

@@ -19,6 +19,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
  else
 	slotShowClientWidget();
 
+ connect(pservice, SIGNAL(slotError(QString, QString)),
+				 SLOT(slotShowSocketError(QString, QString)));
+
  setCentralWidget(pstackedWidgets);
  resize(1000, 600);
 }
@@ -28,4 +31,9 @@ void MainWindow::slotShowClientWidget()
  pclientWidget=new ClientWidget(pservice, this);
  pstackedWidgets->addWidget(pclientWidget);
  pstackedWidgets->setCurrentIndex(pstackedWidgets->count()-1);
+}
+
+void MainWindow::slotShowSocketError(QString title, QString info)
+{
+ QMessageBox::critical(this, title, info);
 }

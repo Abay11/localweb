@@ -5,10 +5,8 @@
 #include <QMap>
 #include <QTcpSocket>
 #include <QNetworkInterface>
-#include <QMessageBox>
 #include <QStringListModel>
 #include <QListWidget>
-#include <QMessageBox>
 #include <QFile>
 #include <QLabel>
 
@@ -19,7 +17,6 @@ class ClientService : public QObject
  Q_OBJECT
 
 private:
- QWidget *pparent;
  QString nick;
  QString name;
 
@@ -63,6 +60,7 @@ signals:
  void connected();
  void disconnected();
  void returnRegistrationResult(bool);
+ void socketError(QString title, QString info);
 };
 
 #endif // CLIENTSERVICE_H

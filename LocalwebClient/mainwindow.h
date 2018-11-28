@@ -35,6 +35,7 @@ public:
 
 public slots:
 	void slotShowClientWidget();
+	void slotShowSocketError(QString title, QString info);
 };
 
 #endif // MAINWINDOW_H

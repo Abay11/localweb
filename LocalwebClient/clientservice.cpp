@@ -51,7 +51,6 @@ void ClientService::addAllUsersToOfflineModel()
 
 ClientService::ClientService(QWidget *prnt)
  :QObject (prnt)
- ,pparent(prnt)
  ,psocket(new QTcpSocket)
  ,pserverAddress(new QString)
  ,pserverPort(new QString)
@@ -278,11 +277,9 @@ void ClientService::slotError(QAbstractSocket::SocketError nerr)
 							 "Обратитесь к администратору сети.");
 	}
 
-	QMessageBox::critical(pparent,
-											 "Ошибка подключения к серверу", info);
-
-	qCritical()<<"Ошибка соединения с сервером: "<<psocket->errorString();
-	psocket->close();
+ emit socketError("Ошибка подключения к серверу", info);
+ qCritical()<<"Ошибка соединения с сервером: "<<psocket->errorString();
+ psocket->close();
 }
 
 void ClientService::slotConnectToServer()

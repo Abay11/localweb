@@ -371,17 +371,17 @@ void MyWidget::slotReadClient()
 		 bool isRegistrationSuccess=pos==clientbase.end();
 		 if(isRegistrationSuccess)
 			{
-		 clientbase.insert(nick,
-											 new ClientInfo(fullname,
-																			pclient->localAddress().toString()
-																			,pclient->localAddress().toString()
-																			,true));
-		 socketsAndNicksOfOnlines.insert(pclient, nick);
-		 plist->addItem(nick);
-		 plist->sortItems();
-		 pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
-									 + "Зарегистрирован новый пользователь " + nick);
-		 qInfo()<<"Зарегистрирован новый пользователь " + nick;
+			 clientbase.insert(nick,
+												 new ClientInfo(fullname,
+																				pclient->localAddress().toString()
+																				,pclient->localAddress().toString()
+																				,true));
+			 socketsAndNicksOfOnlines.insert(pclient, nick);
+			 plist->addItem(nick);
+			 plist->sortItems();
+			 pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
+										 + "Зарегистрирован новый пользователь " + nick);
+			 qInfo()<<"Зарегистрирован новый пользователь " + nick;
 			}
 
 

@@ -53,9 +53,37 @@ bool ServerNetworkService::restoreData(QString filename)
 	return false;
 }
 
-void ServerNetworkService::sendToClient()
+void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant data, void *paddition)
 {
+ QByteArray byteArr;
+ QDataStream out(&byteArr, QIODevice::WriteOnly);
+ out.setVersion(QDataStream::Qt_5_11);
 
+ out<<quint16(0)
+	 <<static_cast<int>(type);
+
+ switch(type)
+	{
+	case DATATYPE::CONNECT:
+	 {
+		int clientBaseSize=data.toInt();
+		out<<clientBaseSize;
+
+		if(clientbase->size() != clientBaseSize)
+			out<<*clientbase;
+
+		out<<socketsAndNicksOfOnlines->values();
+
+		break;
+	 }
+	default:
+	 qWarning()<<"Unknown datatype for sending to client";
+	 break;
+	}
+
+ out.device()->seek(0);
+ out<<quint16(static_cast<size_t>(byteArr.size())-sizeof (quint16));
+ to->write(byteArr);
 }
 
 bool ServerNetworkService::addToBase(const QString &nick,
@@ -139,11 +167,36 @@ void ServerNetworkService::slotReadClient()
 		 qDebug()<<"Received message";
 
 		 in>>msg;
+		 for(auto it=socketsAndNicksOfOnlines->begin();
+				 it!=socketsAndNicksOfOnlines->end();
+				 ++it)
+			{
+			 sendToClient(it.key(), DATATYPE::MESSAGE, msg);
+
+			}
+		 break;
+	 }
+	 case DATATYPE::CONNECT:
+	 {
+		 QString nick;
+		 int clientBaseSize;
+		 in>>nick>>clientBaseSize;
+
+		 auto client=clientbase->find(nick);
+		 if(!nick.isEmpty() && client!=clientbase->end())
+			{
+			 socketsAndNicksOfOnlines->insert(pclient, nick);
+//		  notifying other users
+			}
+
+		 sendToClient(pclient, DATATYPE::CONNECT, clientbase->size());
 		 break;
 	 }
 	 default:
 		qWarning()<<"Unknown datatype";
 		break;
 	 }
+
+	nextBlockSize=0;
  }
 }

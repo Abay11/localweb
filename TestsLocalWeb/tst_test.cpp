@@ -2,6 +2,8 @@
 #include <QCoreApplication>
 
 // add necessary includes here
+#include "../LocalwebClient/clientservice.h"
+#include "../servernetworkservice.h"
 
 class test : public QObject
 {
@@ -12,8 +14,13 @@ public:
  ~test();
 
 private slots:
- void test_case1();
-
+ void test_addToBase();
+ void test_saveDataAndRestoreData();
+ void test_startServer0();
+ void test_startServer1();
+ void test_startServer2();
+ void test_clientConnectionToServer();
+// void test_readingMessage();
 };
 
 test::test()
@@ -26,10 +33,191 @@ test::~test()
 
 }
 
-void test::test_case1()
+void test::test_addToBase()
 {
+ ServerNetworkService *pservice=new ServerNetworkService(0);
+	QCOMPARE(pservice->addToBase("nick1","","",""), true);
+	QCOMPARE(pservice->addToBase("nick2","","",""), true);
+	QCOMPARE(pservice->addToBase("JOHNY","","",""), true);
+	QCOMPARE(pservice->addToBase("test00","name","ip","port"), true);
+	QCOMPARE(pservice->addToBase("test0","name","ip","port"), true);
+	QCOMPARE(pservice->addToBase("test","name","ip","port"), true);
 
+	QCOMPARE(pservice->addToBase("nick1","","",""), false);
+	QCOMPARE(pservice->addToBase("NICK1","","",""), false);
+	QCOMPARE(pservice->addToBase("JOHNY","","",""), false);
+	QCOMPARE(pservice->addToBase("test00","name","ip","port"), false);
+	QCOMPARE(pservice->addToBase("test00","","",""), false);
+
+	delete pservice;
 }
+
+void test::test_saveDataAndRestoreData()
+{
+ QString filename="clientdata.bin";
+ quint16 nport=9009;
+ ServerNetworkService *pserviceForSave=new ServerNetworkService(nport);
+ ServerNetworkService *pserviceForRestore=new ServerNetworkService(0);
+
+ pserviceForSave->addToBase("nick1","name1","127.0.0.1","8888");
+ pserviceForSave->addToBase("nick2","name2","127.0.0.1","9999");
+ QCOMPARE(pserviceForSave->saveData(filename), true);
+
+ QCOMPARE(pserviceForRestore->restoreData(filename), true);
+ QCOMPARE(pserviceForRestore->expectedPort(), nport);
+
+ QCOMPARE(pserviceForRestore->getClientBase()->size(), 2);
+
+ auto keys=pserviceForRestore->getClientBase()->keys();
+ QCOMPARE(keys.at(0), "nick1");
+ QCOMPARE(keys.at(1), "nick2");
+
+ auto cinfo1=pserviceForRestore->getClientBase()->first();
+ QCOMPARE(cinfo1->fullName(), "name1");
+ QCOMPARE(cinfo1->address(), "127.0.0.1");
+ QCOMPARE(cinfo1->port(), "8888");
+
+ auto cinfo2=pserviceForRestore->getClientBase()->last();
+ QCOMPARE(cinfo2->fullName(), "name2");
+ QCOMPARE(cinfo2->address(), "127.0.0.1");
+ QCOMPARE(cinfo2->port(), "9999");
+
+
+ QFile file(filename);
+ QCOMPARE(file.exists(), true);
+ file.remove();
+
+ delete pserviceForSave;
+ delete pserviceForRestore;
+}
+
+void test::test_startServer0()
+{
+ quint16 nPort=7777;
+ ServerNetworkService *pservice=new ServerNetworkService(nPort);
+ QCOMPARE(pservice->slotStartServer(), true);
+ QCOMPARE(pservice->serverPort(), nPort);
+ pservice->slotStopServer();
+
+ delete pservice;
+}
+
+void test::test_startServer1()
+{
+ quint16 nPort=7777;
+ ServerNetworkService *pservice0=new ServerNetworkService(nPort);
+ QCOMPARE(pservice0->slotStartServer(), true);
+
+ ServerNetworkService *pservice1=new ServerNetworkService(nPort);
+ QCOMPARE(pservice1->slotStartServer(), false);
+
+ pservice0->slotStopServer();
+ pservice1->slotStopServer();
+ delete pservice0;
+ delete pservice1;
+}
+
+void test::test_startServer2()
+{
+ quint16 nPort=8888;
+ ServerNetworkService *pservice=new ServerNetworkService(nPort);
+ pservice->slotStartServer();
+ pservice->slotStopServer();
+
+ QCOMPARE(pservice->slotStartServer(), true);
+ pservice->slotStopServer();
+ delete pservice;
+}
+
+void test::test_clientConnectionToServer()
+{
+ QString port="9000";
+ ServerNetworkService *pserver=new ServerNetworkService(9000);
+ QCOMPARE(pserver->slotStartServer(), true);
+
+ QCOMPARE(pserver->addToBase("client0", "name0", "", ""), true);
+ QCOMPARE(pserver->addToBase("client1", "name1", "", ""), true);
+
+
+ ClientService *pclient0=new ClientService;
+ pclient0->slotSetAddress("localhost", port);
+ pclient0->setNickAndName("client0", "name0");
+ pclient0->slotConnectToServer();
+
+ QEventLoop *loop=new QEventLoop;
+ QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ QCOMPARE(pclient0->isConnected(), true);
+
+ auto clientbase = pclient0->getClientBase();
+ QCOMPARE(clientbase->size(), 2);
+ QCOMPARE(pclient0->getOnlines().size(), 1);
+
+ ClientService *pclient1=new ClientService;
+ pclient1->setNickAndName("client1", "nick1");
+ pclient1->slotSetAddress("localhost", port);
+ pclient1->slotConnectToServer();
+
+
+ QObject::connect(pclient1, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ QCOMPARE(pclient1->isConnected(), true);
+
+ auto clientbase1 = pclient1->getClientBase();
+ QCOMPARE(clientbase1->size(), 2);
+ QCOMPARE(pclient1->getOnlines().size(), 2);
+
+ pclient0->slotDisconnectFromServer();
+ pclient1->slotDisconnectFromServer();
+ pserver->slotStopServer();
+ delete pclient0;
+ delete pclient1;
+ delete pserver;
+ delete loop;
+}
+//*/
+
+/*
+void test::test_readingMessage()
+{
+ QString port="9000";
+ ServerNetworkService *pserver=new ServerNetworkService(9000);
+ QCOMPARE(pserver->slotStartServer(), true);
+
+ QEventLoop *loop=new QEventLoop;
+
+ ClientService *pclient0=new ClientService;
+ pclient0->setNickAndName("pclient0", "name0");
+ pclient0->slotSetAddress("localhost", port);
+ pclient0->slotConnectToServer();
+ QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+// ClientService *pclient1=new ClientService;
+// pclient1->slotSetAddress("localhost", port);
+// pclient1->slotConnectToServer();
+// QObject::connect(pclient1, SIGNAL(connected()), loop, SLOT(quit()));
+// loop->exec();
+
+ QCOMPARE(pclient0->isConnected(), true);
+// QCOMPARE(pclient1->isConnected(), true);
+
+// pserver->addToBase("client1", "name1", "localhost", pclient1->clientPort())
+
+// QString sendingMessage="Read me!";
+// pclient0->slotSentToServer(DATATYPE::MESSAGE, sendingMessage);
+
+ pclient0->slotDisconnectFromServer();
+ pserver->slotStopServer();
+ delete pclient0;
+ delete pserver;
+ delete loop;
+}
+*/
+
+
 
 QTEST_MAIN(test)
 

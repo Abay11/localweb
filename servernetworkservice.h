@@ -12,6 +12,8 @@
 #include <QTcpSocket>
 #include <QDataStream>
 
+#define CLIENTBASE QMap<QString, ClientInfo *>
+
 class ServerNetworkService : public QObject
 {
  Q_OBJECT
@@ -20,7 +22,7 @@ private:
  quint16 port;
  QTcpServer *ptcpServer;
 
- QMap<QString, ClientInfo *> *clientbase;
+ CLIENTBASE *clientbase;
  QMap<QTcpSocket *, QString> *socketsAndNicksOfOnlines;
 
 public:
@@ -29,7 +31,7 @@ public:
  quint16 expectedPort();
  bool saveData(QString filename="data.bin");
  bool restoreData(QString filename="data.bin");
- void sendToClient();
+ void sendToClient(QTcpSocket *to, DATATYPE type, QVariant data, void *paddition=nullptr);
  bool addToBase(const QString &nick, const QString &name,
 								const QString &address, const QString &port);
  QMap<QString, ClientInfo *> *getClientBase() const;
@@ -41,7 +43,6 @@ public slots:
  void slotNewConnection();
  void slotDisconnection();
  void slotReadClient();
-
 };
 
 #endif // SERVERNETWORKSERVICE_H

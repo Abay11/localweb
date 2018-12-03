@@ -1,7 +1,7 @@
 #include "mywidget.h"
+
 #include <QApplication>
 
-#include <mylogger.h>
 
 int main(int argc, char *argv[])
 {

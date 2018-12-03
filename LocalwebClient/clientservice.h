@@ -12,6 +12,8 @@
 
 #include "../clientinfo.h"
 
+#define CLIENTBASE QMap<QString, ClientInfo*>
+
 class ClientService : public QObject
 {
  Q_OBJECT
@@ -27,7 +29,7 @@ private:
  QString *pserverAddress, *pserverPort;
 
  QStringListModel *ponlineModel, *pofflineModel;
- QMap<QString, ClientInfo*> clients;
+ CLIENTBASE clients;
 
  void saveDataAndProperties();
  void restoreDataAndProperties();
@@ -41,8 +43,13 @@ public:
  bool socketIsOpen();
  QStringListModel *onlineModel();
  QStringListModel *offlineModel();
+ quint16 clientPort();
+ CLIENTBASE* getClientBase();
+ QStringList getOnlines();
+
 
  void setNickAndName(QString nick, QString name);
+ bool isConnected();
 
 private slots:
  void slotConnected();
@@ -57,6 +64,7 @@ public slots:
 
 
 signals:
+ void debugPurpose();
  void connected();
  void disconnected();
  void returnRegistrationResult(bool);

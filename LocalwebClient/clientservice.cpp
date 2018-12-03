@@ -86,10 +86,30 @@ QStringListModel *ClientService::offlineModel()
  return pofflineModel;
 }
 
+quint16 ClientService::clientPort()
+{
+ return psocket->localPort();
+}
+
+QMap<QString, ClientInfo *> *ClientService::getClientBase()
+{
+ return &clients;
+}
+
+QStringList ClientService::getOnlines()
+{
+ return ponlineModel->stringList();
+}
+
 void ClientService::setNickAndName(QString nick, QString name)
 {
  this->nick=nick;
  this->name=name;
+}
+
+bool ClientService::isConnected()
+{
+ return psocket->state()==QTcpSocket::ConnectedState;
 }
 
 void ClientService::slotConnected()
@@ -158,6 +178,7 @@ void ClientService::slotReadyRead()
 
 		 removeOnlinesFromOfflines(onlines);
 
+		 emit debugPurpose();
 		 break;
 	 }
 	 case DATATYPE::DISCONNECTION:
@@ -308,11 +329,8 @@ void ClientService::slotSentToServer(DATATYPE type, QString msg, QVariant additi
 
  switch(type)
 	{
-	case DATATYPE::REGISTRATION:
-	 out<<msg<<additionData.toString();
-	 break;
-
 	case DATATYPE::MESSAGE:
+	 {
  /*//когда общая рассылка, другой клиент не сможет узнать,
  //кто прислал мсг, т.к. получит от сервера, поэтому отправителю
  //нужно приписать, что это он.
@@ -322,10 +340,20 @@ void ClientService::slotSentToServer(DATATYPE type, QString msg, QVariant additi
 	 out<<msg;
 	 qDebug()<<"msg send";
 	 break;
+	 }
+
+	case DATATYPE::REGISTRATION:
+	 {
+	 out<<msg<<additionData.toString();
+	 break;
+	 }
 
 	case DATATYPE::CONNECT:
+	 {
 	 out<<nick<<clients.size();
 	 break;
+	 }
+
 	default: break;
 	}
 
@@ -364,7 +392,8 @@ void ClientService::throwOnlinesToOfflines()
  QStringList onlines= ponlineModel->stringList();
  QStringList offlines=pofflineModel->stringList();
 
- onlines.pop_front();
+ if(!onlines.empty())
+	onlines.pop_front();
  offlines.append(onlines);
  offlines.prepend("Вы: nick");
 

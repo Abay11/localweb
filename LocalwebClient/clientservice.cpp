@@ -124,6 +124,8 @@ void ClientService::slotConnected()
 
 void ClientService::slotReadyRead()
 {
+ qDebug()<<"read server event";
+
  QDataStream in(psocket) ;
  in.setVersion(QDataStream::Qt_5_11);
 
@@ -145,7 +147,6 @@ void ClientService::slotReadyRead()
 
 	DATATYPE type;
 	in>>type;
-	qDebug()<<"новое событие ";
 
 	switch (type) {
 	 case DATATYPE::REGISTRATION:
@@ -166,15 +167,15 @@ void ClientService::slotReadyRead()
 		 in>>serverBaseSize;
 		 if(serverBaseSize!=clients.size())
 			{
-			 qDebug()<<"база не сошлась, ждем новый";
-			 in>>clients;
+             qDebug()<<"база не сошлась, ждем новый";
+             in>>clients;
 			}
 
 		 QList<QString> onlines;
 		 in>>onlines;
-		 qDebug()<<"Приняли как онлайн: ";
-		 for(auto s : onlines)
-			qDebug()<<s;
+//		 qDebug()<<"Приняли как онлайн: ";
+//		 for(auto s : onlines)
+//			qDebug()<<s;
 
 		 removeOnlinesFromOfflines(onlines);
 

@@ -6,7 +6,7 @@ ServerNetworkService::ServerNetworkService(quint16 port, QObject *parent)
  this->port=port;
  ptcpServer=new QTcpServer(this);
 
- clientbase=new QMap<QString, ClientInfo *>;
+ clientbase=new CLIENTBASE;
  socketsAndNicksOfOnlines=new QMap<QTcpSocket *, QString>;
 
  connect(ptcpServer, SIGNAL(newConnection()),
@@ -67,10 +67,14 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 	case DATATYPE::CONNECT:
 	 {
 		int clientBaseSize=data.toInt();
-		out<<clientBaseSize;
-
+		out<<clientbase->size();
 		if(clientbase->size() != clientBaseSize)
+		 {
+			qDebug()<<"Server sent a base with size:"<<clientbase->size();
 			out<<*clientbase;
+		 }
+
+
 
 		out<<socketsAndNicksOfOnlines->values();
 
@@ -189,7 +193,7 @@ void ServerNetworkService::slotReadClient()
 //		  notifying other users
 			}
 
-		 sendToClient(pclient, DATATYPE::CONNECT, clientbase->size());
+		 sendToClient(pclient, DATATYPE::CONNECT, clientBaseSize);
 		 break;
 	 }
 	 default:

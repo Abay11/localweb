@@ -49,6 +49,13 @@ void ClientService::addAllUsersToOfflineModel()
  pofflineModel->setStringList(offlines);
 }
 
+void ClientService::addNewOnlineToModel(QString nick)
+{
+ int nIndex=ponlineModel->rowCount()-1;
+ ponlineModel->insertRow(nIndex);
+ ponlineModel->setData(ponlineModel->index(nIndex), nick);
+}
+
 ClientService::ClientService(QWidget *prnt)
  :QObject (prnt)
  ,psocket(new QTcpSocket)
@@ -222,9 +229,10 @@ void ClientService::slotReadyRead()
 		}
 	 case DATATYPE::NOTIFYING:
 		{
-		 qDebug()<<"есть новый подсоединившийся";
-		 QString connected;
-		 in>>connected;
+		 QString connectedUserNick;
+		 in>>connectedUserNick;
+		 qDebug()<<"есть новый подсоединившийся:"<<connectedUserNick;
+//		 client
 		 //убираем из недоступных подсоединившегося
 //		 for(auto i=0;
 //				 i<pofflineList->count(); ++i)
@@ -239,16 +247,16 @@ void ClientService::slotReadyRead()
 		 //и добавляем к доступным
 //		 ponlineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/online.png"), connected));
 //		 ponlineList->sortItems();
+		 addNewOnlineToModel(connectedUserNick);
 
-		 QString msg=connected;
-		 msg+=" доступен";
+//		 QString msg=connectedUserNick;
+//		 msg+=" доступен";
 
 //		 if(parentWidget()->parentWidget()->isMinimized()
 //				|| parentWidget()->parentWidget()->isHidden())
 //			ptray->showMessage("Новое событие", msg, QSystemTrayIcon::Information, 3000);
 //		 else
 //			popup->showNotify(std::move(msg), mapToGlobal(pos()));
-
 
 		 break;
 		}

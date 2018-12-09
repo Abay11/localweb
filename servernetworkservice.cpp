@@ -86,6 +86,13 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 		out<<socketsAndNicksOfOnlines->values();
 		break;
 	 }
+	case DATATYPE::NOTIFYING:
+	 {
+		qDebug()<<"Notifying users";
+		QString nick=data.toString();
+		out<<nick;
+		break;
+	 }
 	case DATATYPE::MESSAGE:
 	 {
 		QString msg=data.toString();
@@ -227,11 +234,21 @@ void ServerNetworkService::slotReadClient()
 		 int clientBaseSize;
 		 in>>nick>>clientBaseSize;
 
-		 auto client=clientbase->find(nick);
-		 if(!nick.isEmpty() && client!=clientbase->end())
+		 auto iter=clientbase->find(nick);
+		 if(!nick.isEmpty())
 			{
+			 if(iter!=clientbase->end())
+				{
+			 //		  notifying other users
+				 for(auto iter=socketsAndNicksOfOnlines->begin();
+						 iter!=socketsAndNicksOfOnlines->end();
+						 ++iter)
+					{
+					 sendToClient(iter.key(), DATATYPE::NOTIFYING, nick);
+					}
+				}
+
 			 socketsAndNicksOfOnlines->insert(pclient, nick);
-//		  notifying other users
 			}
 
 		 sendToClient(pclient, DATATYPE::CONNECT, clientBaseSize);

@@ -34,6 +34,7 @@ private:
  void saveDataAndProperties();
  void restoreDataAndProperties();
  void addAllUsersToOfflineModel();
+ void addNewOnlineToModel(QString nick);
  void removeOnlinesFromOfflines(QStringList onlines);
  void throwOnlinesToOfflines();
 
@@ -68,6 +69,7 @@ public slots:
 
 signals:
  void debugPurpose();
+
  void connected();
  void disconnected();
  void returnRegistrationResult(bool);

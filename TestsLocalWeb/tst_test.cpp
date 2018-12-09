@@ -20,6 +20,7 @@ private slots:
  void test_startServer1();
  void test_startServer2();
  void test_registration();
+ void test_notifying();
  void test_clientConnectionToServer();
  void test_sendingAndReadingMessage();
 };
@@ -287,7 +288,45 @@ void test::test_sendingAndReadingMessage()
  delete loop;
 }
 
+void test::test_notifying()
+{
+ QString port="22222";
+ ServerNetworkService *pserver=new ServerNetworkService(22222);
+ QCOMPARE(pserver->slotStartServer(), true);
 
+ pserver->addToBase("client0", "name0", "localhost", "0");
+ pserver->addToBase("client1", "name1", "localhost", "0");
+ pserver->addToBase("client2", "name2", "localhost", "0");
+
+ QEventLoop *loop=new QEventLoop;
+ ClientService *pclient0=new ClientService;
+ pclient0->setNickAndName("client0", "name0");
+ pclient0->slotSetAddress("localhost", port);
+ pclient0->slotConnectToServer();
+ QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ ClientService *pclient1=new ClientService;
+ pclient1->setNickAndName("client1", "name1");
+ pclient1->slotSetAddress("localhost", port);
+ pclient1->slotConnectToServer();
+ QObject::connect(pclient1, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ QCOMPARE(pclient0->getOnlines().size(), 2);
+ QCOMPARE(pclient1->getOnlines().size(), 2);
+
+
+ pclient0->slotDisconnectFromServer();
+ pclient1->slotDisconnectFromServer();
+ pserver->slotStopServer();
+
+
+ delete pclient0;
+ delete pclient1;
+ delete pserver;
+ delete loop;
+}
 
 QTEST_MAIN(test)
 

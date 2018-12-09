@@ -17,8 +17,6 @@ private slots:
  void test_addToBase();
  void test_saveDataAndRestoreData();
  void test_startServer0();
- void test_startServer1();
- void test_startServer2();
  void test_registration();
  void test_notifying();
  void test_clientConnectionToServer();
@@ -96,39 +94,22 @@ void test::test_saveDataAndRestoreData()
 void test::test_startServer0()
 {
  quint16 nPort=7777;
- ServerNetworkService *pservice=new ServerNetworkService(nPort);
- QCOMPARE(pservice->slotStartServer(), true);
- QCOMPARE(pservice->serverPort(), nPort);
- pservice->slotStopServer();
-
- delete pservice;
-}
-
-void test::test_startServer1()
-{
- quint16 nPort=7777;
  ServerNetworkService *pservice0=new ServerNetworkService(nPort);
  QCOMPARE(pservice0->slotStartServer(), true);
+ QCOMPARE(pservice0->serverPort(), nPort);
+
+ pservice0->slotStopServer();
+ QCOMPARE(pservice0->slotStartServer(), true);
+
 
  ServerNetworkService *pservice1=new ServerNetworkService(nPort);
  QCOMPARE(pservice1->slotStartServer(), false);
+
 
  pservice0->slotStopServer();
  pservice1->slotStopServer();
  delete pservice0;
  delete pservice1;
-}
-
-void test::test_startServer2()
-{
- quint16 nPort=8888;
- ServerNetworkService *pservice=new ServerNetworkService(nPort);
- pservice->slotStartServer();
- pservice->slotStopServer();
-
- QCOMPARE(pservice->slotStartServer(), true);
- pservice->slotStopServer();
- delete pservice;
 }
 
 void test::test_registration()

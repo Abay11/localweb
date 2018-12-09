@@ -20,7 +20,7 @@ private slots:
  void test_startServer1();
  void test_startServer2();
  void test_clientConnectionToServer();
-// void test_readingMessage();
+ void test_readingMessage();
 };
 
 test::test()
@@ -179,35 +179,44 @@ void test::test_clientConnectionToServer()
 }
 //*/
 
-/*
 void test::test_readingMessage()
 {
  QString port="9000";
  ServerNetworkService *pserver=new ServerNetworkService(9000);
  QCOMPARE(pserver->slotStartServer(), true);
+ pserver->addToBase("client0", "name0", "localhost", "0");
+ pserver->addToBase("client1", "name1", "localhost", "0");
 
  QEventLoop *loop=new QEventLoop;
 
  ClientService *pclient0=new ClientService;
- pclient0->setNickAndName("pclient0", "name0");
+ pclient0->setNickAndName("client0", "name0");
  pclient0->slotSetAddress("localhost", port);
  pclient0->slotConnectToServer();
  QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
  loop->exec();
 
-// ClientService *pclient1=new ClientService;
-// pclient1->slotSetAddress("localhost", port);
-// pclient1->slotConnectToServer();
-// QObject::connect(pclient1, SIGNAL(connected()), loop, SLOT(quit()));
-// loop->exec();
+ ClientService *pclient1=new ClientService;
+ pclient1->setNickAndName("client1", "name1");
+ pclient1->slotSetAddress("localhost", port);
+ pclient1->slotConnectToServer();
+ QObject::connect(pclient1, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
 
  QCOMPARE(pclient0->isConnected(), true);
-// QCOMPARE(pclient1->isConnected(), true);
+ QCOMPARE(pclient1->isConnected(), true);
 
-// pserver->addToBase("client1", "name1", "localhost", pclient1->clientPort())
+ QString sendingMessage="Read me!";
 
-// QString sendingMessage="Read me!";
-// pclient0->slotSentToServer(DATATYPE::MESSAGE, sendingMessage);
+ pclient0->slotSentToServer(DATATYPE::MESSAGE, sendingMessage);
+ QObject::connect(pclient1, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ pclient1->slotSentToServer(DATATYPE::MESSAGE, sendingMessage);
+ QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ QCOMPARE(pclient0->receivedMessage, "client1: "+sendingMessage);
 
  pclient0->slotDisconnectFromServer();
  pserver->slotStopServer();
@@ -215,7 +224,6 @@ void test::test_readingMessage()
  delete pserver;
  delete loop;
 }
-*/
 
 
 

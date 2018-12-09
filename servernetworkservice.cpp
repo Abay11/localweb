@@ -74,10 +74,15 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 			out<<*clientbase;
 		 }
 
-
-
 		out<<socketsAndNicksOfOnlines->values();
-
+		break;
+	 }
+	case DATATYPE::MESSAGE:
+	 {
+		QString msg=data.toString();
+		QTime *time=(QTime*)paddition;
+		out<<*time;
+		out<<msg;
 		break;
 	 }
 	default:
@@ -175,8 +180,8 @@ void ServerNetworkService::slotReadClient()
 				 it!=socketsAndNicksOfOnlines->end();
 				 ++it)
 			{
-			 sendToClient(it.key(), DATATYPE::MESSAGE, msg);
-
+			 if(pclient != it.key()) //пропускаем, чтобы клиент не получил сообщение от самого себя
+				sendToClient(it.key(), DATATYPE::MESSAGE, msg, &time);
 			}
 		 break;
 	 }

@@ -252,6 +252,10 @@ void ClientService::slotReadyRead()
 		 //новое сообщение
 		 qDebug()<<"новое  сообщение";
 		 in>>time>>msg;
+
+		 receivedMessage=msg;
+		 emit debugPurpose();
+
 		 msg.prepend(time.toString("[hh:mm:ss] "));
 //		 msg=time.toString("[hh:mm:ss] ")+"Новое сообщение: "+msg;
 //		 pinfo->append(msg);
@@ -332,6 +336,7 @@ void ClientService::slotSentToServer(DATATYPE type, QString msg, QVariant additi
 	{
 	case DATATYPE::MESSAGE:
 	 {
+	 qDebug()<<"Client send message";
  /*//когда общая рассылка, другой клиент не сможет узнать,
  //кто прислал мсг, т.к. получит от сервера, поэтому отправителю
  //нужно приписать, что это он.
@@ -339,7 +344,6 @@ void ClientService::slotSentToServer(DATATYPE type, QString msg, QVariant additi
  //а пока так.*/
 	 msg.prepend(nick+": ");
 	 out<<msg;
-	 qDebug()<<"msg send";
 	 break;
 	 }
 

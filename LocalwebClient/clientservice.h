@@ -47,6 +47,8 @@ public:
  CLIENTBASE* getClientBase();
  QStringList getOnlines();
 
+ QString receivedMessage;
+
 
  void setNickAndName(QString nick, QString name);
  bool isConnected();

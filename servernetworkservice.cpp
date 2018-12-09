@@ -64,6 +64,15 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 
  switch(type)
 	{
+	case DATATYPE::REGISTRATION:
+	 {
+		bool registrationResult=data.toBool();
+		qDebug()<<"Sending to a client registration result:"<<registrationResult;
+
+		out<<QTime().currentTime()<<registrationResult;
+
+		break;
+	 }
 	case DATATYPE::CONNECT:
 	 {
 		int clientBaseSize=data.toInt();
@@ -171,6 +180,33 @@ void ServerNetworkService::slotReadClient()
 
 	switch(type)
 	 {
+	 case DATATYPE::REGISTRATION:
+		{
+		 qDebug()<<"A user is trying to register";
+
+		 QString nick;
+		 QString name;
+		 in>>nick>>name;
+		 nick=nick.toLower();
+
+		 auto pos = clientbase->find(nick);
+		 bool isRegistrationSuccess=pos==clientbase->end();
+		 if(isRegistrationSuccess)
+			{
+			 clientbase->insert(nick,
+												 new ClientInfo(name,
+																				pclient->localAddress().toString()
+																				,pclient->localAddress().toString()
+																				,true));
+
+			 socketsAndNicksOfOnlines->insert(pclient, nick);
+
+			 qInfo()<<"Зарегистрирован новый пользователь " + nick;
+			}
+
+		 sendToClient(pclient, DATATYPE::REGISTRATION, isRegistrationSuccess);
+		 break;
+		}
 	 case DATATYPE::MESSAGE:
 	 {
 		 qDebug()<<"Received message";

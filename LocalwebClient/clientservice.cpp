@@ -101,6 +101,11 @@ QStringList ClientService::getOnlines()
  return ponlineModel->stringList();
 }
 
+bool ClientService::getRegistrationResult()
+{
+ return registrationResult;
+}
+
 void ClientService::setNickAndName(QString nick, QString name)
 {
  this->nick=nick;
@@ -117,7 +122,7 @@ void ClientService::slotConnected()
 	qInfo()<<"Соединение с сервером установлено.";
 
 	//говорим серверу что мы только что подключились и нам нужно сверить базу
-	slotSentToServer(DATATYPE::CONNECT);
+	slotSendToServer(DATATYPE::CONNECT);
 
 	qInfo()<<"Отправлен запрос на получение списка";
 }
@@ -151,8 +156,8 @@ void ClientService::slotReadyRead()
 	switch (type) {
 	 case DATATYPE::REGISTRATION:
 		in>>time>>registrationResult;
+        emit returnRegistrationResult(registrationResult);
 
-		emit returnRegistrationResult(registrationResult);
 		qInfo()<<time.toString("[hh:mm:ss] ")
 					<<"Registration attempt. Result: "<<registrationResult;
 		break;
@@ -322,7 +327,7 @@ void ClientService::slotDisconnectFromServer()
  emit disconnected();
 }
 
-void ClientService::slotSentToServer(DATATYPE type, QString msg, QVariant additionData)
+void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant additionData)
 {
  QByteArray arrBlock;
  QDataStream out(&arrBlock, QIODevice::WriteOnly);
@@ -349,8 +354,11 @@ void ClientService::slotSentToServer(DATATYPE type, QString msg, QVariant additi
 
 	case DATATYPE::REGISTRATION:
 	 {
-	 out<<msg<<additionData.toString();
-	 break;
+		qDebug()<<"Sending to server registration request";
+		QString *nick=&msg;
+		QString name=additionData.toString();
+		out<<*nick<<name;
+		break;
 	 }
 
 	case DATATYPE::CONNECT:

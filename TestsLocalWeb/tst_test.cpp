@@ -19,8 +19,9 @@ private slots:
  void test_startServer0();
  void test_startServer1();
  void test_startServer2();
+ void test_registration();
  void test_clientConnectionToServer();
- void test_readingMessage();
+ void test_sendingAndReadingMessage();
 };
 
 test::test()
@@ -129,6 +130,67 @@ void test::test_startServer2()
  delete pservice;
 }
 
+void test::test_registration()
+{
+ QString port="11000";
+ ServerNetworkService *pserver=new ServerNetworkService(11000);
+ QCOMPARE(pserver->slotStartServer(), true);
+
+ ClientService *pclient0=new ClientService;
+ pclient0->slotSetAddress("localhost", port);
+ pclient0->setNickAndName("client0", "name0");
+ pclient0->slotConnectToServer();
+
+ QEventLoop *loop=new QEventLoop;
+ QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ pclient0->slotSendToServer(DATATYPE::REGISTRATION, "pclient0", "name0");
+ QObject::connect(pclient0, SIGNAL(returnRegistrationResult(bool)), loop, SLOT(quit()));
+ loop->exec();
+
+ QCOMPARE(pclient0->getRegistrationResult(), true);
+
+ ClientService *pclient1=new ClientService;
+ pclient1->slotSetAddress("localhost", port);
+ pclient1->setNickAndName("client1", "name1");
+ pclient1->slotConnectToServer();
+
+ QObject::connect(pclient1, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ pclient1->slotSendToServer(DATATYPE::REGISTRATION, "pclient1", "name1");
+ QObject::connect(pclient1, SIGNAL(returnRegistrationResult(bool)), loop, SLOT(quit()));
+ loop->exec();
+
+ QCOMPARE(pclient1->getRegistrationResult(), true);
+
+ ClientService *pclientClone=new ClientService;
+ pclientClone->slotSetAddress("localhost", port);
+ pclientClone->setNickAndName("client0", "name0");
+ pclientClone->slotConnectToServer();
+
+ QObject::connect(pclientClone, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ pclientClone->slotSendToServer(DATATYPE::REGISTRATION, "pclient0", "name0");
+ QObject::connect(pclientClone, SIGNAL(returnRegistrationResult(bool)), loop, SLOT(quit()));
+ loop->exec();
+
+ QCOMPARE(pclientClone->getRegistrationResult(), false);
+
+ pclient0->slotDisconnectFromServer();
+ pclient1->slotDisconnectFromServer();
+ pclientClone->slotDisconnectFromServer();
+ pserver->slotStopServer();
+
+ delete pserver;
+ delete pclient0;
+ delete pclient1;
+ delete pclientClone;
+ delete loop;
+}
+
 void test::test_clientConnectionToServer()
 {
  QString port="9000";
@@ -179,7 +241,7 @@ void test::test_clientConnectionToServer()
 }
 //*/
 
-void test::test_readingMessage()
+void test::test_sendingAndReadingMessage()
 {
  QString port="9000";
  ServerNetworkService *pserver=new ServerNetworkService(9000);
@@ -208,11 +270,11 @@ void test::test_readingMessage()
 
  QString sendingMessage="Read me!";
 
- pclient0->slotSentToServer(DATATYPE::MESSAGE, sendingMessage);
+ pclient0->slotSendToServer(DATATYPE::MESSAGE, sendingMessage);
  QObject::connect(pclient1, SIGNAL(debugPurpose()), loop, SLOT(quit()));
  loop->exec();
 
- pclient1->slotSentToServer(DATATYPE::MESSAGE, sendingMessage);
+ pclient1->slotSendToServer(DATATYPE::MESSAGE, sendingMessage);
  QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
  loop->exec();
 

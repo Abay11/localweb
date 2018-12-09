@@ -48,6 +48,7 @@ public:
  QStringList getOnlines();
 
  QString receivedMessage;
+ bool getRegistrationResult();
 
 
  void setNickAndName(QString nick, QString name);
@@ -61,7 +62,7 @@ private slots:
 public slots:
  void slotConnectToServer();
  void slotDisconnectFromServer();
- void slotSentToServer(DATATYPE, QString="", QVariant=0);
+ void slotSendToServer(DATATYPE, QString="", QVariant=0);
  void slotSetAddress(QString addr, QString port);
 
 

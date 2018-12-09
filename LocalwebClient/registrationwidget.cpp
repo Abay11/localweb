@@ -70,7 +70,7 @@ void Registration::slotSentRequest()
 	 loop.exec();
 	}
 
- pservice->slotSentToServer(DATATYPE::REGISTRATION, pleNick->text(), QVariant(pleName->text()));
+ pservice->slotSendToServer(DATATYPE::REGISTRATION, pleNick->text(), QVariant(pleName->text()));
  pservice->setNickAndName(pleNick->text(), pleName->text());
 }
 

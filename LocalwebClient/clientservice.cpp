@@ -98,19 +98,9 @@ quint16 ClientService::clientPort()
  return psocket->localPort();
 }
 
-QMap<QString, ClientInfo *> *ClientService::getClientBase()
-{
- return &clients;
-}
-
 QStringList ClientService::getOnlines()
 {
  return ponlineModel->stringList();
-}
-
-bool ClientService::getRegistrationResult()
-{
- return registrationResult;
 }
 
 void ClientService::setNickAndName(QString nick, QString name)
@@ -191,7 +181,6 @@ void ClientService::slotReadyRead()
 
 		 removeOnlinesFromOfflines(onlines);
 
-		 emit debugPurpose();
 		 break;
 	 }
 	 case DATATYPE::DISCONNECTION:
@@ -267,7 +256,6 @@ void ClientService::slotReadyRead()
 		 in>>time>>msg;
 
 		 receivedMessage=msg;
-		 emit debugPurpose();
 
 		 msg.prepend(time.toString("[hh:mm:ss] "));
 //		 msg=time.toString("[hh:mm:ss] ")+"Новое сообщение: "+msg;

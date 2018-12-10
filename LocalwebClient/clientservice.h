@@ -18,18 +18,20 @@ class ClientService : public QObject
 {
  Q_OBJECT
 
+protected:
+ QTcpSocket *psocket;
+ bool registrationResult=false;
+ CLIENTBASE clients;
+
 private:
  QString nick;
  QString name;
 
- bool registrationResult=false;
 
  quint16 mnNextBlockSize=0;
- QTcpSocket *psocket;
  QString *pserverAddress, *pserverPort;
 
  QStringListModel *ponlineModel, *pofflineModel;
- CLIENTBASE clients;
 
  void saveDataAndProperties();
  void restoreDataAndProperties();
@@ -45,17 +47,14 @@ public:
  QStringListModel *onlineModel();
  QStringListModel *offlineModel();
  quint16 clientPort();
- CLIENTBASE* getClientBase();
  QStringList getOnlines();
 
  QString receivedMessage;
- bool getRegistrationResult();
-
 
  void setNickAndName(QString nick, QString name);
  bool isConnected();
 
-private slots:
+protected slots:
  void slotConnected();
  void slotReadyRead();
  void slotError(QAbstractSocket::SocketError);
@@ -68,8 +67,6 @@ public slots:
 
 
 signals:
- void debugPurpose();
-
  void connected();
  void disconnected();
  void returnRegistrationResult(bool);

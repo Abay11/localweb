@@ -11,11 +11,13 @@ SOURCES +=  tst_test.cpp \
 ../LocalwebClient/clientservice.cpp \
 ../clientinfo.cpp \
 #server
-../servernetworkservice.cpp
+../servernetworkservice.cpp \
+    clientservicefordebug.cpp
 
 HEADERS += \
 #client
 ../LocalwebClient/clientservice.h \
   ../clientinfo.h \
 #server
-../servernetworkservice.h
+../servernetworkservice.h \
+    clientservicefordebug.h

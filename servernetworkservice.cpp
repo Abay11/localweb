@@ -1,26 +1,49 @@
 #include "servernetworkservice.h"
 
-ServerNetworkService::ServerNetworkService(quint16 port, QObject *parent)
+ServerNetworkService::ServerNetworkService(quint16 nport, QObject *parent)
  :QObject(parent)
 {
- this->port=port;
  ptcpServer=new QTcpServer(this);
+ this->nport=nport;
+
+ foreach (const QHostAddress &addr, QNetworkInterface::allAddresses()) {
+	 if (addr.protocol() == QAbstractSocket::IPv4Protocol
+			 && addr!= QHostAddress(QHostAddress::LocalHost))
+		address=addr.toString();
+	}
+
+ pmodel=new QStringListModel(this);
 
  clientbase=new CLIENTBASE;
  socketsAndNicksOfOnlines=new QMap<QTcpSocket *, QString>;
 
+ if(!restoreData()) qWarning()<<"Не удалось восстановить данные";
+ setDataFromBaseToModel();
+
  connect(ptcpServer, SIGNAL(newConnection()),
 				 SLOT(slotNewConnection()));
+ connect(ptcpServer, SIGNAL(acceptError(QAbstractSocket::SocketError)),
+				 SLOT(slotAcceptError(QAbstractSocket::SocketError)));
 }
 
-quint16 ServerNetworkService::serverPort()
+quint16 ServerNetworkService::listeningPort()
 {
  return ptcpServer->serverPort();
 }
 
-quint16 ServerNetworkService::expectedPort()
+void ServerNetworkService::setPort(quint16 nport)
 {
- return port;
+ this->nport=nport;
+}
+
+quint16 ServerNetworkService::getPort()
+{
+ return nport;
+}
+
+QString ServerNetworkService::getAddress()
+{
+ return address;
 }
 
 bool ServerNetworkService::saveData(QString filename)
@@ -29,7 +52,7 @@ bool ServerNetworkService::saveData(QString filename)
  if(file.open(QFile::WriteOnly))
 	{
 	 QDataStream out(&file);
-	 out<<port<<*clientbase;
+	 out<<nport<<*clientbase;
 	 file.close();
 
 	 return true;
@@ -44,8 +67,7 @@ bool ServerNetworkService::restoreData(QString filename)
  if(file.open(QFile::ReadOnly))
 	{
 	 QDataStream in(&file);
-	 in>>port>>*clientbase;
-
+	 in>>nport>>*clientbase;
 	 file.close();
 	 return true;
 	}
@@ -96,7 +118,7 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 	case DATATYPE::MESSAGE:
 	 {
 		QString msg=data.toString();
-		QTime *time=(QTime*)paddition;
+		QTime *time=static_cast<QTime*>(paddition);
 		out<<*time;
 		out<<msg;
 		break;
@@ -111,19 +133,44 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
  to->write(byteArr);
 }
 
-bool ServerNetworkService::addToBase(const QString &nick,
+bool ServerNetworkService::addUserIfNickNotBusy(const QString &nick,
+																								const QString &name,
+																								const QString &address,
+																								const QString &port)
+{
+ QString lowerNick=nick.toLower();
+ bool isNickFree=clientbase->find(lowerNick)==clientbase->end();
+
+ if(isNickFree)
+	{
+	 addToBase(lowerNick, name, address, port);
+	 addToModel(nick);
+	}
+
+ return isNickFree;
+}
+
+void ServerNetworkService::addToBase(const QString &nick,
 																		 const QString &name,
 																		 const QString &addr,
 																		 const QString &port)
 {
- QString lowerNick=nick.toLower();
- if(clientbase->find(lowerNick)!=clientbase->end())
-	return false;
-
- clientbase->insert(lowerNick,
+ clientbase->insert(nick,
 										new ClientInfo(name, addr,
 																	 port, true));
- return true;
+}
+
+void ServerNetworkService::addToModel(const QString &nick)
+{
+ int nIndex=pmodel->rowCount();
+ pmodel->insertRow(nIndex);
+ pmodel->setData(pmodel->index(nIndex), nick);
+}
+
+void ServerNetworkService::setDataFromBaseToModel()
+{
+ auto list = clientbase->keys();
+ pmodel->setStringList(list);
 }
 
 QMap<QString, ClientInfo *> *ServerNetworkService::getClientBase() const
@@ -131,10 +178,20 @@ QMap<QString, ClientInfo *> *ServerNetworkService::getClientBase() const
  return clientbase;
 }
 
+QStringListModel *ServerNetworkService::getModel()
+{
+ return pmodel;
+}
+
+QStringList ServerNetworkService::getClientsList()
+{
+ return pmodel->stringList();
+}
+
 bool ServerNetworkService::slotStartServer()
 {
  return ptcpServer->listen(QHostAddress::Any,
-								 static_cast<quint16>(port));
+								 static_cast<quint16>(nport));
 }
 
 void ServerNetworkService::slotStopServer()
@@ -261,4 +318,15 @@ void ServerNetworkService::slotReadClient()
 
 	nextBlockSize=0;
  }
+}
+
+void ServerNetworkService::slotAcceptError(
+	QAbstractSocket::SocketError socketError)
+{
+ if(socketError == QAbstractSocket::SocketAccessError)
+	qWarning()<<"A socket accepting error:"
+					 <<ptcpServer->errorString();
+ else {
+	 qWarning()<<"Unknown error type occurred when accepted socket";
+	}
 }

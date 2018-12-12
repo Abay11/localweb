@@ -24,7 +24,8 @@ MyWidget::MyWidget(QWidget *parent)
  ,pvlay(new QVBoxLayout)
  ,pvalidator(new QIntValidator(1000, 65535, plePort))
  ,pdock(new QDockWidget("Пользователи", this))
- ,plist(new QListWidget())
+// ,plist(new QListWidget())
+ ,pview(new QListView(this))
  ,pserver(new QTcpServer(this))
 // ,logger(new MyLogger)
  ,nextBlockSize(0)
@@ -66,9 +67,15 @@ MyWidget::MyWidget(QWidget *parent)
 
  connect(plePort, SIGNAL(textChanged(QString)), SLOT(slotPortChanged(QString)));
 
+ //----------------------------
+ connect(pcmdOn, SIGNAL(clicked()), SIGNAL(startClicked()));
+ connect(pcmdOff, SIGNAL(clicked()), SIGNAL(stopClicked()));
+ //----------------------------
+
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, pdock);
  readBase();
- pdock->setWidget(plist);
+// pdock->setWidget(plist);
+ pdock->setWidget(pview);
 
  setMenuAndIcons();
 
@@ -176,14 +183,20 @@ void MyWidget::readBase()
 
 	 in>>clientbase;
 
-	 for(auto iter=clientbase.begin(), end=clientbase.end();
-			 iter!=end;++iter)
-		plist->addItem(iter.key());
+//	 for(auto iter=clientbase.begin(), end=clientbase.end();
+//			 iter!=end;++iter)
+//		plist->addItem(iter.key());
 
 	 file.close();
 	}
  else if(QFile::exists(file.fileName()))
 	qCritical()<<"Error restoring clients base";
+}
+
+void MyWidget::setModelToView(QStringListModel *pmodel)
+{
+ pview->setModel(pmodel);
+ qDebug()<<"Model row count:"<<pmodel->rowCount();
 }
 
 void MyWidget::setMenuAndIcons()
@@ -377,8 +390,8 @@ void MyWidget::slotReadClient()
 																				,pclient->localAddress().toString()
 																				,true));
 			 socketsAndNicksOfOnlines.insert(pclient, nick);
-			 plist->addItem(nick);
-			 plist->sortItems();
+//			 plist->addItem(nick);
+//			 plist->sortItems();
 			 pInfo->append(QTime::currentTime().toString("[hh:mm:ss] ")
 										 + "Зарегистрирован новый пользователь " + nick);
 			 qInfo()<<"Зарегистрирован новый пользователь " + nick;

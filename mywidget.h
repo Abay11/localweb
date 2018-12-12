@@ -6,6 +6,8 @@
 
 #include <QMap>
 #include <QListWidget>
+#include <QListView>
+#include <QStringListModel>
 #include <QMainWindow>
 #include <QLabel>
 #include <QLineEdit>
@@ -27,7 +29,6 @@
 #include <QNetworkInterface>
 
 
-
 class MyWidget : public QMainWindow
 {
  Q_OBJECT
@@ -46,6 +47,7 @@ private:
  QValidator* pvalidator;
  QDockWidget *pdock;
  QListWidget *plist;
+ QListView *pview;
 
  QTcpServer* pserver;
 
@@ -77,8 +79,13 @@ public:
  void removeUser(QString);
  void saveBase();
  void readBase();
+ void setModelToView(QStringListModel *pmodel);
 
  void setMenuAndIcons();
+
+signals:
+ void startClicked();
+ void stopClicked();
 
 private slots:
  void slotStartServer();

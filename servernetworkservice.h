@@ -5,44 +5,60 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringListModel>
 #include <QTime>
 #include <QFile>
-
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QDataStream>
+#include <QNetworkInterface>
 
+#ifndef CLIENTBASE
 #define CLIENTBASE QMap<QString, ClientInfo *>
+#endif
 
 class ServerNetworkService : public QObject
 {
  Q_OBJECT
 private:
  quint16 nextBlockSize=0;
- quint16 port;
+ quint16 nport;
+ QString address;
  QTcpServer *ptcpServer;
+ QStringListModel *pmodel;
 
  CLIENTBASE *clientbase;
  QMap<QTcpSocket *, QString> *socketsAndNicksOfOnlines;
 
 public:
- explicit ServerNetworkService(quint16 port, QObject *parent = nullptr);
- quint16 serverPort();
- quint16 expectedPort();
- bool saveData(QString filename="data.bin");
- bool restoreData(QString filename="data.bin");
+ explicit ServerNetworkService(quint16 nport=0, QObject *parent = nullptr);
+ quint16 listeningPort();
+ void setPort(quint16 nport);
+ quint16 getPort();
+ QString getAddress();
+ bool saveData(QString filename="serverdata.bin");
+ bool restoreData(QString filename="serverdata.bin");
  void sendToClient(QTcpSocket *to, DATATYPE type, QVariant data, void *paddition=nullptr);
- bool addToBase(const QString &nick, const QString &name,
-								const QString &address, const QString &port);
- QMap<QString, ClientInfo *> *getClientBase() const;
+ bool addUserIfNickNotBusy(const QString &nick, const QString &name,
+											 const QString &address, const QString &nport);
+ void addToBase(const QString &nick, const QString &name,
+								const QString &address, const QString &nport);
+ void addToModel(const QString &nick);
+ void setDataFromBaseToModel();
+ CLIENTBASE *getClientBase() const;
+ QStringListModel *getModel();
+ QStringList getClientsList();
+
 signals:
-// void receivedMessage(QString msg);
+
 public slots:
  bool slotStartServer();
  void slotStopServer();
  void slotNewConnection();
  void slotDisconnection();
  void slotReadClient();
+
+ void slotAcceptError(QAbstractSocket::SocketError socketError);
 };
 
 #endif // SERVERNETWORKSERVICE_H

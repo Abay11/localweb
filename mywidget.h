@@ -3,9 +3,9 @@
 
 #include "mylogger.h"
 #include "clientinfo.h"
+#include "servernetworkservice.h"
 
 #include <QMap>
-#include <QListWidget>
 #include <QListView>
 #include <QStringListModel>
 #include <QMainWindow>
@@ -24,17 +24,10 @@
 #include <QToolBar>
 #include <QApplication>
 
-#include <QTcpServer>
-#include <QTcpSocket>
-#include <QNetworkInterface>
-
-
 class MyWidget : public QMainWindow
 {
  Q_OBJECT
 private:
- QString *pport;
-
  QLabel* plblAddress;
  QLabel* plblPort;
  QLineEdit* pleAddress;
@@ -44,43 +37,22 @@ private:
  QPushButton* pcmdOff;
  QHBoxLayout* phlay;
  QVBoxLayout* pvlay;
- QValidator* pvalidator;
+ QValidator* portValidator;
  QDockWidget *pdock;
- QListWidget *plist;
  QListView *pview;
 
- QTcpServer* pserver;
-
-// MyLogger* logger;
-
- QString maddress;
- quint16 nextBlockSize;
-
-
- QMap<QString, ClientInfo*> clientbase;
-
- //for clients identification by socket
- //also it can serve as a list of online clients
- QMap<QTcpSocket*, QString> socketsAndNicksOfOnlines;
-
+ MyLogger* logger;
  QSystemTrayIcon *ptray;
- QAction *paonOff;
+ QAction *onOff;
 
+ ServerNetworkService *pservice;
 public:
  MyWidget(QWidget* parent=nullptr);
  ~MyWidget();
 
- void sendToClient(QTcpSocket*
-									 ,QVariant data
-									 ,DATATYPE type=DATATYPE::MESSAGE
-									 ,const QTime &curTime=QTime::currentTime());
- void updateClientBase(ClientInfo&);
- void addNewUser(ClientInfo&);
- void removeUser(QString);
- void saveBase();
- void readBase();
+ void turnStateOn();
+ void turnStateOff();
  void setModelToView(QStringListModel *pmodel);
-
  void setMenuAndIcons();
 
 signals:
@@ -90,11 +62,8 @@ signals:
 private slots:
  void slotStartServer();
  void slotStopServer();
- void slotNewConnection();
- void slotDisconnection();
- void slotReadClient();
+ void slotOnOffHandler();
 
- void slotOnOff();
  void slotQuit();
 
  void slotPortChanged(QString);

@@ -1,10 +1,9 @@
 #include "servernetworkservice.h"
 
-ServerNetworkService::ServerNetworkService(quint16 nport, QObject *parent)
+ServerNetworkService::ServerNetworkService(QObject *parent)
  :QObject(parent)
 {
  ptcpServer=new QTcpServer(this);
- this->nport=nport;
 
  foreach (const QHostAddress &addr, QNetworkInterface::allAddresses()) {
 	 if (addr.protocol() == QAbstractSocket::IPv4Protocol
@@ -26,6 +25,11 @@ ServerNetworkService::ServerNetworkService(quint16 nport, QObject *parent)
 				 SLOT(slotAcceptError(QAbstractSocket::SocketError)));
 }
 
+ServerNetworkService::~ServerNetworkService()
+{
+ if(!saveData()) qWarning()<<"Не удалось сохранить данные";
+}
+
 quint16 ServerNetworkService::listeningPort()
 {
  return ptcpServer->serverPort();
@@ -33,11 +37,13 @@ quint16 ServerNetworkService::listeningPort()
 
 void ServerNetworkService::setPort(quint16 nport)
 {
+ qDebug()<<"Received new port";
  this->nport=nport;
 }
 
 quint16 ServerNetworkService::getPort()
 {
+ qDebug()<<"getPort() called "<<nport;
  return nport;
 }
 
@@ -48,17 +54,16 @@ QString ServerNetworkService::getAddress()
 
 bool ServerNetworkService::saveData(QString filename)
 {
+ qDebug()<<"saving data";
  QFile file(filename);
  if(file.open(QFile::WriteOnly))
 	{
 	 QDataStream out(&file);
 	 out<<nport<<*clientbase;
 	 file.close();
-
 	 return true;
 	}
-	else
-	return false;
+	else return false;
 }
 
 bool ServerNetworkService::restoreData(QString filename)
@@ -93,6 +98,13 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 
 		out<<QTime().currentTime()<<registrationResult;
 
+		break;
+	 }
+	case DATATYPE::DISCONNECTION:
+	 {
+		qDebug()<<"sending clients about client disconnection";
+		QString disconnected=data.toString();
+		out<<disconnected;
 		break;
 	 }
 	case DATATYPE::CONNECT:
@@ -135,16 +147,18 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 
 bool ServerNetworkService::addUserIfNickNotBusy(const QString &nick,
 																								const QString &name,
-																								const QString &address,
-																								const QString &port)
+																								QTcpSocket *client)
 {
  QString lowerNick=nick.toLower();
  bool isNickFree=clientbase->find(lowerNick)==clientbase->end();
 
  if(isNickFree)
 	{
-	 addToBase(lowerNick, name, address, port);
+	 addToBase(lowerNick, name,
+						 client->localAddress().toString(),
+						 QString::number(client->localPort()));
 	 addToModel(nick);
+	 addToOnlines(client, nick);
 	}
 
  return isNickFree;
@@ -162,9 +176,28 @@ void ServerNetworkService::addToBase(const QString &nick,
 
 void ServerNetworkService::addToModel(const QString &nick)
 {
+ qDebug()<<"Adding to model";
  int nIndex=pmodel->rowCount();
  pmodel->insertRow(nIndex);
  pmodel->setData(pmodel->index(nIndex), nick);
+}
+
+void ServerNetworkService::addToOnlines(QTcpSocket *client, const QString &nick)
+{
+ socketsAndNicksOfOnlines->insert(client, nick);
+}
+
+void ServerNetworkService::notifyOthersAboutDisconnection(QString nick)
+{
+ for (auto i = socketsAndNicksOfOnlines->begin();
+			i!=socketsAndNicksOfOnlines->end();
+			++i)
+	 sendToClient(i.key(), DATATYPE::DISCONNECTION, nick);
+}
+
+void ServerNetworkService::removeFromOnlines(QTcpSocket *client)
+{
+ socketsAndNicksOfOnlines->remove(client);
 }
 
 void ServerNetworkService::setDataFromBaseToModel()
@@ -212,8 +245,11 @@ void ServerNetworkService::slotDisconnection()
 {
  qDebug()<<"A client disconnected";
 
- QTcpSocket* pclient=static_cast<QTcpSocket*>(sender());
- delete pclient;
+ QTcpSocket *client=static_cast<QTcpSocket*>(sender());
+ QString disconnected=socketsAndNicksOfOnlines->value(client);
+ removeFromOnlines(client);
+ notifyOthersAboutDisconnection(disconnected);
+ client->deleteLater();
 }
 
 void ServerNetworkService::slotReadClient()
@@ -253,29 +289,17 @@ void ServerNetworkService::slotReadClient()
 		 in>>nick>>name;
 		 nick=nick.toLower();
 
-		 auto pos = clientbase->find(nick);
-		 bool isRegistrationSuccess=pos==clientbase->end();
-		 if(isRegistrationSuccess)
-			{
-			 clientbase->insert(nick,
-												 new ClientInfo(name,
-																				pclient->localAddress().toString()
-																				,pclient->localAddress().toString()
-																				,true));
-
-			 socketsAndNicksOfOnlines->insert(pclient, nick);
-
-			 qInfo()<<"Зарегистрирован новый пользователь " + nick;
-			}
-
-		 sendToClient(pclient, DATATYPE::REGISTRATION, isRegistrationSuccess);
+		 bool registrationResult=addUserIfNickNotBusy(nick,
+														name,
+														pclient);
+		 sendToClient(pclient, DATATYPE::REGISTRATION, registrationResult);
+		 qInfo()<<"Зарегистрирован новый пользователь " + nick;
 		 break;
 		}
 	 case DATATYPE::MESSAGE:
 	 {
-		 qDebug()<<"Received message";
-
 		 in>>msg;
+		 qDebug()<<"Received message"<<msg;
 		 for(auto it=socketsAndNicksOfOnlines->begin();
 				 it!=socketsAndNicksOfOnlines->end();
 				 ++it)
@@ -305,7 +329,7 @@ void ServerNetworkService::slotReadClient()
 					}
 				}
 
-			 socketsAndNicksOfOnlines->insert(pclient, nick);
+			 addToOnlines(pclient, nick);
 			}
 
 		 sendToClient(pclient, DATATYPE::CONNECT, clientBaseSize);

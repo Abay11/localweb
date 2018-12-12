@@ -31,7 +31,8 @@ private:
  QMap<QTcpSocket *, QString> *socketsAndNicksOfOnlines;
 
 public:
- explicit ServerNetworkService(quint16 nport=0, QObject *parent = nullptr);
+ explicit ServerNetworkService(QObject *parent = nullptr);
+ ~ServerNetworkService();
  quint16 listeningPort();
  void setPort(quint16 nport);
  quint16 getPort();
@@ -39,11 +40,13 @@ public:
  bool saveData(QString filename="serverdata.bin");
  bool restoreData(QString filename="serverdata.bin");
  void sendToClient(QTcpSocket *to, DATATYPE type, QVariant data, void *paddition=nullptr);
- bool addUserIfNickNotBusy(const QString &nick, const QString &name,
-											 const QString &address, const QString &nport);
+ bool addUserIfNickNotBusy(const QString &nick, const QString &name, QTcpSocket *client);
  void addToBase(const QString &nick, const QString &name,
 								const QString &address, const QString &nport);
  void addToModel(const QString &nick);
+ void addToOnlines(QTcpSocket *client, const QString &nick);
+ void notifyOthersAboutDisconnection(QString nick);
+ void removeFromOnlines(QTcpSocket *client);
  void setDataFromBaseToModel();
  CLIENTBASE *getClientBase() const;
  QStringListModel *getModel();

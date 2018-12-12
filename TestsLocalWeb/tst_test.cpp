@@ -35,33 +35,35 @@ test::~test()
 
 }
 
-static QString savingFile="data.bin";
+static QString savingFile="serverdata.bin";
 
 void test::test_addToBase()
 {
  QFile::remove(savingFile);
 
- ServerNetworkService *pservice=new ServerNetworkService(0);
-	QCOMPARE(pservice->addUserIfNickNotBusy("nick1","","",""), true);
-	QCOMPARE(pservice->addUserIfNickNotBusy("nick2","","",""), true);
-	QCOMPARE(pservice->addUserIfNickNotBusy("JOHNY","","",""), true);
-	QCOMPARE(pservice->addUserIfNickNotBusy("test00","name","ip","port"), true);
-	QCOMPARE(pservice->addUserIfNickNotBusy("test0","name","ip","port"), true);
-	QCOMPARE(pservice->addUserIfNickNotBusy("test","name","ip","port"), true);
+ ServerNetworkService *pservice=new ServerNetworkService;
+ QTcpSocket *client1 = new QTcpSocket;
+ QTcpSocket *client2 = new QTcpSocket;
+ QTcpSocket *client3 = new QTcpSocket;
 
-	QCOMPARE(pservice->getClientBase()->size(), 6);
-	QCOMPARE(pservice->getClientsList().size(), 6);
+ QCOMPARE(pservice->addUserIfNickNotBusy("nick1","", client1), true);
+ QCOMPARE(pservice->addUserIfNickNotBusy("nick2","", client2), true);
+ QCOMPARE(pservice->addUserIfNickNotBusy("JOHNY","", client3), true);
 
-	QCOMPARE(pservice->addUserIfNickNotBusy("nick1","","",""), false);
-	QCOMPARE(pservice->addUserIfNickNotBusy("NICK1","","",""), false);
-	QCOMPARE(pservice->addUserIfNickNotBusy("JOHNY","","",""), false);
-	QCOMPARE(pservice->addUserIfNickNotBusy("test00","name","ip","port"), false);
-	QCOMPARE(pservice->addUserIfNickNotBusy("test00","","",""), false);
+ QCOMPARE(pservice->getClientBase()->size(), 3);
+ QCOMPARE(pservice->getClientsList().size(), 3);
 
-	QCOMPARE(pservice->getClientBase()->size(), 6);
-	QCOMPARE(pservice->getClientsList().size(), 6);
+ QCOMPARE(pservice->addUserIfNickNotBusy("nick1","", client1), false);
+ QCOMPARE(pservice->addUserIfNickNotBusy("NICK2","", client2), false);
+ QCOMPARE(pservice->addUserIfNickNotBusy("JOHNY","", client3), false);
 
-	delete pservice;
+ QCOMPARE(pservice->getClientBase()->size(), 3);
+ QCOMPARE(pservice->getClientsList().size(), 3);
+
+ delete pservice;
+ delete  client1;
+ delete  client2;
+ delete  client3;
 }
 
 void test::test_saveDataAndRestoreData()
@@ -69,10 +71,11 @@ void test::test_saveDataAndRestoreData()
  QFile::remove(savingFile);
 
  quint16 nport=9009;
- ServerNetworkService *pserviceForSave=new ServerNetworkService(nport);
+ ServerNetworkService *pserviceForSave=new ServerNetworkService;
+ pserviceForSave->setPort(nport);
  QCOMPARE(pserviceForSave->getPort(), nport);
 
- ServerNetworkService *pserviceForRestore=new ServerNetworkService(0);
+ ServerNetworkService *pserviceForRestore=new ServerNetworkService;
 
  pserviceForSave->addToBase("nick1","name1","127.0.0.1","8888");
  pserviceForSave->addToBase("nick2","name2","127.0.0.1","9999");
@@ -108,7 +111,8 @@ void test::test_startServer0()
 {
  QFile::remove(savingFile);
  quint16 nPort=7777;
- ServerNetworkService *pservice0=new ServerNetworkService(nPort);
+ ServerNetworkService *pservice0=new ServerNetworkService;
+ pservice0->setPort(nPort);
 
  QCOMPARE(pservice0->slotStartServer(), true);
  QCOMPARE(pservice0->listeningPort(), nPort);
@@ -117,7 +121,8 @@ void test::test_startServer0()
  QCOMPARE(pservice0->slotStartServer(), true);
 
 
- ServerNetworkService *pservice1=new ServerNetworkService(nPort);
+ ServerNetworkService *pservice1=new ServerNetworkService;
+ pservice1->setPort(nPort);
  QCOMPARE(pservice1->slotStartServer(), false);
 
 
@@ -132,7 +137,8 @@ void test::test_startServer0()
 void test::test_registration()
 {
  QString port="11000";
- ServerNetworkService *pserver=new ServerNetworkService(11000);
+ ServerNetworkService *pserver=new ServerNetworkService;
+ pserver->setPort(quint16(port.toInt()));
  QCOMPARE(pserver->slotStartServer(), true);
 
  ClientServiceForDebug *pclient0=new ClientServiceForDebug;
@@ -195,7 +201,8 @@ void test::test_notifying()
  QFile::remove(savingFile);
 
  QString port="22222";
- ServerNetworkService *pserver=new ServerNetworkService(22222);
+ ServerNetworkService *pserver=new ServerNetworkService;
+ pserver->setPort(quint16(port.toInt()));
  QCOMPARE(pserver->slotStartServer(), true);
  QCOMPARE(pserver->listeningPort(), port.toInt());
 
@@ -238,12 +245,17 @@ void test::test_notifying()
 void test::test_clientConnectionToServer()
 {
  QString port="9000";
- ServerNetworkService *pserver=new ServerNetworkService(9000);
+ ServerNetworkService *pserver=new ServerNetworkService;
+ pserver->setPort(quint16(port.toInt()));
  QCOMPARE(pserver->slotStartServer(), true);
 
- QCOMPARE(pserver->addUserIfNickNotBusy("client0", "name0", "", ""), true);
- QCOMPARE(pserver->addUserIfNickNotBusy("client1", "name1", "", ""), true);
+ QTcpSocket *client0=new QTcpSocket;
+ QTcpSocket *client1=new QTcpSocket;
 
+ QCOMPARE(pserver->addUserIfNickNotBusy("client0", "name0", client0), true);
+ QCOMPARE(pserver->addUserIfNickNotBusy("client1", "name1", client1), true);
+ pserver->removeFromOnlines(client0);
+ pserver->removeFromOnlines(client1);
 
  ClientServiceForDebug *pclient0=new ClientServiceForDebug;
  pclient0->slotSetAddress("localhost", port);
@@ -281,13 +293,16 @@ void test::test_clientConnectionToServer()
  delete pclient1;
  delete pserver;
  delete loop;
+ delete client0;
+ delete client1;
  QFile::remove(savingFile);
 }
 
 void test::test_sendingAndReadingMessage()
 {
  QString port="9000";
- ServerNetworkService *pserver=new ServerNetworkService(9000);
+ ServerNetworkService *pserver=new ServerNetworkService;
+ pserver->setPort(quint16(port.toInt()));
  QCOMPARE(pserver->slotStartServer(), true);
  pserver->addToBase("client0", "name0", "localhost", "0");
  pserver->addToBase("client1", "name1", "localhost", "0");

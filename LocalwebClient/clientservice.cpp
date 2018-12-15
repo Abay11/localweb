@@ -6,11 +6,7 @@ void ClientService::saveDataAndProperties()
  if(file.open(QFile::WriteOnly))
 	{
 	 QDataStream out(&file);
-	 out<<nick<<name<<*pserverAddress<<*pserverPort;
-
-	 if(!clients.isEmpty())
-		out<<clients;
-
+	 out<<nick<<name<<*pserverAddress<<*pserverPort<<clients;
 	 file.close();
 	}
  else
@@ -23,11 +19,7 @@ void ClientService::restoreDataAndProperties()
  if(file.open(QFile::ReadOnly))
 	{
 	 QDataStream in(&file);
-	 in>>nick>>name;
-
-	 in>>*pserverAddress>>*pserverPort;
-
-	 in>>clients;
+	 in>>nick>>name>>*pserverAddress>>*pserverPort>>clients;
 	 file.close();
 
 	 addAllUsersToOfflineModel();

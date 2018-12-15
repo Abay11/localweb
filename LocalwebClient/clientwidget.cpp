@@ -21,7 +21,8 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  plistdock->setOnlineModel(pservice->onlineModel());
  plistdock->setOfflineModel(pservice->offlineModel());
 
- pcmdDisconnect->setEnabled(false);
+ pleAddress->setInputMask("000.000.000.000");
+ plePort->setInputMask("00000");
 
  phlay->addWidget(plblAddress);
  phlay->addWidget(pleAddress);

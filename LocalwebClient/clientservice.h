@@ -26,12 +26,13 @@ protected:
 private:
  QString nick;
  QString name;
-
+ QString *pserverAddress;
+ QString *pserverPort;
 
  quint16 mnNextBlockSize=0;
- QString *pserverAddress, *pserverPort;
 
- QStringListModel *ponlineModel, *pofflineModel;
+ QStringListModel *ponlineModel;
+ QStringListModel *pofflineModel;
 
  void saveDataAndProperties();
  void restoreDataAndProperties();

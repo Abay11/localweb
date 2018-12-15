@@ -55,6 +55,7 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 	QWidget *pcentral=new QWidget(this);
 	pcentral->setLayout(pvlay);
 	setCentralWidget(pcentral);
+	turnStateOff();
 	setUI();
 	resize(640, 480);
 }
@@ -80,7 +81,6 @@ void ClientWidget::slotConnected()
 void ClientWidget::slotDisconnected()
 {
  turnStateOff();
-
  pgeneralConvertion->setSentEnabled(false);
  pgeneralConvertion->setSocketState(false);
 }

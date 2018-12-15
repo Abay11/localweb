@@ -16,13 +16,20 @@ public:
  ~test();
 
 private slots:
+ //server
  void test_addToBase();
  void test_saveDataAndRestoreData();
  void test_startServer0();
+
+ //both
  void test_registration();
  void test_notifying();
  void test_clientConnectionToServer();
  void test_sendingAndReadingMessage();
+
+ //client
+ void test_addAllUsersToOfflineModel();
+ void test_addNewOnlineToModel();
 };
 
 test::test()
@@ -239,11 +246,12 @@ void test::test_notifying()
  delete pclient1;
  delete pserver;
  delete loop;
- QFile::remove(savingFile);
 }
 
 void test::test_clientConnectionToServer()
 {
+ QFile::remove(savingFile);
+
  QString port="9000";
  ServerNetworkService *pserver=new ServerNetworkService;
  pserver->setPort(quint16(port.toInt()));
@@ -300,6 +308,8 @@ void test::test_clientConnectionToServer()
 
 void test::test_sendingAndReadingMessage()
 {
+ QFile::remove(savingFile);
+
  QString port="9000";
  ServerNetworkService *pserver=new ServerNetworkService;
  pserver->setPort(quint16(port.toInt()));
@@ -343,6 +353,67 @@ void test::test_sendingAndReadingMessage()
  delete pclient0;
  delete pserver;
  delete loop;
+}
+
+void test::test_addAllUsersToOfflineModel()
+{
+ QFile::remove(savingFile);
+
+ QString port="6565";
+ ServerNetworkService *pserver=new ServerNetworkService;
+ pserver->setPort(quint16(port.toInt()));
+ QCOMPARE(pserver->slotStartServer(), true);
+
+ QTcpSocket *psocket0=new QTcpSocket;
+ QTcpSocket *psocket1=new QTcpSocket;
+ QTcpSocket *psocket2=new QTcpSocket;
+
+ pserver->addUserIfNickNotBusy("n0", "", psocket0);
+ pserver->addUserIfNickNotBusy("n1", "", psocket1);
+ pserver->addUserIfNickNotBusy("n2", "", psocket2);
+ pserver->removeFromOnlines(psocket0);
+
+ QEventLoop *loop=new QEventLoop;
+
+ ClientServiceForDebug *pclient0=new ClientServiceForDebug;
+ pclient0->setNickAndName("n0", "");
+ pclient0->slotSetAddress("localhost", port);
+ pclient0->slotConnectToServer();
+ QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ pclient0->addAllUsersToOfflineModel();
+
+ auto onlines = pclient0->onlineModel()->stringList();
+ auto offlines= pclient0->offlineModel()->stringList();
+
+ QCOMPARE(onlines.size(), 0);
+ QCOMPARE(offlines.size(), 3);
+ QCOMPARE(offlines.contains("Вы: n0"), true);
+
+ pclient0->slotDisconnectFromServer();
+ pserver->slotStopServer();
+ delete psocket0;
+ delete psocket1;
+ delete psocket2;
+ delete pclient0;
+ delete pserver;
+ delete loop;
+}
+
+void test::test_addNewOnlineToModel()
+{
+ ClientServiceForDebug *pclient0=new ClientServiceForDebug;
+ pclient0->addNewOnlineToModel("Client1");
+ pclient0->addNewOnlineToModel("Client2");
+ pclient0->addNewOnlineToModel("Client3");
+ pclient0->addNewOnlineToModel("Client4");
+ pclient0->addNewOnlineToModel("Client5");
+ QCOMPARE(pclient0->getOnlines().size(), 5);
+ QCOMPARE(pclient0->getOnlines().first(), "Client1");
+ QCOMPARE(pclient0->getOnlines().last(), "Client5");
+
+ delete  pclient0;
 }
 
 QTEST_MAIN(test)

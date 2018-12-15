@@ -16,6 +16,16 @@ const CLIENTBASE *ClientServiceForDebug::getClientBase()
  return &clients;
 }
 
+void ClientServiceForDebug::addAllUsersToOfflineModel()
+{
+ ClientService::addAllUsersToOfflineModel();
+}
+
+void ClientServiceForDebug::addNewOnlineToModel(QString nick)
+{
+ ClientService::addNewOnlineToModel(nick);
+}
+
 void ClientServiceForDebug::slotReadyRead()
 {
  QTimer *timer=new QTimer;

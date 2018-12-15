@@ -22,6 +22,8 @@ protected:
  QTcpSocket *psocket;
  bool registrationResult=false;
  CLIENTBASE clients;
+ void addAllUsersToOfflineModel();
+ void addNewOnlineToModel(QString nick);
 
 private:
  QString nick;
@@ -36,8 +38,6 @@ private:
 
  void saveDataAndProperties();
  void restoreDataAndProperties();
- void addAllUsersToOfflineModel();
- void addNewOnlineToModel(QString nick);
  void removeOnlinesFromOfflines(QStringList onlines);
  void throwOnlinesToOfflines();
 

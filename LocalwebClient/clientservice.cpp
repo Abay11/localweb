@@ -32,7 +32,10 @@ void ClientService::addAllUsersToOfflineModel()
 {
  QStringList offlines;
  if(!clients.isEmpty())
-	offlines.append(clients.keys());
+	{
+	 clients.remove(nick);
+	 offlines.append(clients.keys());
+	}
 
  QString usernick="Вы: "+nick;
  offlines.prepend(usernick);
@@ -43,7 +46,7 @@ void ClientService::addAllUsersToOfflineModel()
 
 void ClientService::addNewOnlineToModel(QString nick)
 {
- int nIndex=ponlineModel->rowCount()-1;
+ int nIndex=ponlineModel->rowCount();
  ponlineModel->insertRow(nIndex);
  ponlineModel->setData(ponlineModel->index(nIndex), nick);
 }

@@ -13,6 +13,8 @@ public:
  ClientServiceForDebug(QWidget *parent=nullptr);
  bool getRegistrationResult();
  const CLIENTBASE *getClientBase();
+ void addAllUsersToOfflineModel();
+ void addNewOnlineToModel(QString nick);
 
 private slots:
  void slotReadyRead();

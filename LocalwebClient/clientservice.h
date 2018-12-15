@@ -47,8 +47,12 @@ public:
  bool socketIsOpen();
  QStringListModel *onlineModel();
  QStringListModel *offlineModel();
+ QString serverAddress();
+ QString serverPort();
  quint16 clientPort();
  QStringList getOnlines();
+ void setAddress(QString addr);
+ void setPort(QString port);
 
  QString receivedMessage;
 

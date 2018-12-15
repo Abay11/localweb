@@ -77,14 +77,10 @@ private slots:
  void slotQuit();
 
 public slots:
-
- void slotAddressChanged(QString);
- void slotPortChanged(QString);
-
+ void slotAddressEdited();
+ void slotPortEdited();
  void slotSetAddress(QString addr, QString port);
-
  void slotOpenConversion();
-
  void slotConnected();
  void slotDisconnected();
 };

@@ -22,7 +22,9 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  plistdock->setOfflineModel(pservice->offlineModel());
 
  pleAddress->setInputMask("000.000.000.000");
+ pleAddress->setText(pservice->serverAddress());
  plePort->setInputMask("00000");
+ plePort->setText(pservice->serverPort());
 
  phlay->addWidget(plblAddress);
  phlay->addWidget(pleAddress);
@@ -45,8 +47,8 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
  connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
 
- connect(pleAddress, SIGNAL(textChanged(QString)), SLOT(slotAddressChanged(QString)));
- connect(plePort, SIGNAL(textChanged(QString)), SLOT(slotPortChanged(QString)));
+ connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
+ connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
 
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 
@@ -55,16 +57,6 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 	setCentralWidget(pcentral);
 	setUI();
 	resize(640, 480);
-}
-
-void ClientWidget::slotAddressChanged(QString newAddress)
-{
- *pserverAddress=newAddress;
-}
-
-void ClientWidget::slotPortChanged(QString newPort)
-{
- *pserverPort=newPort;
 }
 
 void ClientWidget::slotSetAddress(QString addr, QString port)
@@ -192,4 +184,14 @@ void ClientWidget::slotConnectClicked()
 void ClientWidget::slotQuit()
 {
  QApplication::quit();
+}
+
+void ClientWidget::slotAddressEdited()
+{
+ pservice->setAddress(pleAddress->text());
+}
+
+void ClientWidget::slotPortEdited()
+{
+ pservice->setPort((plePort->text()));
 }

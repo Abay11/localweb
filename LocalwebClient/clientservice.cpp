@@ -85,6 +85,16 @@ QStringListModel *ClientService::offlineModel()
  return pofflineModel;
 }
 
+QString ClientService::serverAddress()
+{
+ return *pserverAddress;
+}
+
+QString ClientService::serverPort()
+{
+ return *pserverPort;
+}
+
 quint16 ClientService::clientPort()
 {
  return psocket->localPort();
@@ -93,6 +103,16 @@ quint16 ClientService::clientPort()
 QStringList ClientService::getOnlines()
 {
  return ponlineModel->stringList();
+}
+
+void ClientService::setAddress(QString addr)
+{
+ *pserverAddress=addr;
+}
+
+void ClientService::setPort(QString port)
+{
+ *pserverPort=port;
 }
 
 void ClientService::setNickAndName(QString nick, QString name)

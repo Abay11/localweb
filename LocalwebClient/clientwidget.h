@@ -67,6 +67,8 @@ private:
 public:
  ClientWidget(ClientService *pservice, QWidget *parent = nullptr);
  ~ClientWidget();
+ void turnStateOn();
+ void turnStateOff();
 
  void setUI();
 

@@ -38,7 +38,7 @@ private:
  ClientService *pservice;
 
  QString address="127.0.0.1";
- QString port="7165";
+ QString port="7777";
 public:
  Registration(ClientService *pservice, QWidget *parent=nullptr);
 

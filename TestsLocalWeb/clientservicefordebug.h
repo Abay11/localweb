@@ -16,7 +16,9 @@ public:
  void addAllUsersToOfflineModel();
  void addNewOnlineToModel(QString nick);
  void removeOnlineFromOfflines(QStringList onlines);
+ void setListToOnlineModel(QStringList onlines);
  void setListToOfflineModel(QStringList offlines);
+ void throwOnlinesToOfflines();
  QStringList getOnlines();
  QStringList getOfflines();
 

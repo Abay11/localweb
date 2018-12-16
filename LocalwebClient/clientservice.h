@@ -28,6 +28,7 @@ protected:
  void addAllUsersToOfflineModel();
  void addNewOnlineToModel(QString nick);
  void removeOnlinesFromOfflines(QStringList onlines);
+ void throwOnlinesToOfflines();
 
 private:
  QString nick;
@@ -39,7 +40,6 @@ private:
 
  void saveDataAndProperties();
  void restoreDataAndProperties();
- void throwOnlinesToOfflines();
 
 public:
  ClientService(QWidget *parent=nullptr);

@@ -54,10 +54,10 @@ void ClientService::addNewOnlineToModel(QString nick)
 ClientService::ClientService(QWidget *prnt)
  :QObject (prnt)
  ,psocket(new QTcpSocket)
- ,pserverAddress(new QString)
- ,pserverPort(new QString)
  ,ponlineModel(new QStringListModel)
  ,pofflineModel(new QStringListModel)
+ ,pserverAddress(new QString)
+ ,pserverPort(new QString)
 {
  restoreDataAndProperties();
 
@@ -408,13 +408,14 @@ void ClientService::removeOnlinesFromOfflines(QStringList onlines)
 
 void ClientService::throwOnlinesToOfflines()
 {
- QStringList onlines= ponlineModel->stringList();
+ QStringList onlines=ponlineModel->stringList();
  QStringList offlines=pofflineModel->stringList();
 
  if(!onlines.empty())
 	onlines.pop_front();
+
  offlines.append(onlines);
- offlines.prepend("Вы: nick");
+ offlines.prepend("Вы: "+nick);
 
  ponlineModel->setStringList(QStringList());
  pofflineModel->setStringList(offlines);

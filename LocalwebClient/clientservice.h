@@ -22,8 +22,12 @@ protected:
  QTcpSocket *psocket;
  bool registrationResult=false;
  CLIENTBASE clients;
+ QStringListModel *ponlineModel;
+ QStringListModel *pofflineModel;
+
  void addAllUsersToOfflineModel();
  void addNewOnlineToModel(QString nick);
+ void removeOnlinesFromOfflines(QStringList onlines);
 
 private:
  QString nick;
@@ -33,12 +37,8 @@ private:
 
  quint16 mnNextBlockSize=0;
 
- QStringListModel *ponlineModel;
- QStringListModel *pofflineModel;
-
  void saveDataAndProperties();
  void restoreDataAndProperties();
- void removeOnlinesFromOfflines(QStringList onlines);
  void throwOnlinesToOfflines();
 
 public:
@@ -50,7 +50,6 @@ public:
  QString serverAddress();
  QString serverPort();
  quint16 clientPort();
- QStringList getOnlines();
  void setAddress(QString addr);
  void setPort(QString port);
 

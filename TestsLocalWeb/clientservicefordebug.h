@@ -15,6 +15,10 @@ public:
  const CLIENTBASE *getClientBase();
  void addAllUsersToOfflineModel();
  void addNewOnlineToModel(QString nick);
+ void removeOnlineFromOfflines(QStringList onlines);
+ void setListToOfflineModel(QStringList offlines);
+ QStringList getOnlines();
+ QStringList getOfflines();
 
 private slots:
  void slotReadyRead();

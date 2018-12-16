@@ -26,6 +26,26 @@ void ClientServiceForDebug::addNewOnlineToModel(QString nick)
  ClientService::addNewOnlineToModel(nick);
 }
 
+void ClientServiceForDebug::removeOnlineFromOfflines(QStringList onlines)
+{
+ ClientService::removeOnlinesFromOfflines(onlines);
+}
+
+void ClientServiceForDebug::setListToOfflineModel(QStringList offlines)
+{
+ pofflineModel->setStringList(offlines);
+}
+
+QStringList ClientServiceForDebug::getOnlines()
+{
+ return ponlineModel->stringList();
+}
+
+QStringList ClientServiceForDebug::getOfflines()
+{
+ return pofflineModel->stringList();
+}
+
 void ClientServiceForDebug::slotReadyRead()
 {
  QTimer *timer=new QTimer;

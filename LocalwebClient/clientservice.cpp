@@ -103,11 +103,6 @@ quint16 ClientService::clientPort()
  return psocket->localPort();
 }
 
-QStringList ClientService::getOnlines()
-{
- return ponlineModel->stringList();
-}
-
 void ClientService::setAddress(QString addr)
 {
  *pserverAddress=addr;

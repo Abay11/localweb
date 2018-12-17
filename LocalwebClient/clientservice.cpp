@@ -65,7 +65,8 @@ ClientService::ClientService(QWidget *prnt)
  connect(psocket, SIGNAL(connected()), SIGNAL(connected()));
  connect(psocket, SIGNAL(disconnected()), SIGNAL(disconnected()));
  connect(psocket, SIGNAL(readyRead()), SLOT(slotReadyRead()));
- connect(psocket, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(slotError(QAbstractSocket::SocketError)));
+ connect(psocket, SIGNAL(error(QAbstractSocket::SocketError)),
+				 this, SLOT(slotError(QAbstractSocket::SocketError)));
 }
 
 ClientService::~ClientService()
@@ -314,8 +315,9 @@ void ClientService::slotError(QAbstractSocket::SocketError nerr)
 							 "Обратитесь к администратору сети.");
 	}
 
- emit socketError("Ошибка подключения к серверу", info);
+ emit socketError("Ошибка соединения", info);
  qCritical()<<"Ошибка соединения с сервером: "<<psocket->errorString();
+ throwOnlinesToOfflines();
  psocket->close();
 }
 
@@ -327,10 +329,9 @@ void ClientService::slotConnectToServer()
 
 void ClientService::slotDisconnectFromServer()
 {
- psocket->close();
+ qDebug()<<"Disconnected from server";
  throwOnlinesToOfflines();
-
- emit disconnected();
+ psocket->close();
 }
 
 void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant additionData)
@@ -355,6 +356,7 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant additi
  //а пока так.*/
 	 msg.prepend(nick+": ");
 	 out<<msg;
+	 qDebug()<<"socket state:"<<psocket->state();
 	 break;
 	 }
 
@@ -412,10 +414,11 @@ void ClientService::throwOnlinesToOfflines()
  QStringList offlines=pofflineModel->stringList();
 
  if(!onlines.empty())
-	onlines.pop_front();
-
- offlines.append(onlines);
- offlines.prepend("Вы: "+nick);
+	{
+	 onlines.pop_front();
+	 offlines.append(onlines);
+	 offlines.prepend("Вы: "+nick);
+	}
 
  ponlineModel->setStringList(QStringList());
  pofflineModel->setStringList(offlines);

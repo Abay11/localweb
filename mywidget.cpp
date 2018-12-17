@@ -44,6 +44,7 @@ MyWidget::MyWidget(QWidget *parent)
 
  connect(pcmdOn, SIGNAL(clicked()), SLOT(slotStartServer()));
  connect(pcmdOff, SIGNAL(clicked()), SLOT(slotStopServer()));
+ connect(pcmdOff, SIGNAL(clicked()), pservice, SLOT(slotStopServer()));
  connect(onOff, SIGNAL(triggered()), SLOT(slotOnOffHandler()));
  connect(plePort, SIGNAL(textChanged(QString)), SLOT(slotPortChanged(QString)));
 
@@ -147,7 +148,6 @@ void MyWidget::slotStartServer()
 
 void MyWidget::slotStopServer()
 {
- pservice->slotStopServer();
  turnStateOff();
 
  pInfo->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")

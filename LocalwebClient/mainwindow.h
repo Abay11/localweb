@@ -22,10 +22,9 @@ class MainWindow : public QMainWindow
  Q_OBJECT
 private:
  QStackedWidget *pstackedWidgets;
-
  MyLogger *plogger;
- ClientWidget* pclientWidget;
- Registration* preg;
+ ClientWidget *pclientWidget;
+ Registration *preg;
  ClientService *pservice;
 
  void setupAndShowRegistrationWidget();

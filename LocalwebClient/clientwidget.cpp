@@ -46,6 +46,7 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 
  connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
  connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
+ connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));
 
  connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
  connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
@@ -79,6 +80,13 @@ void ClientWidget::slotConnected()
 }
 
 void ClientWidget::slotDisconnected()
+{
+ turnStateOff();
+ pgeneralConvertion->setSentEnabled(false);
+ pgeneralConvertion->setSocketState(false);
+}
+
+void ClientWidget::slotSocketError()
 {
  turnStateOff();
  pgeneralConvertion->setSentEnabled(false);

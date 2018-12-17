@@ -229,6 +229,7 @@ bool ServerNetworkService::slotStartServer()
 
 void ServerNetworkService::slotStopServer()
 {
+
  ptcpServer->close();
 }
 

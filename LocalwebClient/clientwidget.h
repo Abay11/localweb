@@ -75,6 +75,7 @@ public:
 private slots:
  void slotConnectClicked();
  void slotQuit();
+ void slotSocketError();
 
 public slots:
  void slotAddressEdited();

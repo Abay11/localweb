@@ -139,12 +139,12 @@ void test::test_startServer0()
  pservice1->slotStopServer();
  delete pservice0;
  delete pservice1;
-
- QFile::remove(savingFile);
 }
 
 void test::test_registration()
 {
+ QFile::remove(savingFile);
+
  QString port="11000";
  ServerNetworkService *pserver=new ServerNetworkService;
  pserver->setPort(quint16(port.toInt()));

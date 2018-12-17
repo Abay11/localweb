@@ -356,7 +356,6 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant additi
  //а пока так.*/
 	 msg.prepend(nick+": ");
 	 out<<msg;
-	 qDebug()<<"socket state:"<<psocket->state();
 	 break;
 	 }
 

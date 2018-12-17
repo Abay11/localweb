@@ -38,7 +38,6 @@ class ClientWidget : public QMainWindow
  Q_OBJECT
 
 private:
-
  QString maddress;
  QString *pserverAddress;
  QString *pserverPort;

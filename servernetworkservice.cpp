@@ -229,8 +229,12 @@ bool ServerNetworkService::slotStartServer()
 
 void ServerNetworkService::slotStopServer()
 {
+ ptcpServer->close(); //stop only listening
 
- ptcpServer->close();
+ for(auto c : socketsAndNicksOfOnlines->keys()) //disconnect of all clients
+	c->disconnectFromHost();
+
+ qInfo()<<"Сервер остановлен.";
 }
 
 void ServerNetworkService::slotNewConnection()

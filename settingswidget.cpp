@@ -47,9 +47,9 @@ void SettingsWidget::setCurrentAddress(QString addr, QString port )
  plePort->setText(mcurrentPort);
 
  pflay->addRow(new QLabel(
-                   QString("Текущий адрес и порт: %1:%2")
-                   .arg(mcurrentAddress)
-                   .arg(mcurrentPort)));
+								QString("Текущий адрес и порт: %1:%2")
+								.arg(mcurrentAddress)
+								.arg(mcurrentPort)));
 }
 
 void SettingsWidget::slotOK()

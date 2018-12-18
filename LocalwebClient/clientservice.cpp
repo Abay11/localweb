@@ -23,9 +23,13 @@ void ClientService::restoreDataAndProperties()
 	 file.close();
 
 	 addAllUsersToOfflineModel();
+	 return;
 	}
  else if(QFile::exists(file.fileName()))
 	qWarning()<<"Error restoring clients base";
+
+ *pserverAddress=defaultServerAddress;
+ *pserverPort=defaultServerPort;
 }
 
 void ClientService::addAllUsersToOfflineModel()

@@ -12,7 +12,6 @@ Registration::Registration(ClientService *pclientService, QWidget *parent)
  ,pcmdHelp(new QPushButton("Помощь"))
  ,phlay(new QHBoxLayout)
  ,pflay(new QFormLayout)
- ,psocket(new QTcpSocket)
  ,pservice(pclientService)
 {
  pcmdSettings->setToolTip("Задать настройки");
@@ -61,7 +60,6 @@ void Registration::slotSentRequest()
  //зарегаться еще(отказ возможен если подобранный ник уже используется)
  if(!pservice->socketIsOpen())
 	{
-	 pservice->slotSetAddress(address, port);
 	 pservice->slotConnectToServer();
 	 //нужно подождать пока установится соединение,
 	 //поэтому блокируемся до нужного сигнала
@@ -102,15 +100,14 @@ void Registration::slotExit()
 void Registration::slotSettings()
 {
  SettingsWidget *sd=new SettingsWidget;
- sd->setCurrentAddress(address, port);
- sd->show();
+ sd->setCurrentAddress(pservice->serverAddress(), pservice->serverPort());
  connect(sd, SIGNAL(addressChanged(QString, QString)),
 				 SLOT(slotAddressChanged(QString, QString)));
+ sd->show();
 }
 
-void Registration::slotAddressChanged(QString addr, QString port)
+void Registration::slotAddressChanged(QString address, QString port)
 {
- address=addr;
- port=port;
- emit addressChanged(addr, port);
+ pservice->setAddress(address);
+ pservice->setPort(port);
 }

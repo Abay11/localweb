@@ -34,11 +34,8 @@ private:
  QGridLayout *pglay;
  QFormLayout *pflay;
 
- QTcpSocket *psocket;
  ClientService *pservice;
 
- QString address="127.0.0.1";
- QString port="7777";
 public:
  Registration(ClientService *pservice, QWidget *parent=nullptr);
 
@@ -53,8 +50,6 @@ public slots:
 
 signals:
  void registrationFinished();
- void addressChanged(QString address, QString port);
- void nickAndNameChanged(QString nick, QString name);
 };
 
 #endif // REGISTRATION_H

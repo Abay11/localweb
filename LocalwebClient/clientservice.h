@@ -14,10 +14,12 @@
 
 #define CLIENTBASE QMap<QString, ClientInfo*>
 
+static QString defaultServerAddress="127.0.0.1";
+static QString defaultServerPort="9999";
+
 class ClientService : public QObject
 {
  Q_OBJECT
-
 protected:
  QTcpSocket *psocket;
  bool registrationResult=false;

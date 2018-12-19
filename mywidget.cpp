@@ -45,7 +45,7 @@ MyWidget::MyWidget(QWidget *parent)
  connect(pcmdOn, SIGNAL(clicked()), SLOT(slotStartServer()));
  connect(pcmdOff, SIGNAL(clicked()), SLOT(slotStopServer()));
  connect(onOff, SIGNAL(triggered()), SLOT(slotOnOffHandler()));
- connect(plePort, SIGNAL(textChanged(QString)), SLOT(slotPortChanged(QString)));
+ connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
 
  setModelToView(pservice->getModel());
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, pdock);
@@ -169,10 +169,8 @@ void MyWidget::slotQuit()
  QApplication::quit();
 }
 
-void MyWidget::slotPortChanged(QString newPort)
+void MyWidget::slotPortEdited()
 {
- qDebug()<<"port text changed";
- int pos;
- if(portValidator->validate(newPort, pos)==QValidator::Acceptable)
-	pservice->setPort(quint16(newPort.toInt()));
+ qDebug()<<"port text edited";
+ pservice->setPort(quint16(plePort->text().toInt()));
 }

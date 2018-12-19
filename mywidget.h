@@ -66,7 +66,7 @@ private slots:
 
  void slotQuit();
 
- void slotPortChanged(QString);
+ void slotPortEdited();
 };
 
 #endif // MYWIDGET_H

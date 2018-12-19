@@ -182,20 +182,18 @@ void ClientService::slotReadyRead()
 		 //ждем актуальную базу
 		 int serverBaseSize;
 		 in>>serverBaseSize;
-		 if(serverBaseSize!=clients.size())
+		 bool hasClientActualBase=serverBaseSize==clients.size();
+		 if(!hasClientActualBase)
 			{
-             qDebug()<<"база не сошлась, ждем новый";
-             in>>clients;
+			 //receive and update base
+			 in>>clients;
+			 addAllUsersToOfflineModel();
+			 qDebug()<<"база не сошлась, получена новая";
 			}
 
 		 QList<QString> onlines;
 		 in>>onlines;
-//		 qDebug()<<"Приняли как онлайн: ";
-//		 for(auto s : onlines)
-//			qDebug()<<s;
-
 		 removeOnlinesFromOfflines(onlines);
-
 		 break;
 	 }
 	 case DATATYPE::DISCONNECTION:

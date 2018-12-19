@@ -1,4 +1,4 @@
-#include "clientservice.h"
+﻿#include "clientservice.h"
 
 void ClientService::saveDataAndProperties()
 {
@@ -135,6 +135,7 @@ void ClientService::slotConnected()
 
 	//говорим серверу что мы только что подключились и нам нужно сверить базу
 	slotSendToServer(DATATYPE::CONNECT);
+	emit newMessageForNotification("Соединение с сервером установлено!");
 
 	qInfo()<<"Отправлен запрос на получение списка";
 }
@@ -168,7 +169,8 @@ void ClientService::slotReadyRead()
 	switch (type) {
 	 case DATATYPE::REGISTRATION:
 		in>>time>>registrationResult;
-        emit returnRegistrationResult(registrationResult);
+
+		emit returnRegistrationResult(registrationResult);
 
 		qInfo()<<time.toString("[hh:mm:ss] ")
 					<<"Registration attempt. Result: "<<registrationResult;
@@ -202,31 +204,9 @@ void ClientService::slotReadyRead()
 		 QString disconnected;
 		 in>>disconnected;
 		 qDebug()<<disconnected<<" отсоединился";
-//		 onlines.removeOne(disconnected);
-
-//		 ponlineList->findItems(disconnected, Qt::MatchExactly).first();
-//		 for(auto i=0, s=ponlineList->count();
-//				 i<s; ++i)
-//			{
-//			 if(ponlineList->item(i)->text()==disconnected)
-//				{
-//				 delete ponlineList->takeItem(i);
-//				 break;
-//				}
-//			}
-
-//		 pofflineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/offline.png"),disconnected));
-//		 pofflineList->sortItems();
-
 		 QString msg=disconnected;
 		 msg+=" вышел";
-
-//		 if(parentWidget()->parentWidget()->isMinimized()
-//				|| parentWidget()->parentWidget()->isHidden())
-//			ptray->showMessage("Новое событие", msg, QSystemTrayIcon::Information, 3000);
-//		 else
-//			popup->showNotify(std::move(msg), mapToGlobal(pos()));
-
+		 emit(newMessageForNotification(disconnected + " вышел"));
 		 break;
 		}
 	 case DATATYPE::NOTIFYING:
@@ -234,53 +214,19 @@ void ClientService::slotReadyRead()
 		 QString connectedUserNick;
 		 in>>connectedUserNick;
 		 qDebug()<<"есть новый подсоединившийся:"<<connectedUserNick;
-//		 client
-		 //убираем из недоступных подсоединившегося
-//		 for(auto i=0;
-//				 i<pofflineList->count(); ++i)
-//			{
-//			 if(pofflineList->item(i)->text()==connected)
-//				{
-//				delete pofflineList->takeItem(i);
-//				 break;
-//				}
-//			}
-
-		 //и добавляем к доступным
-//		 ponlineList->addItem(new QListWidgetItem(QIcon(":/Res/Icons/online.png"), connected));
-//		 ponlineList->sortItems();
 		 addNewOnlineToModel(connectedUserNick);
-
-//		 QString msg=connectedUserNick;
-//		 msg+=" доступен";
-
-//		 if(parentWidget()->parentWidget()->isMinimized()
-//				|| parentWidget()->parentWidget()->isHidden())
-//			ptray->showMessage("Новое событие", msg, QSystemTrayIcon::Information, 3000);
-//		 else
-//			popup->showNotify(std::move(msg), mapToGlobal(pos()));
-
+		 emit(newMessageForNotification(connectedUserNick + " стал доступен"));
 		 break;
 		}
 	 case DATATYPE::MESSAGE:
 	 {
-		 //новое сообщение
 		 qDebug()<<"новое  сообщение";
 		 in>>time>>msg;
-
 		 receivedMessage=msg;
-
 		 msg.prepend(time.toString("[hh:mm:ss] "));
-//		 msg=time.toString("[hh:mm:ss] ")+"Новое сообщение: "+msg;
-//		 pinfo->append(msg);
 
-//		 if(parentWidget()->parentWidget()->isMinimized()
-//				|| parentWidget()->parentWidget()->isHidden())
-//			ptray->showMessage("Новое событие", "Новое сообщение", QSystemTrayIcon::Information, 3000);
-//		 else
-//			popup->showNotify("***Новое сообщение***", mapToGlobal(pos()));
 		 emit(newMessage(msg));
-
+		 emit(newMessageForNotification("***Новое сообщение***"));
 		 break;
 	 }
 	 default:
@@ -289,7 +235,7 @@ void ClientService::slotReadyRead()
 		 qDebug()<<"но что?!?!";
 		 qDebug()<<"но это уже не моя забота";
 
-		qCritical()<<"Неизвестная ошибка при получении сообщения.";
+		 qCritical()<<"Неизвестная ошибка при получении сообщения.";
 	 }
 
 	mnNextBlockSize=0;

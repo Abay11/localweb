@@ -48,7 +48,7 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
  connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));
  connect(pservice, SIGNAL(newMessage(QString)), pgeneralConvertion, SLOT(slotAppendNewMessage(QString)));
- connect(pservice, SIGNAL(newMessage(QString)), this, SLOT(slotShowNotification()));
+ connect(pservice, SIGNAL(newMessageForNotification(QString)), this, SLOT(slotShowNotification(QString)));
 
  connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
  connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
@@ -95,9 +95,9 @@ void ClientWidget::slotSocketError()
  turnStateOff();
 }
 
-void ClientWidget::slotShowNotification()
+void ClientWidget::slotShowNotification(QString msg)
 {
- ptray->showMessage("Localweb", "***Новое сообщение***",
+ ptray->showMessage("Localweb", msg,
 										QSystemTrayIcon::Information, 3000);
 }
 

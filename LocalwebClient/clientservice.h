@@ -78,6 +78,7 @@ signals:
  void returnRegistrationResult(bool);
  void socketError(QString title, QString info);
  void newMessage(QString msg);
+ void newMessageForNotification(QString msg);
 };
 
 #endif // CLIENTSERVICE_H

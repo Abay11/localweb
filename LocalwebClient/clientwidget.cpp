@@ -20,6 +20,7 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 {
  plistdock->setOnlineModel(pservice->onlineModel());
  plistdock->setOfflineModel(pservice->offlineModel());
+ qDebug()<<"size of offlines"<<pservice->offlineModel()->rowCount();
 
  pleAddress->setInputMask("000.000.000.000");
  pleAddress->setText(pservice->serverAddress());
@@ -33,7 +34,6 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  phlay->addWidget(pcmdConnect);
  phlay->addWidget(pcmdDisconnect);
  pvlay->addLayout(phlay);
-
  pconvertionLay->addWidget(pgeneralConvertion);
  pvlay->addLayout(pconvertionLay);
 
@@ -53,10 +53,14 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 
+ if(pservice->isConnected())
+	turnStateOn();
+ else
+	turnStateOff();
+
 	QWidget *pcentral=new QWidget(this);
 	pcentral->setLayout(pvlay);
 	setCentralWidget(pcentral);
-	turnStateOff();
 	setUI();
 	resize(640, 480);
 }
@@ -76,21 +80,16 @@ void ClientWidget::slotOpenConversion()
 void ClientWidget::slotConnected()
 {
  turnStateOn();
- pgeneralConvertion->setSocketState(true);
 }
 
 void ClientWidget::slotDisconnected()
 {
  turnStateOff();
- pgeneralConvertion->setSentEnabled(false);
- pgeneralConvertion->setSocketState(false);
 }
 
 void ClientWidget::slotSocketError()
 {
  turnStateOff();
- pgeneralConvertion->setSentEnabled(false);
- pgeneralConvertion->setSocketState(false);
 }
 
 ClientWidget::~ClientWidget()
@@ -103,6 +102,9 @@ void ClientWidget::turnStateOn()
  plePort->setEnabled(false);
  pcmdConnect->setEnabled(false);
  pcmdDisconnect->setEnabled(true);
+
+ bool isConnected=true;
+ pgeneralConvertion->setSocketState(isConnected);
 }
 
 void ClientWidget::turnStateOff()
@@ -111,6 +113,10 @@ void ClientWidget::turnStateOff()
  plePort->setEnabled(true);
  pcmdConnect->setEnabled(true);
  pcmdDisconnect->setEnabled(false);
+
+ bool isConnected=false;
+ pgeneralConvertion->setSocketState(isConnected);
+ pgeneralConvertion->setSentEnabled(false);
 }
 
 

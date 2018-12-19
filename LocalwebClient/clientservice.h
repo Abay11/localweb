@@ -77,6 +77,7 @@ signals:
  void disconnected();
  void returnRegistrationResult(bool);
  void socketError(QString title, QString info);
+ void newMessage(QString msg);
 };
 
 #endif // CLIENTSERVICE_H

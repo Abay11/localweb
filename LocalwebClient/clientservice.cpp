@@ -279,6 +279,7 @@ void ClientService::slotReadyRead()
 //			ptray->showMessage("Новое событие", "Новое сообщение", QSystemTrayIcon::Information, 3000);
 //		 else
 //			popup->showNotify("***Новое сообщение***", mapToGlobal(pos()));
+		 emit(newMessage(msg));
 
 		 break;
 	 }

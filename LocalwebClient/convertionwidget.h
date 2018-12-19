@@ -33,6 +33,7 @@ private slots:
  void slotMsgChanged();
 
 public slots:
+ void slotAppendNewMessage(QString msg);
 
 signals:
  void sentClicked(DATATYPE type, QString msg);

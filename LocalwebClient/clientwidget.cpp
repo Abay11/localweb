@@ -47,9 +47,11 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
  connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
  connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));
+ connect(pservice, SIGNAL(newMessage(QString)), pgeneralConvertion, SLOT(slotAppendNewMessage(QString)));
 
  connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
  connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
+
 
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 

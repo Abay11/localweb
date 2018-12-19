@@ -56,3 +56,8 @@ void ConvertionWidget::slotMsgChanged()
  if(pmsgField->toPlainText()!="" && socketIsOpen)
 	pcmdSent->setEnabled(true);
 }
+
+void ConvertionWidget::slotAppendNewMessage(QString msg)
+{
+ pdisplay->append(msg);
+}

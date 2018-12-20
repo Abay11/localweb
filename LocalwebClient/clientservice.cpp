@@ -210,10 +210,10 @@ void ClientService::slotReadyRead()
 		 qDebug()<<"кто-то отсоединился";
 		 QString disconnected;
 		 in>>disconnected;
-		 qDebug()<<disconnected<<" отсоединился";
 		 QString msg=disconnected;
 		 msg+=" вышел";
-		 emit(newMessageForNotification(disconnected + " вышел"));
+		 emit(newMessageForNotification(msg));
+		 emit(newMessageForDisplay(formatTimeToString(QTime::currentTime()) + " " + msg));
 		 break;
 		}
 	 case DATATYPE::NOTIFYING:

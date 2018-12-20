@@ -10,6 +10,7 @@ ConvertionWidget::ConvertionWidget(QString name,
 {
  pcmdSent->setEnabled(false);
  pmsgField->setPlaceholderText("Введите сообщение...");
+ pdisplay->setReadOnly(true);
 
  QVBoxLayout *pvlay=new QVBoxLayout;
  pvlay->addWidget(new QLabel(name));

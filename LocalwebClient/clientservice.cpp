@@ -136,13 +136,15 @@ bool ClientService::isConnected()
 
 void ClientService::slotConnected()
 {
-	qInfo()<<"Соединение с сервером установлено.";
+ QString actionTime=formatTimeToString(QTime::currentTime());
+	qInfo()<<actionTime<<"Соединение с сервером установлено.";
 
 	//говорим серверу что мы только что подключились и нам нужно сверить базу
 	slotSendToServer(DATATYPE::CONNECT);
 	emit newMessageForNotification("Соединение с сервером установлено!");
+	emit newMessageForDisplay(actionTime + " Соединение с сервером установлено!");
 
-	qInfo()<<"Отправлен запрос на получение списка";
+	qInfo()<<actionTime<<"Отправлен запрос на получение списка";
 }
 
 void ClientService::slotReadyRead()

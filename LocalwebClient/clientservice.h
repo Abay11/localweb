@@ -11,6 +11,7 @@
 #include <QLabel>
 
 #include "../clientinfo.h"
+#include "../commonutilityfuncs.h"
 
 #define CLIENTBASE QMap<QString, ClientInfo*>
 
@@ -42,7 +43,6 @@ private:
 
  void saveDataAndProperties();
  void restoreDataAndProperties();
- QString formatTimeToString(const QTime &time);
 
 public:
  ClientService(QWidget *parent=nullptr);
@@ -78,7 +78,7 @@ signals:
  void disconnected();
  void returnRegistrationResult(bool);
  void socketError(QString title, QString info);
- void newMessageForDisplay(QString msg);
+ void newMessageForDisplay(QString msg, const QTime &time=QTime::currentTime());
  void newMessageForNotification(QString msg);
 };
 

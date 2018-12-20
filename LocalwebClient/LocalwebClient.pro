@@ -34,7 +34,8 @@ SOURCES += \
     convertionwidget.cpp \
     listdock.cpp \
     clientservice.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    ../commonutilityfuncs.cpp
 
 HEADERS += \
     ../mylogger.h \
@@ -46,7 +47,8 @@ HEADERS += \
     convertionwidget.h \
     listdock.h \
     clientservice.h \
-    mainwindow.h
+    mainwindow.h \
+    ../commonutilityfuncs.h
 
 
 # Default rules for deployment.

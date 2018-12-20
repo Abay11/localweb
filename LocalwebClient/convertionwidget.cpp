@@ -58,7 +58,7 @@ void ConvertionWidget::slotMsgChanged()
 	pcmdSent->setEnabled(true);
 }
 
-void ConvertionWidget::slotAppendMessageToDisplay(QString msg)
+void ConvertionWidget::slotAppendMessageToDisplay(QString msg, const QTime &actionTime)
 {
- pdisplay->append(msg);
+ pdisplay->append(formatTimeToString(actionTime) +" " + msg);
 }

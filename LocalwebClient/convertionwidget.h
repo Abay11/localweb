@@ -6,8 +6,10 @@
 #include <QTextEdit>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QTime>
 
 #include "../clientinfo.h"
+#include "../commonutilityfuncs.h"
 
 class ConvertionWidget:public QWidget
 {
@@ -33,7 +35,7 @@ private slots:
  void slotMsgChanged();
 
 public slots:
- void slotAppendMessageToDisplay(QString msg);
+ void slotAppendMessageToDisplay(QString msg, const QTime &actionTime);
 
 signals:
  void sentClicked(DATATYPE type, QString msg);

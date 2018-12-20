@@ -12,7 +12,8 @@ SOURCES +=  tst_test.cpp \
 ../clientinfo.cpp \
 #server
 ../servernetworkservice.cpp \
-    clientservicefordebug.cpp
+    clientservicefordebug.cpp \
+    ../commonutilityfuncs.cpp
 
 HEADERS += \
 #client
@@ -20,4 +21,5 @@ HEADERS += \
   ../clientinfo.h \
 #server
 ../servernetworkservice.h \
-    clientservicefordebug.h
+    clientservicefordebug.h \
+    ../commonutilityfuncs.h

@@ -32,11 +32,6 @@ void ClientService::restoreDataAndProperties()
  *pserverPort=defaultServerPort;
 }
 
-QString ClientService::formatTimeToString(const QTime &time)
-{
- return time.toString("[hh:mm:ss]");
-}
-
 void ClientService::addAllUsersToOfflineModel()
 {
  QStringList offlines;
@@ -136,13 +131,13 @@ bool ClientService::isConnected()
 
 void ClientService::slotConnected()
 {
- QString actionTime=formatTimeToString(QTime::currentTime());
-	qInfo()<<actionTime<<"Соединение с сервером установлено.";
+ QTime actionTime=QTime::currentTime();
+	qInfo()<<formatTimeToString(actionTime)<<" Соединение с сервером установлено.";
 
 	//говорим серверу что мы только что подключились и нам нужно сверить базу
 	slotSendToServer(DATATYPE::CONNECT);
 	emit newMessageForNotification("Соединение с сервером установлено!");
-	emit newMessageForDisplay(actionTime + " Соединение с сервером установлено!");
+	emit newMessageForDisplay("Соединение с сервером установлено!", actionTime);
 
 	qInfo()<<actionTime<<"Отправлен запрос на получение списка";
 }
@@ -213,7 +208,7 @@ void ClientService::slotReadyRead()
 		 QString msg=disconnected;
 		 msg+=" вышел";
 		 emit(newMessageForNotification(msg));
-		 emit(newMessageForDisplay(formatTimeToString(QTime::currentTime()) + " " + msg));
+		 emit(newMessageForDisplay(msg));
 		 break;
 		}
 	 case DATATYPE::NOTIFYING:
@@ -222,7 +217,9 @@ void ClientService::slotReadyRead()
 		 in>>connectedUserNick;
 		 qDebug()<<"есть новый подсоединившийся:"<<connectedUserNick;
 		 addNewOnlineToModel(connectedUserNick);
-		 emit(newMessageForNotification(connectedUserNick + " стал доступен"));
+		 QString msg=connectedUserNick + " стал доступен";
+		 emit(newMessageForNotification(msg));
+		 emit(newMessageForDisplay(msg));
 		 break;
 		}
 	 case DATATYPE::MESSAGE:
@@ -230,9 +227,7 @@ void ClientService::slotReadyRead()
 		 qDebug()<<"новое  сообщение";
 		 in>>time>>msg;
 		 receivedMessage=msg;
-		 msg.prepend(time.toString("[hh:mm:ss] "));
-
-		 emit(newMessageForDisplay(msg));
+		 emit(newMessageForDisplay(msg, time));
 		 emit(newMessageForNotification("***Новое сообщение***"));
 		 break;
 	 }

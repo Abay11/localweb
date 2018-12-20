@@ -42,6 +42,7 @@ private:
 
  void saveDataAndProperties();
  void restoreDataAndProperties();
+ QString formatTimeToString(const QTime &time);
 
 public:
  ClientService(QWidget *parent=nullptr);
@@ -77,7 +78,7 @@ signals:
  void disconnected();
  void returnRegistrationResult(bool);
  void socketError(QString title, QString info);
- void newMessage(QString msg);
+ void newMessageForDisplay(QString msg);
  void newMessageForNotification(QString msg);
 };
 

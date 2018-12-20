@@ -47,7 +47,7 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
  connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
  connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));
- connect(pservice, SIGNAL(newMessage(QString)), pgeneralConvertion, SLOT(slotAppendNewMessage(QString)));
+ connect(pservice, SIGNAL(newMessageForDisplay(QString)), pgeneralConvertion, SLOT(slotAppendMessageToDisplay(QString)));
  connect(pservice, SIGNAL(newMessageForNotification(QString)), this, SLOT(slotShowNotification(QString)));
 
  connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));

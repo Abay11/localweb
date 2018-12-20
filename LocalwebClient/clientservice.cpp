@@ -32,6 +32,11 @@ void ClientService::restoreDataAndProperties()
  *pserverPort=defaultServerPort;
 }
 
+QString ClientService::formatTimeToString(const QTime &time)
+{
+ return time.toString("[hh:mm:ss]");
+}
+
 void ClientService::addAllUsersToOfflineModel()
 {
  QStringList offlines;
@@ -225,7 +230,7 @@ void ClientService::slotReadyRead()
 		 receivedMessage=msg;
 		 msg.prepend(time.toString("[hh:mm:ss] "));
 
-		 emit(newMessage(msg));
+		 emit(newMessageForDisplay(msg));
 		 emit(newMessageForNotification("***Новое сообщение***"));
 		 break;
 	 }
@@ -290,8 +295,8 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant additi
 
  out.setVersion(QDataStream::Qt_5_11);
 
- out<<quint16(0)<<type<<QTime::currentTime();
-
+ QTime curTime=QTime::currentTime();
+ out<<quint16(0)<<type<<curTime;
 
  switch(type)
 	{
@@ -303,6 +308,7 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant additi
  //нужно приписать, что это он.
  //Если это будет Р2Р, возможно это будет не обяз. Нужно еще раз обдумать...
  //а пока так.*/
+	 emit newMessageForDisplay(formatTimeToString(curTime)+" Вы: "+msg);
 	 msg.prepend(nick+": ");
 	 out<<msg;
 	 break;

@@ -58,7 +58,7 @@ void ConvertionWidget::slotMsgChanged()
 	pcmdSent->setEnabled(true);
 }
 
-void ConvertionWidget::slotAppendNewMessage(QString msg)
+void ConvertionWidget::slotAppendMessageToDisplay(QString msg)
 {
  pdisplay->append(msg);
 }

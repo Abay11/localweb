@@ -27,13 +27,15 @@ SOURCES += \
         mywidget.cpp \
     mylogger.cpp \
     clientinfo.cpp \
-    servernetworkservice.cpp
+    servernetworkservice.cpp \
+    commonutilityfuncs.cpp
 
 HEADERS += \
         mywidget.h \
     mylogger.h \
     clientinfo.h \
-    servernetworkservice.h
+    servernetworkservice.h \
+    commonutilityfuncs.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

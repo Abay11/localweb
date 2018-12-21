@@ -305,7 +305,7 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant additi
  //нужно приписать, что это он.
  //Если это будет Р2Р, возможно это будет не обяз. Нужно еще раз обдумать...
  //а пока так.*/
-	 emit newMessageForDisplay(formatTimeToString(curTime)+" Вы: "+msg);
+	 emit newMessageForDisplay("Вы: "+msg);
 	 msg.prepend(nick+": ");
 	 out<<msg;
 	 break;

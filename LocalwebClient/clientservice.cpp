@@ -6,7 +6,7 @@ void ClientService::saveDataAndProperties()
  if(file.open(QFile::WriteOnly))
 	{
 	 QDataStream out(&file);
-	 out<<nick<<name<<*pserverAddress<<*pserverPort<<clients;
+	 out<<nick<<name<<*pserverAddress<<*pserverPort<<*clients;
 	 file.close();
 	}
  else
@@ -19,7 +19,7 @@ void ClientService::restoreDataAndProperties()
  if(file.open(QFile::ReadOnly))
 	{
 	 QDataStream in(&file);
-	 in>>nick>>name>>*pserverAddress>>*pserverPort>>clients;
+	 in>>nick>>name>>*pserverAddress>>*pserverPort>>*clients;
 	 file.close();
 
 	 addAllUsersToOfflineModel();
@@ -35,14 +35,15 @@ void ClientService::restoreDataAndProperties()
 void ClientService::addAllUsersToOfflineModel()
 {
  QStringList offlines;
+ QStringList nicksInBase=clients->keys();
  if(!nick.isEmpty())
 	{
 	 QString usernick="Вы: "+nick;
 	 offlines.prepend(usernick);
-	 clients.remove(nick);
+	 nicksInBase.removeOne(nick);
 	}
 
- offlines.append(clients.keys());
+ offlines.append(nicksInBase);
 
  ponlineModel->setStringList(QStringList());
  pofflineModel->setStringList(offlines);
@@ -58,6 +59,7 @@ void ClientService::addNewOnlineToModel(QString nick)
 ClientService::ClientService(QWidget *prnt)
  :QObject (prnt)
  ,psocket(new QTcpSocket)
+ ,clients(new CLIENTBASE)
  ,ponlineModel(new QStringListModel)
  ,pofflineModel(new QStringListModel)
  ,pserverAddress(new QString)
@@ -203,18 +205,19 @@ void ClientService::slotReadyRead()
 		 //ждем актуальную базу
 		 int serverBaseSize;
 		 in>>serverBaseSize;
-		 bool hasClientActualBase=serverBaseSize==clients.size();
+		 bool hasClientActualBase=serverBaseSize==clients->size();
 		 if(!hasClientActualBase)
 			{
 			 //receive and update base
-			 in>>clients;
+			 in>>*clients;
+			 qDebug()<<"база не сошлась, получена новая с размером:"<<clients->size();
 			 addAllUsersToOfflineModel();
-			 qDebug()<<"база не сошлась, получена новая";
 			}
+		 else
+			qDebug()<<"база сошлась, синхрон не нужен";
 
 		 QList<QString> onlines;
 		 in>>onlines;
-//		 if(QFile::exists(defaultSavingFile))
 		 removeOnlinesFromOfflines(onlines);
 		 break;
 	 }
@@ -345,7 +348,8 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant additi
 
 	case DATATYPE::CONNECT:
 	 {
-	 out<<nick<<clients.size();
+	 qDebug()<<"Sending to server size of base:"<<clients->size();
+	 out<<nick<<clients->size();
 	 break;
 	 }
 

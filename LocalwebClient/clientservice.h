@@ -25,7 +25,7 @@ class ClientService : public QObject
 protected:
  QTcpSocket *psocket;
  bool registrationResult=false;
- CLIENTBASE clients;
+ CLIENTBASE *clients;
  QStringListModel *ponlineModel;
  QStringListModel *pofflineModel;
 

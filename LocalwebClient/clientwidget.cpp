@@ -20,7 +20,6 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 {
  plistdock->setOnlineModel(pservice->onlineModel());
  plistdock->setOfflineModel(pservice->offlineModel());
- qDebug()<<"size of offlines"<<pservice->offlineModel()->rowCount();
 
  pleAddress->setInputMask("000.000.000.000");
  pleAddress->setText(pservice->serverAddress());
@@ -43,16 +42,13 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 				 pservice, SLOT(slotDisconnectFromServer()));
  connect(pgeneralConvertion, SIGNAL(sentClicked(DATATYPE, QString)),
 				 pservice, SLOT(slotSendToServer(DATATYPE, QString)));
-
  connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
  connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
  connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));
  connect(pservice, SIGNAL(newMessageForDisplay(QString, const QTime &)), pgeneralConvertion, SLOT(slotAppendMessageToDisplay(QString, const QTime &)));
  connect(pservice, SIGNAL(newMessageForNotification(QString)), this, SLOT(slotShowNotification(QString)));
-
  connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
  connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
-
 
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 

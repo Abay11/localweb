@@ -65,8 +65,13 @@ void Registration::slotSentRequest()
 	 //поэтому блокируемся до нужного сигнала
 	 QEventLoop loop;
 	 connect(pservice, SIGNAL(connected()), &loop, SLOT(quit()));
+	 connect(pservice, SIGNAL(socketError(QString, QString)), &loop, SLOT(quit()));
 	 loop.exec();
 	}
+
+ if(!pservice->isConnected())
+	//device not open (after error)
+	return;
 
  pservice->slotSendToServer(DATATYPE::REGISTRATION, pleNick->text(), QVariant(pleName->text()));
  pservice->setNickAndName(pleNick->text(), pleName->text());
@@ -84,11 +89,9 @@ void Registration::slotProcessResult(bool registrationResult)
 		 return;
 		 }
 
-	 emit(registrationFinished());
-
-	 QMessageBox::information(this, "Регистрация прошла успешно",
-														"Вы успешно зарегистрировались в сети");
-
+		emit(registrationFinished());
+		QMessageBox::information(this, "Регистрация прошла успешно",
+														 "Вы успешно зарегистрировались в сети");
 	 deleteLater();
 }
 

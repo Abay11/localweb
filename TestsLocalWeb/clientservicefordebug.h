@@ -19,6 +19,7 @@ public:
  void setListToOnlineModel(QStringList onlines);
  void setListToOfflineModel(QStringList offlines);
  void throwOnlinesToOfflines();
+ void throwDisconnectedToOfflines(QString disconnected);
  QStringList getOnlines();
  QStringList getOfflines();
 

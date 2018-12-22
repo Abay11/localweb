@@ -46,6 +46,11 @@ void ClientServiceForDebug::throwOnlinesToOfflines()
  ClientService::throwOnlinesToOfflines();
 }
 
+void ClientServiceForDebug::throwDisconnectedToOfflines(QString disconnected)
+{
+ ClientService::throwDisconnectedToOfflines(disconnected);
+}
+
 QStringList ClientServiceForDebug::getOnlines()
 {
  return ponlineModel->stringList();

@@ -214,8 +214,11 @@ void ClientService::slotReadyRead()
 		 qDebug()<<"кто-то отсоединился";
 		 QString disconnected;
 		 in>>disconnected;
+		 throwDisconnectedToOfflines(disconnected);
+
 		 QString msg=disconnected;
 		 msg+=" вышел";
+
 		 emit(newMessageForNotification(msg));
 		 emit(newMessageForDisplay(msg));
 		 break;
@@ -382,4 +385,16 @@ void ClientService::throwOnlinesToOfflines()
 
  ponlineModel->setStringList(QStringList());
  pofflineModel->setStringList(offlines);
+}
+
+void ClientService::throwDisconnectedToOfflines(QString disconnected)
+{
+ int nrow = ponlineModel->stringList().indexOf(disconnected);
+ if(nrow!=-1)
+	{
+	 ponlineModel->removeRow(nrow);
+	 int i=pofflineModel->rowCount();
+	 pofflineModel->insertRow(pofflineModel->rowCount());
+	 pofflineModel->setData(pofflineModel->index(i), disconnected);
+	}
 }

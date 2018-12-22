@@ -32,6 +32,7 @@ protected:
  void addNewOnlineToModel(QString nick);
  void removeOnlinesFromOfflines(QStringList onlines);
  void throwOnlinesToOfflines();
+ void throwDisconnectedToOfflines(QString disconnected);
 
 private:
  QString nick;

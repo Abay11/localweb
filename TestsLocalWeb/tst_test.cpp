@@ -32,6 +32,7 @@ private slots:
  void test_addNewOnlineToModel();
  void test_removeOnlinesFromOfflines();
  void test_throwOnlinesToOfflines();
+ void test_throwDisconnectedToOfflines();
 };
 
 test::test()
@@ -454,6 +455,32 @@ void test::test_throwOnlinesToOfflines()
  QCOMPARE(pclient->getOnlines().size(), 0);
  QCOMPARE(pclient->getOfflines().size(), 5);
  QCOMPARE(pclient->getOfflines().first(), "Вы: ownernick");
+}
+
+void test::test_throwDisconnectedToOfflines()
+{
+ ClientServiceForDebug *pclient=new ClientServiceForDebug;
+ QStringList onlines={"nick1", "nick2"};
+ QStringList offlines={"nick3", "nick4"};
+ pclient->setListToOnlineModel(onlines);
+ pclient->setListToOfflineModel(offlines);
+ pclient->throwDisconnectedToOfflines("nick1");
+ QCOMPARE(pclient->getOnlines().size(), 1);
+ QCOMPARE(pclient->getOfflines().size(), 3);
+ QCOMPARE(pclient->getOnlines().first(), "nick2");
+ QCOMPARE(pclient->getOfflines().at(0), "nick3");
+ QCOMPARE(pclient->getOfflines().at(1), "nick4");
+ QCOMPARE(pclient->getOfflines().at(2), "nick1");
+
+ pclient->throwDisconnectedToOfflines("nick1");
+ QCOMPARE(pclient->getOnlines().size(), 1);
+ QCOMPARE(pclient->getOfflines().size(), 3);
+ QCOMPARE(pclient->getOnlines().first(), "nick2");
+ QCOMPARE(pclient->getOfflines().at(0), "nick3");
+ QCOMPARE(pclient->getOfflines().at(1), "nick4");
+ QCOMPARE(pclient->getOfflines().at(2), "nick1");
+
+ delete pclient;
 }
 
 QTEST_MAIN(test)

@@ -31,6 +31,11 @@ void ClientServiceForDebug::removeOnlineFromOfflines(QStringList onlines)
  ClientService::removeOnlinesFromOfflines(onlines);
 }
 
+void ClientServiceForDebug::removeConnectedFromOfflines(QString connected)
+{
+ ClientService::removeConnectedFromOfflines(connected);
+}
+
 void ClientServiceForDebug::setListToOnlineModel(QStringList onlines)
 {
  ponlineModel->setStringList(onlines);

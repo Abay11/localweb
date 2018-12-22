@@ -229,6 +229,8 @@ void ClientService::slotReadyRead()
 		 in>>connectedUserNick;
 		 qDebug()<<"есть новый подсоединившийся:"<<connectedUserNick;
 		 addNewOnlineToModel(connectedUserNick);
+		 removeConnectedFromOfflines(connectedUserNick);
+
 		 QString msg=connectedUserNick + " стал доступен";
 		 emit(newMessageForNotification(msg));
 		 emit(newMessageForDisplay(msg));
@@ -369,6 +371,13 @@ void ClientService::removeOnlinesFromOfflines(QStringList onlines)
 
  ponlineModel->setStringList(onlines);
  pofflineModel->setStringList(offlines);
+}
+
+void ClientService::removeConnectedFromOfflines(QString connected)
+{
+ int nrow = pofflineModel->stringList().indexOf(connected);
+ if(nrow!=-1)
+	 pofflineModel->removeRow(nrow);
 }
 
 void ClientService::throwOnlinesToOfflines()

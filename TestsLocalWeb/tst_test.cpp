@@ -31,6 +31,7 @@ private slots:
  void test_addAllUsersToOfflineModel();
  void test_addNewOnlineToModel();
  void test_removeOnlinesFromOfflines();
+ void test_removeConnectedFromOfflines();
  void test_throwOnlinesToOfflines();
  void test_throwDisconnectedToOfflines();
 };
@@ -437,6 +438,24 @@ void test::test_removeOnlinesFromOfflines()
  QCOMPARE(pclient->getOnlines().first(), "Вы: ownernick");
  QCOMPARE(pclient->getOnlines().last(), "nick3");
  QCOMPARE(pclient->getOfflines().contains("ownernick"), false);
+}
+
+void test::test_removeConnectedFromOfflines()
+{
+ ClientServiceForDebug *pclient=new ClientServiceForDebug;
+ QStringList onlines={"nick1", "nick2"};
+ QStringList offlines={"nick3", "nick4"};
+ pclient->setListToOnlineModel(onlines);
+ pclient->setListToOfflineModel(offlines);
+ pclient->removeConnectedFromOfflines("nick4");
+ QCOMPARE(pclient->getOfflines().size(), 1);
+ QCOMPARE(pclient->getOfflines().at(0), "nick3");
+
+ pclient->removeConnectedFromOfflines("nick4");
+ QCOMPARE(pclient->getOfflines().size(), 1);
+ QCOMPARE(pclient->getOfflines().at(0), "nick3");
+
+ delete pclient;
 }
 
 void test::test_throwOnlinesToOfflines()

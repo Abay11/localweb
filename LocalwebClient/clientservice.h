@@ -31,6 +31,7 @@ protected:
  void addAllUsersToOfflineModel();
  void addNewOnlineToModel(QString nick);
  void removeOnlinesFromOfflines(QStringList onlines);
+ void removeConnectedFromOfflines(QString connected);
  void throwOnlinesToOfflines();
  void throwDisconnectedToOfflines(QString disconnected);
 

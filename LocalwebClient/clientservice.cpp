@@ -2,7 +2,7 @@
 
 void ClientService::saveDataAndProperties()
 {
- QFile file("data.bin");
+ QFile file(defaultSavingFile);
  if(file.open(QFile::WriteOnly))
 	{
 	 QDataStream out(&file);
@@ -15,7 +15,7 @@ void ClientService::saveDataAndProperties()
 
 void ClientService::restoreDataAndProperties()
 {
- QFile file("data.bin");
+ QFile file(defaultSavingFile);
  if(file.open(QFile::ReadOnly))
 	{
 	 QDataStream in(&file);
@@ -35,14 +35,14 @@ void ClientService::restoreDataAndProperties()
 void ClientService::addAllUsersToOfflineModel()
 {
  QStringList offlines;
- if(!clients.isEmpty())
+ if(!nick.isEmpty())
 	{
+	 QString usernick="Вы: "+nick;
+	 offlines.prepend(usernick);
 	 clients.remove(nick);
-	 offlines.append(clients.keys());
 	}
 
- QString usernick="Вы: "+nick;
- offlines.prepend(usernick);
+ offlines.append(clients.keys());
 
  ponlineModel->setStringList(QStringList());
  pofflineModel->setStringList(offlines);
@@ -77,6 +77,14 @@ ClientService::ClientService(QWidget *prnt)
 ClientService::~ClientService()
 {
  saveDataAndProperties();
+}
+
+void ClientService::appendOwnerUserToOnlines()
+{
+ //this method may be usefull only on registration
+ ponlineModel->insertRow(0);
+ auto firstIndex=ponlineModel->index(0);
+ ponlineModel->setData(firstIndex, "Вы: " + nick);
 }
 
 bool ClientService::socketIsOpen()
@@ -133,14 +141,14 @@ bool ClientService::isConnected()
 void ClientService::slotConnected()
 {
  QTime actionTime=QTime::currentTime();
-	qInfo()<<formatTimeToString(actionTime)<<" Соединение с сервером установлено.";
+ qInfo()<<formatTimeToString(actionTime)<<" Соединение с сервером установлено.";
 
-	//говорим серверу что мы только что подключились и нам нужно сверить базу
-	slotSendToServer(DATATYPE::CONNECT);
-	emit newMessageForNotification("Соединение с сервером установлено!");
-	emit newMessageForDisplay("Соединение с сервером установлено!", actionTime);
+ //говорим серверу что мы только что подключились и нам нужно сверить базу
+ slotSendToServer(DATATYPE::CONNECT);
+ emit newMessageForNotification("Соединение с сервером установлено!");
+ emit newMessageForDisplay("Соединение с сервером установлено!", actionTime);
 
-	qInfo()<<actionTime<<"Отправлен запрос на получение списка";
+ qInfo()<<actionTime<<"Отправлен запрос на получение списка";
 }
 
 void ClientService::slotDisconnected()
@@ -206,6 +214,7 @@ void ClientService::slotReadyRead()
 
 		 QList<QString> onlines;
 		 in>>onlines;
+//		 if(QFile::exists(defaultSavingFile))
 		 removeOnlinesFromOfflines(onlines);
 		 break;
 	 }
@@ -359,11 +368,14 @@ void ClientService::removeOnlinesFromOfflines(QStringList onlines)
 {
  QStringList offlines=pofflineModel->stringList();
 
- if(!offlines.empty())
-	offlines.pop_front();
+ if(!nick.isEmpty())
+	{
+	 if(!offlines.empty())
+		offlines.pop_front();
 
- onlines.removeOne(nick);
- onlines.prepend("Вы: "+nick);
+	 if(onlines.removeOne(nick))
+		onlines.prepend("Вы: "+nick);
+	}
 
  for(auto o:onlines)
 	if(offlines.contains(o))

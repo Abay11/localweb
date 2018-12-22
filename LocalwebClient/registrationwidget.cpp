@@ -74,7 +74,6 @@ void Registration::slotSentRequest()
 	return;
 
  pservice->slotSendToServer(DATATYPE::REGISTRATION, pleNick->text(), QVariant(pleName->text()));
- pservice->setNickAndName(pleNick->text(), pleName->text());
 }
 
 void Registration::slotProcessResult(bool registrationResult)
@@ -87,6 +86,12 @@ void Registration::slotProcessResult(bool registrationResult)
 													"Псевдоним уже используется другим пользователем. "
 													"Вам нужно использовать другой");
 		 return;
+		 }
+
+		if(registrationResult)
+		 {
+			pservice->setNickAndName(pleNick->text(), pleName->text());
+			pservice->appendOwnerUserToOnlines();
 		 }
 
 		emit(registrationFinished());

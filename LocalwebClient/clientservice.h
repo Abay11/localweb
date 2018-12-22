@@ -17,6 +17,7 @@
 
 static QString defaultServerAddress="127.0.0.1";
 static QString defaultServerPort="9999";
+static QString defaultSavingFile="data.bin";
 
 class ClientService : public QObject
 {
@@ -49,6 +50,7 @@ private:
 public:
  ClientService(QWidget *parent=nullptr);
  ~ClientService();
+ void appendOwnerUserToOnlines();
  bool socketIsOpen();
  QStringListModel *onlineModel();
  QStringListModel *offlineModel();

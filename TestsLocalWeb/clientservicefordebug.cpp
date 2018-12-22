@@ -13,7 +13,7 @@ bool ClientServiceForDebug::getRegistrationResult()
 
 const CLIENTBASE *ClientServiceForDebug::getClientBase()
 {
- return &clients;
+ return clients;
 }
 
 void ClientServiceForDebug::addAllUsersToOfflineModel()

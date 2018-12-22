@@ -63,6 +63,7 @@ public:
 
 protected slots:
  void slotConnected();
+ void slotDisconnected();
  void slotReadyRead();
  void slotError(QAbstractSocket::SocketError);
 

@@ -67,6 +67,7 @@ ClientService::ClientService(QWidget *prnt)
 
  connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
  connect(psocket, SIGNAL(connected()), SIGNAL(connected()));
+ connect(psocket, SIGNAL(disconnected()), SLOT(slotDisconnected()));
  connect(psocket, SIGNAL(disconnected()), SIGNAL(disconnected()));
  connect(psocket, SIGNAL(readyRead()), SLOT(slotReadyRead()));
  connect(psocket, SIGNAL(error(QAbstractSocket::SocketError)),
@@ -140,6 +141,14 @@ void ClientService::slotConnected()
 	emit newMessageForDisplay("Соединение с сервером установлено!", actionTime);
 
 	qInfo()<<actionTime<<"Отправлен запрос на получение списка";
+}
+
+void ClientService::slotDisconnected()
+{
+ QTime actionTime=QTime::currentTime();
+	qInfo()<<formatTimeToString(actionTime)<<" Соединение с сервером разорвано.";
+	emit newMessageForNotification("Соединение с сервером разорвано!");
+	emit newMessageForDisplay("Соединение с сервером разорвано!", actionTime);
 }
 
 void ClientService::slotReadyRead()

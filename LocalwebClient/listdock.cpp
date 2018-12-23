@@ -64,7 +64,13 @@ void ListDock::slotShowContextMenu(const QPoint &pos)
  if(model->rowCount()>0)
 	{
 	 auto index=ponline->indexAt(pos);
-	 qDebug()<<"Item data: "<<model->data(index);
+	 bool isOwner=index.row()==0;
+	 bool isGeneral=index.row()==1;
+	 //need to disable some actions if it's the owner or the general chat
+	 auto actions=menu->actions();
+	 actions[0]->setEnabled(!(isOwner));
+	 actions[1]->setEnabled(!(isOwner || isGeneral));
+	 actions[2]->setEnabled(!(isOwner || isGeneral));
 	 QPoint gpos=ponline->mapToGlobal(pos);
 	 menu->exec(gpos);
 	}

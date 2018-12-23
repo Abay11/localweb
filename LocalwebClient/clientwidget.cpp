@@ -148,6 +148,8 @@ void ClientWidget::setUI()
  pashow->setIcon(QIcon(":/Res/Icons/show.png"));
  connect(pashow, SIGNAL(triggered()),
 				parentWidget(), SLOT(show()));
+ connect(pashow, SIGNAL(triggered()),
+				parentWidget(), SLOT(slotRestoreWindow()));
 
  QAction *pahide=new QAction("Скрыть", this);
  pahide->setIcon(QIcon(":/Res/Icons/hide.png"));

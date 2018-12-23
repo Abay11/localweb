@@ -32,6 +32,12 @@ void MainWindow::slotShowClientWidget()
  pstackedWidgets->addWidget(pclientWidget);
  pstackedWidgets->setCurrentIndex(pstackedWidgets->count()-1);
 }
+
+void MainWindow::slotRestoreWindow()
+{
+ setWindowState(windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
+}
+
 void MainWindow::slotShowSocketError(QString title, QString info)
 {
  QMessageBox::critical(this, title, info);

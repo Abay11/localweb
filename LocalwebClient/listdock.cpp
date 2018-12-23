@@ -17,6 +17,7 @@ ListDock::ListDock(QWidget *parent)
  pwidget->setLayout(pvlay);
 
  setFeatures(QDockWidget::NoDockWidgetFeatures);
+ setupListviewContextMenu();
  setWidget(pwidget);
 }
 
@@ -38,4 +39,33 @@ void ListDock::setOnlineModel(QStringListModel *pmodel)
 void ListDock::setOfflineModel(QStringListModel *pmodel)
 {
  poffline->setModel(pmodel);
+}
+
+void ListDock::setupListviewContextMenu()
+{
+ ponline->setContextMenuPolicy(Qt::CustomContextMenu);
+ connect(ponline, SIGNAL(customContextMenuRequested(const QPoint &)),
+				 SLOT(slotShowContextMenu(const QPoint &)));
+}
+
+void ListDock::slotShowContextMenu(const QPoint &pos)
+{
+ qDebug()<<"context menu requested";
+ static QMenu *menu=nullptr;
+ if(menu==nullptr)
+	{
+	 menu=new QMenu(this);
+	 menu->addAction("Открыть беседу");
+	 menu->addAction("Аудиозвонок");
+	 menu->addAction("Видеозвонок");
+	 menu->addAction("Показать информацию");
+	}
+ auto model=ponline->model();
+ if(model->rowCount()>0)
+	{
+	 auto index=ponline->indexAt(pos);
+	 qDebug()<<"Item data: "<<model->data(index);
+	 QPoint gpos=ponline->mapToGlobal(pos);
+	 menu->exec(gpos);
+	}
 }

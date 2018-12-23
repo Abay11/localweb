@@ -25,6 +25,9 @@ public:
  void setupListviewContextMenu();
 private slots:
  void slotShowContextMenu(const QPoint &pos);
+ void slotOpenConvertion();
+signals:
+ void openConvertion(QString nick);
 };
 
 #endif // CLIENTSLISTCONTAINER_H

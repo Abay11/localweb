@@ -55,7 +55,7 @@ void ListDock::slotShowContextMenu(const QPoint &pos)
  if(menu==nullptr)
 	{
 	 menu=new QMenu(this);
-	 menu->addAction("Открыть беседу");
+	 menu->addAction("Открыть беседу", this, SLOT(slotOpenConvertion()));
 	 menu->addAction("Аудиозвонок");
 	 menu->addAction("Видеозвонок");
 	 menu->addAction("Показать информацию");
@@ -74,4 +74,12 @@ void ListDock::slotShowContextMenu(const QPoint &pos)
 	 QPoint gpos=ponline->mapToGlobal(pos);
 	 menu->exec(gpos);
 	}
+}
+
+void ListDock::slotOpenConvertion()
+{
+ auto model=ponline->model();
+ auto curIndex=ponline->currentIndex();
+ qDebug()<<"slot open convertion:"<<model->data(curIndex).toString();
+ emit openConvertion(model->data(curIndex).toString());
 }

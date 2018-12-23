@@ -96,6 +96,7 @@ void MyWidget::setMenuAndIcons()
  turnStateOff();
 
  QAction *pashow=new QAction(QIcon(":/Res/Icons/show.png"), "Показать");
+ connect(pashow, SIGNAL(triggered()), SLOT(slotRestoreWindow()));
  connect(pashow, SIGNAL(triggered()), SLOT(show()));
  QAction *pahide=new QAction(QIcon(":/Res/Icons/hide.png"), "Скрыть");
  connect(pahide, SIGNAL(triggered()), SLOT(hide()));
@@ -124,6 +125,20 @@ void MyWidget::setMenuAndIcons()
  setMenuBar(pmenuBar);
  setWindowIcon(*picon);
  addToolBar(ptoolbar);
+}
+
+void MyWidget::changeEvent(QEvent *e)
+{
+ if (e->type() == QEvent::WindowStateChange)
+		{
+			 QWindowStateChangeEvent* ev = static_cast<QWindowStateChangeEvent*>(e);
+			 if (!(ev->oldState() & Qt::WindowMinimized) && windowState() & Qt::WindowMinimized)
+				{
+				 qDebug()<<"window hided";
+				 hide();
+				}
+		}
+		QWidget::changeEvent(e);
 }
 
 void MyWidget::slotStartServer()
@@ -173,4 +188,9 @@ void MyWidget::slotPortEdited()
 {
  qDebug()<<"port text edited";
  pservice->setPort(quint16(plePort->text().toInt()));
+}
+
+void MyWidget::slotRestoreWindow()
+{
+ setWindowState(windowState() & ~Qt::WindowMinimized);
 }

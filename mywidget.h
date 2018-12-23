@@ -23,6 +23,7 @@
 #include <QMenuBar>
 #include <QToolBar>
 #include <QApplication>
+#include <QWindowStateChangeEvent>
 
 class MyWidget : public QMainWindow
 {
@@ -48,12 +49,13 @@ private:
  ServerNetworkService *pservice;
 public:
  MyWidget(QWidget* parent=nullptr);
- ~MyWidget();
+ ~MyWidget() override;
 
  void turnStateOn();
  void turnStateOff();
  void setModelToView(QStringListModel *pmodel);
  void setMenuAndIcons();
+ void changeEvent(QEvent *pe) override;
 
 signals:
  void startClicked();
@@ -63,10 +65,9 @@ private slots:
  void slotStartServer();
  void slotStopServer();
  void slotOnOffHandler();
-
  void slotQuit();
-
  void slotPortEdited();
+ void slotRestoreWindow();
 };
 
 #endif // MYWIDGET_H

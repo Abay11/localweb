@@ -117,7 +117,9 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 			out<<*clientbase;
 		 }
 
-		out<<socketsAndNicksOfOnlines->values();
+		auto onlines=socketsAndNicksOfOnlines->values();
+		onlines.prepend("Общий чат");
+		out<<onlines;
 		break;
 	 }
 	case DATATYPE::NOTIFYING:

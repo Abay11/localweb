@@ -228,7 +228,8 @@ void test::test_notifying()
  QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
  loop->exec();
 
- QCOMPARE(pclient0->getOnlines().size(), 1);
+ QCOMPARE(pclient0->getOnlines().size(), 2);
+ QCOMPARE(pclient0->getOnlines().contains("Общий чат"), true);
 
  ClientServiceForDebug *pclient1=new ClientServiceForDebug;
  pclient1->setNickAndName("client1", "name1");
@@ -237,8 +238,8 @@ void test::test_notifying()
  QObject::connect(pclient1, SIGNAL(debugPurpose()), loop, SLOT(quit()));
  loop->exec();
 
- QCOMPARE(pclient0->getOnlines().size(), 2);
- QCOMPARE(pclient1->getOnlines().size(), 2);
+ QCOMPARE(pclient0->getOnlines().size(), 3);
+ QCOMPARE(pclient1->getOnlines().size(), 3);
 
 
  pclient0->slotDisconnectFromServer();
@@ -282,7 +283,7 @@ void test::test_clientConnectionToServer()
 
  auto clientbase = pclient0->getClientBase();
  QCOMPARE(clientbase->size(), 2);
- QCOMPARE(pclient0->getOnlines().size(), 1);
+ QCOMPARE(pclient0->getOnlines().size(), 2);
 
  ClientServiceForDebug *pclient1=new ClientServiceForDebug;
  pclient1->setNickAndName("client1", "nick1");
@@ -296,7 +297,7 @@ void test::test_clientConnectionToServer()
 
  auto clientbase1 = pclient1->getClientBase();
  QCOMPARE(clientbase1->size(), 2);
- QCOMPARE(pclient1->getOnlines().size(), 2);
+ QCOMPARE(pclient1->getOnlines().size(), 3);
 
  pclient0->slotDisconnectFromServer();
  pclient1->slotDisconnectFromServer();

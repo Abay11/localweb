@@ -11,6 +11,7 @@
 #include <QIcon>
 #include <QStyle>
 #include <QDockWidget>
+#include <QEvent>
 
 #include "clientwidget.h"
 #include "registrationwidget.h"
@@ -31,6 +32,7 @@ private:
 
 public:
  explicit MainWindow(QWidget *parent = nullptr);
+ void changeEvent(QEvent *e) override;
 
 public slots:
 	void slotShowClientWidget();

@@ -18,6 +18,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
  resize(1000, 600);
 }
 
+void MainWindow::changeEvent(QEvent *e)
+{
+ if(e->type()==QEvent::WindowStateChange)
+	{
+	 QWindowStateChangeEvent *se = static_cast<QWindowStateChangeEvent*>(e);
+	 if(!(se->oldState() & Qt::WindowMinimized) && windowState() & Qt::WindowMinimized)
+		hide();
+	}
+}
+
 void MainWindow::setupAndShowRegistrationWidget()
 {
  preg=new Registration(pservice, this);

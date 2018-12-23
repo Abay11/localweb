@@ -59,9 +59,11 @@ private:
 
  ListDock *plistdock;
 
- ConvertionWidget *pgeneralConvertion;
-
  ClientService *pservice;
+
+ QMap<QString, QWidget *> *convertionWidgets;
+ ConvertionWidget *pgeneralConvertion=nullptr;
+ void initConvertions();
 
 public:
  ClientWidget(ClientService *pservice, QWidget *parent = nullptr);

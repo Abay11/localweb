@@ -1,5 +1,11 @@
 #include "clientwidget.h"
 
+void ClientWidget::initConvertions()
+{
+ pgeneralConvertion=new ConvertionWidget("Общий чат");
+ convertionWidgets->insert("Общий чат", pgeneralConvertion);
+}
+
 ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  : QMainWindow (parent)
  ,pserverAddress(new QString)
@@ -15,8 +21,8 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  ,pvlay(new QVBoxLayout)
  ,popup(new PopUp(this))
  ,plistdock(new ListDock(this))
- ,pgeneralConvertion(new ConvertionWidget("General"))
  ,pservice(service)
+ ,convertionWidgets(new QMap<QString, QWidget *>)
 {
  plistdock->setOnlineModel(pservice->onlineModel());
  plistdock->setOfflineModel(pservice->offlineModel());
@@ -33,6 +39,7 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  phlay->addWidget(pcmdConnect);
  phlay->addWidget(pcmdDisconnect);
  pvlay->addLayout(phlay);
+ initConvertions();
  pconvertionLay->addWidget(pgeneralConvertion);
  pvlay->addLayout(pconvertionLay);
 
@@ -146,14 +153,15 @@ void ClientWidget::setUI()
 
  QAction *pashow=new QAction("Показать", this);
  pashow->setIcon(QIcon(":/Res/Icons/show.png"));
- connect(pashow, SIGNAL(triggered()),
-				parentWidget(), SLOT(show()));
- connect(pashow, SIGNAL(triggered()),
-				parentWidget(), SLOT(slotRestoreWindow()));
+ auto parentWidget_=parentWidget();
+	 connect(pashow, SIGNAL(triggered()),
+					 parentWidget_, SLOT(show()));
+	 connect(pashow, SIGNAL(triggered()),
+					 parentWidget_, SLOT(slotRestoreWindow()));
 
  QAction *pahide=new QAction("Скрыть", this);
  pahide->setIcon(QIcon(":/Res/Icons/hide.png"));
- connect(pahide, SIGNAL(triggered()),
+	connect(pahide, SIGNAL(triggered()),
 				parentWidget(), SLOT(hide()));
 
  QAction *paexit=new QAction("Выход", this);

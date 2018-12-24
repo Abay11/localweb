@@ -78,12 +78,12 @@ private slots:
  void slotQuit();
  void slotSocketError();
  void slotShowNotification(QString msg);
+ void slotSwitchConvertions(QString convertionName);
 
 public slots:
  void slotAddressEdited();
  void slotPortEdited();
  void slotSetAddress(QString addr, QString port);
- void slotOpenConversion();
  void slotConnected();
  void slotDisconnected();
 };

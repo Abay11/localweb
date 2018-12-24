@@ -56,6 +56,8 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  connect(pservice, SIGNAL(newMessageForNotification(QString)), this, SLOT(slotShowNotification(QString)));
  connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
  connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
+ connect(plistdock, SIGNAL(openConvertion(QString)),
+				 SLOT(slotSwitchConvertions(QString)));
 
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 
@@ -82,9 +84,24 @@ void ClientWidget::slotSetAddress(QString addr, QString port)
  qDebug()<<"receive address info: "<<*pserverAddress<<" "<<*pserverPort;
 }
 
-void ClientWidget::slotOpenConversion()
+void ClientWidget::slotSwitchConvertions(QString convertionName)
 {
-
+ auto it=convertionWidgets->find(convertionName);
+ if(it==convertionWidgets->end())
+	{
+	 it=convertionWidgets->insert(convertionName,
+														 new ConvertionWidget(convertionName, this));
+	}
+ qDebug()<<"Items in the layout"<<pconvertionLay->count();
+ auto oldWidget = (
+		pconvertionLay->itemAt(0)->widget());
+ if(oldWidget)
+	{
+	 pconvertionLay->removeWidget(oldWidget);
+	 oldWidget->hide();
+	}
+ (*it)->show();
+ pconvertionLay->addWidget(*it);
 }
 
 void ClientWidget::slotConnected()

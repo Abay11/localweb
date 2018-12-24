@@ -2,8 +2,9 @@
 
 void ClientWidget::initConvertions()
 {
- pgeneralConvertion=new ConvertionWidget("Общий чат");
- convertionWidgets->insert("Общий чат", pgeneralConvertion);
+ generalConvertion=new ConvertionWidget("Общий чат");
+ convertionWidgets->insert("Общий чат", generalConvertion);
+ currentCunvertion=generalConvertion;
 }
 
 ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
@@ -40,19 +41,19 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  phlay->addWidget(pcmdDisconnect);
  pvlay->addLayout(phlay);
  initConvertions();
- pconvertionLay->addWidget(pgeneralConvertion);
+ pconvertionLay->addWidget(generalConvertion);
  pvlay->addLayout(pconvertionLay);
 
  connect(pcmdConnect, SIGNAL(clicked()),
 				SLOT(slotConnectClicked()));
  connect(pcmdDisconnect, SIGNAL(clicked()),
 				 pservice, SLOT(slotDisconnectFromServer()));
- connect(pgeneralConvertion, SIGNAL(sentClicked(DATATYPE, QString)),
+ connect(generalConvertion, SIGNAL(sentClicked(DATATYPE, QString)),
 				 pservice, SLOT(slotSendToServer(DATATYPE, QString)));
  connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
  connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
  connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));
- connect(pservice, SIGNAL(newMessageForDisplay(QString, const QTime &)), pgeneralConvertion, SLOT(slotAppendMessageToDisplay(QString, const QTime &)));
+ connect(pservice, SIGNAL(newMessageForDisplay(QString, const QTime &)), generalConvertion, SLOT(slotAppendMessageToDisplay(QString, const QTime &)));
  connect(pservice, SIGNAL(newMessageForNotification(QString)), this, SLOT(slotShowNotification(QString)));
  connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
  connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
@@ -137,7 +138,7 @@ void ClientWidget::turnStateOn()
  pcmdDisconnect->setEnabled(true);
 
  bool isConnected=true;
- pgeneralConvertion->setSocketState(isConnected);
+ currentCunvertion->setSocketState(isConnected);
 }
 
 void ClientWidget::turnStateOff()
@@ -148,8 +149,8 @@ void ClientWidget::turnStateOff()
  pcmdDisconnect->setEnabled(false);
 
  bool isConnected=false;
- pgeneralConvertion->setSocketState(isConnected);
- pgeneralConvertion->setSentEnabled(false);
+ currentCunvertion->setSocketState(isConnected);
+ currentCunvertion->setSentEnabled(false);
 }
 
 

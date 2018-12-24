@@ -62,7 +62,8 @@ private:
  ClientService *pservice;
 
  QMap<QString, QWidget *> *convertionWidgets;
- ConvertionWidget *pgeneralConvertion=nullptr;
+ ConvertionWidget *generalConvertion=nullptr;
+ ConvertionWidget *currentCunvertion=nullptr;
  void initConvertions();
 
 public:

@@ -90,8 +90,11 @@ void ClientWidget::slotSwitchConvertions(QString convertionName)
  auto it=convertionWidgets->find(convertionName);
  if(it==convertionWidgets->end())
 	{
+	 auto insertingConvertion=new ConvertionWidget(convertionName, this);
 	 it=convertionWidgets->insert(convertionName,
-														 new ConvertionWidget(convertionName, this));
+														 insertingConvertion);
+	 connect(insertingConvertion, SIGNAL(sentClicked(DATATYPE, QString)),
+					 pservice, SLOT(slotSendToServer(DATATYPE, QString)));
 	}
  qDebug()<<"Items in the layout"<<pconvertionLay->count();
  auto oldWidget = (
@@ -101,8 +104,10 @@ void ClientWidget::slotSwitchConvertions(QString convertionName)
 	 pconvertionLay->removeWidget(oldWidget);
 	 oldWidget->hide();
 	}
- (*it)->show();
- pconvertionLay->addWidget(*it);
+ currentCunvertion=qobject_cast<ConvertionWidget *>(*it);
+ currentCunvertion->setSocketState(pservice->isConnected());
+ currentCunvertion->show();
+ pconvertionLay->addWidget(currentCunvertion);
 }
 
 void ClientWidget::slotConnected()

@@ -42,7 +42,9 @@ void ConvertionWidget::setSentEnabled(bool value)
 
 void ConvertionWidget::slotSentClicked()
 {
- emit sentClicked(DATATYPE::MESSAGE, pmsgField->toPlainText());
+ QString msg=pmsgField->toPlainText();
+ slotAppendMessageToDisplay("Вы: " + msg, QTime::currentTime());
+ emit sentClicked(DATATYPE::MESSAGE, msg);
  pmsgField->clear();
  pcmdSent->setEnabled(false);
 }

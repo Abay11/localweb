@@ -60,7 +60,7 @@ public:
  void setAddress(QString addr);
  void setPort(QString port);
 
- QString receivedMessage;
+ QString receivedMessage=nullptr;
 
  void setNickAndName(QString nick, QString name);
  bool isConnected();

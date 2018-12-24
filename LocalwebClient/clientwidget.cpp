@@ -53,12 +53,13 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
  connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
  connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));
- connect(pservice, SIGNAL(newMessageForDisplay(QString, const QTime &)), generalConvertion, SLOT(slotAppendMessageToDisplay(QString, const QTime &)));
+ connect(pservice, SIGNAL(newMessageForDisplay(QString, const QTime &)),
+				 SLOT(slotForwardToDestination(QString, const QTime &)));
  connect(pservice, SIGNAL(newMessageForNotification(QString)), this, SLOT(slotShowNotification(QString)));
  connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
  connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
  connect(plistdock, SIGNAL(openConvertion(QString)),
-				 SLOT(slotSwitchConvertions(QString)));
+				 SLOT(slotSwitchConversions(QString)));
 
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 
@@ -85,7 +86,7 @@ void ClientWidget::slotSetAddress(QString addr, QString port)
  qDebug()<<"receive address info: "<<*pserverAddress<<" "<<*pserverPort;
 }
 
-void ClientWidget::slotSwitchConvertions(QString convertionName)
+void ClientWidget::slotSwitchConversions(QString convertionName)
 {
  auto it=convertionWidgets->find(convertionName);
  if(it==convertionWidgets->end())
@@ -108,6 +109,12 @@ void ClientWidget::slotSwitchConvertions(QString convertionName)
  currentCunvertion->setSocketState(pservice->isConnected());
  currentCunvertion->show();
  pconvertionLay->addWidget(currentCunvertion);
+}
+
+void ClientWidget::slotForwardToDestination(QString, const QTime &)
+{
+
+// generalConvertion, SLOT(slotAppendMessageToDisplay(QString, const QTime &))
 }
 
 void ClientWidget::slotConnected()

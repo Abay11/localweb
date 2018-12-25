@@ -23,7 +23,7 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  ,popup(new PopUp(this))
  ,plistdock(new ListDock(this))
  ,pservice(service)
- ,convertionWidgets(new QMap<QString, QWidget *>)
+ ,convertionWidgets(new QMap<QString, ConvertionWidget *>)
 {
  plistdock->setOnlineModel(pservice->onlineModel());
  plistdock->setOfflineModel(pservice->offlineModel());
@@ -48,13 +48,15 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 				SLOT(slotConnectClicked()));
  connect(pcmdDisconnect, SIGNAL(clicked()),
 				 pservice, SLOT(slotDisconnectFromServer()));
- connect(generalConvertion, SIGNAL(sentClicked(DATATYPE, QString)),
-				 pservice, SLOT(slotSendToServer(DATATYPE, QString)));
+ connect(generalConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
+				 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
  connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
  connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
  connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));
+ connect(pservice, SIGNAL(newMessageToForwarding(QString, QString, const QTime &)),
+				 SLOT(slotForwardToDestination(QString, QString, const QTime &)));
  connect(pservice, SIGNAL(newMessageForDisplay(QString, const QTime &)),
-				 SLOT(slotForwardToDestination(QString, const QTime &)));
+				 generalConvertion, SLOT(slotAppendMessageToDisplay(QString, const QTime &)));
  connect(pservice, SIGNAL(newMessageForNotification(QString)), this, SLOT(slotShowNotification(QString)));
  connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
  connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
@@ -94,8 +96,8 @@ void ClientWidget::slotSwitchConversions(QString convertionName)
 	 auto insertingConvertion=new ConvertionWidget(convertionName, this);
 	 it=convertionWidgets->insert(convertionName,
 														 insertingConvertion);
-	 connect(insertingConvertion, SIGNAL(sentClicked(DATATYPE, QString)),
-					 pservice, SLOT(slotSendToServer(DATATYPE, QString)));
+	 connect(insertingConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
+					 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
 	}
  qDebug()<<"Items in the layout"<<pconvertionLay->count();
  auto oldWidget = (
@@ -111,10 +113,15 @@ void ClientWidget::slotSwitchConversions(QString convertionName)
  pconvertionLay->addWidget(currentCunvertion);
 }
 
-void ClientWidget::slotForwardToDestination(QString, const QTime &)
+void ClientWidget::slotForwardToDestination(QString msg, QString from, const QTime &time)
 {
-
-// generalConvertion, SLOT(slotAppendMessageToDisplay(QString, const QTime &))
+ auto it=convertionWidgets->find(from);
+ if(it==convertionWidgets->end())
+	{
+	 qWarning()<<"Not founded destination";
+	 return;
+	}
+ (*it)->slotAppendMessageToDisplay(msg, time);
 }
 
 void ClientWidget::slotConnected()

@@ -20,6 +20,7 @@ private:
  QTextEdit *pdisplay,*pmsgField;
 
  bool socketIsOpen=false;
+ QString convertionName;
 
 public:
  ConvertionWidget(QString name,
@@ -38,7 +39,7 @@ public slots:
  void slotAppendMessageToDisplay(QString msg, const QTime &actionTime);
 
 signals:
- void sentClicked(DATATYPE type, QString msg);
+ void sentClicked(DATATYPE type, QString msg, QVariant to);
 };
 
 #endif // CONVERTIONWIDGET_H

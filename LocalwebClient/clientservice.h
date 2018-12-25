@@ -74,7 +74,7 @@ protected slots:
 public slots:
  void slotConnectToServer();
  void slotDisconnectFromServer();
- void slotSendToServer(DATATYPE, QString="", QVariant=0);
+ void slotSendToServer(DATATYPE, QString=nullptr, QVariant=0);
  void slotSetAddress(QString addr, QString port);
 
 
@@ -84,6 +84,7 @@ signals:
  void returnRegistrationResult(bool);
  void socketError(QString title, QString info);
  void newMessageForDisplay(QString msg, const QTime &time=QTime::currentTime());
+ void newMessageToForwarding(QString msg, QString from, const QTime &time=QTime::currentTime());
  void newMessageForNotification(QString msg);
 };
 

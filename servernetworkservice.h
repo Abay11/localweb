@@ -39,7 +39,7 @@ public:
  QString getAddress();
  bool saveData(QString filename="serverdata.bin");
  bool restoreData(QString filename="serverdata.bin");
- void sendToClient(QTcpSocket *to, DATATYPE type, QVariant data, void *paddition=nullptr);
+ void sendToClient(QTcpSocket *to, DATATYPE type, QVariant data, void *paddition=nullptr, QString from=nullptr);
  bool addUserIfNickNotBusy(const QString &nick, const QString &name, QTcpSocket *client);
  void addToBase(const QString &nick, const QString &name,
 								const QString &address, const QString &nport);

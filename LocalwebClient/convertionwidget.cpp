@@ -8,6 +8,8 @@ ConvertionWidget::ConvertionWidget(QString name,
  ,pdisplay(new QTextEdit)
  ,pmsgField(new QTextEdit)
 {
+ convertionName=name;
+
  pcmdSent->setEnabled(false);
  pmsgField->setPlaceholderText("Введите сообщение...");
  pdisplay->setReadOnly(true);
@@ -44,7 +46,9 @@ void ConvertionWidget::slotSentClicked()
 {
  QString msg=pmsgField->toPlainText();
  slotAppendMessageToDisplay("Вы: " + msg, QTime::currentTime());
- emit sentClicked(DATATYPE::MESSAGE, msg);
+
+ QString destination=convertionName;
+ emit sentClicked(DATATYPE::MESSAGE, msg, destination);
  pmsgField->clear();
  pcmdSent->setEnabled(false);
 }

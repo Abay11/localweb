@@ -61,7 +61,7 @@ private:
 
  ClientService *pservice;
 
- QMap<QString, QWidget *> *convertionWidgets;
+ QMap<QString, ConvertionWidget*> *convertionWidgets;
  ConvertionWidget *generalConvertion=nullptr;
  ConvertionWidget *currentCunvertion=nullptr;
  void initConvertions();
@@ -79,7 +79,8 @@ private slots:
  void slotQuit();
  void slotSocketError();
  void slotShowNotification(QString msg);
- void slotSwitchConvertions(QString convertionName);
+ void slotSwitchConversions(QString convertionName);
+ void slotForwardToDestination(QString msg, QString from, const QTime &);
 
 public slots:
  void slotAddressEdited();

@@ -80,7 +80,7 @@ bool ServerNetworkService::restoreData(QString filename)
 	return false;
 }
 
-void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant data, void *paddition)
+void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant data, void *paddition, QString from)
 {
  QByteArray byteArr;
  QDataStream out(&byteArr, QIODevice::WriteOnly);
@@ -133,8 +133,7 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 	 {
 		QString msg=data.toString();
 		QTime *time=static_cast<QTime*>(paddition);
-		out<<*time;
-		out<<msg;
+		out<<*time<<msg<<from;
 		break;
 	 }
 	default:
@@ -305,14 +304,42 @@ void ServerNetworkService::slotReadClient()
 		}
 	 case DATATYPE::MESSAGE:
 	 {
-		 in>>msg;
+		 QString from;
+		 QString to;
+		 in>>msg>>to;
 		 qDebug()<<"Received message"<<msg;
-		 for(auto it=socketsAndNicksOfOnlines->begin();
-				 it!=socketsAndNicksOfOnlines->end();
-				 ++it)
+		 if(to=="Общий чат")
 			{
-			 if(pclient != it.key()) //пропускаем, чтобы клиент не получил сообщение от самого себя
-				sendToClient(it.key(), DATATYPE::MESSAGE, msg, &time);
+			//a broadcast message
+			 qDebug()<<"received broadcast a message";
+
+			//set general chat as a receiver
+			from=to;
+			for(auto it=socketsAndNicksOfOnlines->begin();
+					it!=socketsAndNicksOfOnlines->end();
+					++it)
+			 {
+				if(pclient != it.key()) //пропускаем, чтобы клиент не получил сообщение от самого себя
+				 sendToClient(it.key(), DATATYPE::MESSAGE, msg, &time, from);
+			 }
+			}
+		 else
+			{
+			 qDebug()<<"received private a message";
+			 //a private message
+			 QTcpSocket *toSocket=nullptr;
+			 for (auto it=socketsAndNicksOfOnlines->begin();
+						it!=socketsAndNicksOfOnlines->end();
+						++it)
+				 if(it.value()==to)
+					 toSocket=it.key();
+
+			 //get sender's nick
+			 from=socketsAndNicksOfOnlines->find(pclient).value();
+			 if(toSocket)
+				sendToClient(toSocket, DATATYPE::MESSAGE, msg, &time, from);
+			 else
+				qDebug()<<"User is not online";
 			}
 		 break;
 	 }

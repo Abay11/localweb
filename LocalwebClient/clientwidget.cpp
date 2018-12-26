@@ -99,15 +99,13 @@ void ClientWidget::slotSwitchConversions(QString convertionName)
 	 connect(insertingConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
 					 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
 	}
- qDebug()<<"Items in the layout"<<pconvertionLay->count();
- auto oldWidget = (
-		pconvertionLay->itemAt(0)->widget());
+ auto oldWidget = pconvertionLay->itemAt(0)->widget();
  if(oldWidget)
 	{
 	 pconvertionLay->removeWidget(oldWidget);
 	 oldWidget->hide();
 	}
- currentCunvertion=qobject_cast<ConvertionWidget *>(*it);
+ currentCunvertion=*it;
  currentCunvertion->setSocketState(pservice->isConnected());
  currentCunvertion->show();
  pconvertionLay->addWidget(currentCunvertion);
@@ -116,11 +114,10 @@ void ClientWidget::slotSwitchConversions(QString convertionName)
 void ClientWidget::slotForwardToDestination(QString msg, QString from, const QTime &time)
 {
  auto it=convertionWidgets->find(from);
+
  if(it==convertionWidgets->end())
-	{
-	 qWarning()<<"Not founded destination";
-	 return;
-	}
+	 it=convertionWidgets->insert(from, new ConvertionWidget(from, this));
+
  (*it)->slotAppendMessageToDisplay(msg, time);
 }
 

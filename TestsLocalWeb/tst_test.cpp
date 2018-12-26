@@ -1,5 +1,6 @@
 #include <QtTest>
 #include <QCoreApplication>
+#include <QApplication>
 
 #include "clientservicefordebug.h"
 
@@ -25,7 +26,8 @@ private slots:
  void test_registration();
  void test_notifying();
  void test_clientConnectionToServer();
- void test_sendingAndReadingMessage();
+ void test_sendingAndReadingPublicMessage();
+ void test_sendingPrivateMessage();
 
  //client
  void test_addAllUsersToOfflineModel();
@@ -34,6 +36,8 @@ private slots:
  void test_removeConnectedFromOfflines();
  void test_throwOnlinesToOfflines();
  void test_throwDisconnectedToOfflines();
+
+public slots:
 };
 
 test::test()
@@ -47,10 +51,12 @@ test::~test()
 }
 
 static QString savingFile="serverdata.bin";
+static QString clientSavingFile="data.bin";
 
 void test::test_addToBase()
 {
  QFile::remove(savingFile);
+ QFile::remove(clientSavingFile);
 
  ServerNetworkService *pservice=new ServerNetworkService;
  QTcpSocket *client1 = new QTcpSocket;
@@ -80,6 +86,7 @@ void test::test_addToBase()
 void test::test_saveDataAndRestoreData()
 {
  QFile::remove(savingFile);
+ QFile::remove(clientSavingFile);
 
  quint16 nport=9009;
  ServerNetworkService *pserviceForSave=new ServerNetworkService;
@@ -120,6 +127,7 @@ void test::test_saveDataAndRestoreData()
 
 void test::test_startServer0()
 {
+ QFile::remove(clientSavingFile);
  QFile::remove(savingFile);
  quint16 nPort=7777;
  ServerNetworkService *pservice0=new ServerNetworkService;
@@ -145,6 +153,7 @@ void test::test_startServer0()
 
 void test::test_registration()
 {
+ QFile::remove(clientSavingFile);
  QFile::remove(savingFile);
 
  QString port="11000";
@@ -209,6 +218,7 @@ void test::test_registration()
 
 void test::test_notifying()
 {
+ QFile::remove(clientSavingFile);
  QFile::remove(savingFile);
 
  QString port="22222";
@@ -255,6 +265,7 @@ void test::test_notifying()
 
 void test::test_clientConnectionToServer()
 {
+ QFile::remove(clientSavingFile);
  QFile::remove(savingFile);
 
  QString port="9000";
@@ -311,16 +322,17 @@ void test::test_clientConnectionToServer()
  QFile::remove(savingFile);
 }
 
-void test::test_sendingAndReadingMessage()
+void test::test_sendingAndReadingPublicMessage()
 {
+ QFile::remove(clientSavingFile);
  QFile::remove(savingFile);
 
  QString port="9000";
  ServerNetworkService *pserver=new ServerNetworkService;
  pserver->setPort(quint16(port.toInt()));
  QCOMPARE(pserver->slotStartServer(), true);
- pserver->addToBase("client0", "name0", "localhost", "0");
- pserver->addToBase("client1", "name1", "localhost", "0");
+ pserver->addToBase("client0", "name", "","");
+ pserver->addToBase("client1", "name", "","");
 
  QEventLoop *loop=new QEventLoop;
 
@@ -335,36 +347,107 @@ void test::test_sendingAndReadingMessage()
  pclient1->setNickAndName("client1", "name1");
  pclient1->slotSetAddress("localhost", port);
  pclient1->slotConnectToServer();
- QObject::connect(pclient1, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
  loop->exec();
 
  QCOMPARE(pclient0->isConnected(), true);
  QCOMPARE(pclient1->isConnected(), true);
 
  QString sendingMessage="Read me!";
+ QString sendingMessage2="Read me! 2";
 
- pclient0->slotSendToServer(DATATYPE::MESSAGE, sendingMessage);
+ QString destination="Общий чат";
+ pclient0->slotSendToServer(DATATYPE::MESSAGE, sendingMessage, destination);
+ qApp->processEvents();
  QObject::connect(pclient1, SIGNAL(debugPurpose()), loop, SLOT(quit()));
  loop->exec();
+ QCOMPARE(pclient1->receivedMessage, sendingMessage);
 
- pclient1->slotSendToServer(DATATYPE::MESSAGE, sendingMessage);
+ pclient1->slotSendToServer(DATATYPE::MESSAGE, sendingMessage2, destination);
  QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
  loop->exec();
 
- QCOMPARE(pclient0->receivedMessage, "client1: "+sendingMessage);
+ QCOMPARE(pclient0->receivedMessage, sendingMessage2);
 
  pclient0->slotDisconnectFromServer();
+ pclient1->slotDisconnectFromServer();
  pserver->slotStopServer();
  delete pclient0;
+ delete pclient1;
  delete pserver;
  delete loop;
+}
+
+void test::test_sendingPrivateMessage()
+{
+// /*
+ QFile::remove(savingFile);
+ QFile::remove(clientSavingFile);
+
+ QString port="9000";
+ ServerNetworkService *pserver=new ServerNetworkService;
+ pserver->setPort(quint16(port.toInt()));
+ QCOMPARE(pserver->slotStartServer(), true);
+ pserver->addToBase("client0", "name0", "localhost", "0");
+ pserver->addToBase("client1", "name1", "localhost", "0");
+ pserver->addToBase("client2", "name2", "localhost", "0");
+
+ ClientServiceForDebug *pclient0=new ClientServiceForDebug;
+ pclient0->setNickAndName("client0", "name0");
+ pclient0->slotSetAddress("localhost", port);
+ pclient0->slotConnectToServer();
+ QEventLoop *loop=new QEventLoop;
+ QObject::connect(pclient0, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ ClientServiceForDebug *pclient1=new ClientServiceForDebug;
+ pclient1->setNickAndName("client1", "name1");
+ pclient1->slotSetAddress("localhost", port);
+ pclient1->slotConnectToServer();
+ QObject::connect(pclient1, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ ClientServiceForDebug *pclient2=new ClientServiceForDebug;
+ pclient2->setNickAndName("client2", "name2");
+ pclient2->slotSetAddress("localhost", port);
+ pclient2->slotConnectToServer();
+ QObject::connect(pclient2, SIGNAL(debugPurpose()), loop, SLOT(quit()));
+ loop->exec();
+
+ qApp->processEvents();
+ QCOMPARE(pclient0->isConnected(), true);
+ QCOMPARE(pclient1->isConnected(), true);
+ QCOMPARE(pclient2->isConnected(), true);
+
+ QString privateMessage="Private from c0 to c2!";
+
+ pclient0->slotSendToServer(DATATYPE::MESSAGE, privateMessage, "client2");
+ QEventLoop *waitPrivateMessage=new QEventLoop;
+ connect(pclient2, SIGNAL(debugPurpose()), waitPrivateMessage, SLOT(quit()));
+ waitPrivateMessage->exec();
+
+	qApp->processEvents();
+ QCOMPARE(pclient2->receivedMessage, privateMessage);
+ QCOMPARE(pclient1->receivedMessage, "");
+
+ pclient0->slotDisconnectFromServer();
+ pclient1->slotDisconnectFromServer();
+ pclient2->slotDisconnectFromServer();
+ pserver->slotStopServer();
+ delete pclient0;
+ delete pclient1;
+ delete pclient2;
+ delete pserver;
+ delete loop;
+// */
 }
 
 void test::test_addAllUsersToOfflineModel()
 {
  QFile::remove(savingFile);
+ QFile::remove(clientSavingFile);
 
- QString port="6565";
+ QString port="4444";
  ServerNetworkService *pserver=new ServerNetworkService;
  pserver->setPort(quint16(port.toInt()));
  QCOMPARE(pserver->slotStartServer(), true);
@@ -408,6 +491,7 @@ void test::test_addAllUsersToOfflineModel()
 
 void test::test_addNewOnlineToModel()
 {
+ QFile::remove(clientSavingFile);
  QFile::remove(savingFile);
 
  ClientServiceForDebug *pclient0=new ClientServiceForDebug;

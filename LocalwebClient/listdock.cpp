@@ -44,13 +44,17 @@ void ListDock::setOfflineModel(QStringListModel *pmodel)
 void ListDock::setupListviewContextMenu()
 {
  ponline->setContextMenuPolicy(Qt::CustomContextMenu);
+ poffline->setContextMenuPolicy(Qt::CustomContextMenu);
  connect(ponline, SIGNAL(customContextMenuRequested(const QPoint &)),
+				 SLOT(slotShowContextMenu(const QPoint &)));
+ connect(poffline, SIGNAL(customContextMenuRequested(const QPoint &)),
 				 SLOT(slotShowContextMenu(const QPoint &)));
 }
 
 void ListDock::slotShowContextMenu(const QPoint &pos)
 {
  qDebug()<<"context menu requested";
+ bool isOfflineView = sender()==poffline;
  static QMenu *menu=nullptr;
  if(menu==nullptr)
 	{
@@ -61,25 +65,28 @@ void ListDock::slotShowContextMenu(const QPoint &pos)
 	 menu->addAction("Показать информацию");
 	}
  auto model=ponline->model();
- if(model->rowCount()>0)
+ if(isOfflineView || model->rowCount()>0)
 	{
-	 auto index=ponline->indexAt(pos);
-	 bool isOwner=index.row()==0;
+	 auto index = isOfflineView ? poffline->indexAt(pos) : ponline->indexAt(pos);
+	 bool isOwner=index.data().toString().startsWith("Вы: ");
 	 bool isGeneral=index.row()==1;
 	 //need to disable some actions if it's the owner or the general chat
 	 auto actions=menu->actions();
 	 actions[0]->setEnabled(!(isOwner));
-	 actions[1]->setEnabled(!(isOwner || isGeneral));
-	 actions[2]->setEnabled(!(isOwner || isGeneral));
-	 QPoint gpos=ponline->mapToGlobal(pos);
+	 actions[1]->setEnabled(!(isOwner || isGeneral || isOfflineView));
+	 actions[2]->setEnabled(!(isOwner || isGeneral || isOfflineView));
+
+	 QPoint gpos=isOfflineView ? poffline->mapToGlobal(pos) : ponline->mapToGlobal(pos);
 	 menu->exec(gpos);
 	}
 }
 
 void ListDock::slotOpenConvertion()
 {
- auto model=ponline->model();
- auto curIndex=ponline->currentIndex();
+ bool isOnlineView = focusWidget()==ponline;
+ auto model = isOnlineView ? ponline->model() : poffline->model();
+ auto curIndex = isOnlineView ? ponline->currentIndex() : poffline->currentIndex();
+
  qDebug()<<"slot open convertion:"<<model->data(curIndex).toString();
  emit openConvertion(model->data(curIndex).toString());
 }

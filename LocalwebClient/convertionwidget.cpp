@@ -3,14 +3,16 @@
 ConvertionWidget::ConvertionWidget(QString name,
 																	 QWidget *parent)
  :QWidget(parent)
- ,pcmdSent(new QPushButton("Отправить"))
- ,pcmdClr(new QPushButton("Очистить"))
+ ,cmdSend(new QPushButton("Отправить"))
+ ,cmdSendFile(new QPushButton("Отправить файл"))
+ ,cmdClr(new QPushButton("Очистить"))
  ,pdisplay(new QTextEdit)
  ,pmsgField(new QTextEdit)
 {
  convertionName=name;
 
- pcmdSent->setEnabled(false);
+ cmdSend->setEnabled(false);
+ cmdSendFile->setEnabled(false);
  pmsgField->setPlaceholderText("Введите сообщение...");
  pdisplay->setReadOnly(true);
 
@@ -20,14 +22,16 @@ ConvertionWidget::ConvertionWidget(QString name,
  pvlay->addWidget(pmsgField, 1);
 
  QHBoxLayout *phlay=new QHBoxLayout;
- phlay->addWidget(pcmdSent);
- phlay->addWidget(pcmdClr);
+ phlay->addWidget(cmdSend);
+ phlay->addWidget(cmdSendFile);
+ phlay->addWidget(cmdClr);
  pvlay->addLayout(phlay);
 
  setLayout(pvlay);
 
- connect(pcmdSent, SIGNAL(clicked()), SLOT(slotSentClicked()));
- connect(pcmdClr, SIGNAL(clicked()), SLOT(slotClrDisplay()));
+ connect(cmdSend, SIGNAL(clicked()), SLOT(slotSend()));
+ connect(cmdSendFile, SIGNAL(clicked()), SLOT(slotSendFile()));
+ connect(cmdClr, SIGNAL(clicked()), SLOT(slotClrDisplay()));
 
  connect(pmsgField, SIGNAL(textChanged()), SLOT(slotMsgChanged()));
 }
@@ -35,14 +39,15 @@ ConvertionWidget::ConvertionWidget(QString name,
 void ConvertionWidget::setSocketState(bool isOpen)
 {
  socketIsOpen=isOpen;
+ cmdSendFile->setEnabled(isOpen);
 }
 
 void ConvertionWidget::setSentEnabled(bool value)
 {
- pcmdSent->setEnabled(value);
+ cmdSend->setEnabled(value);
 }
 
-void ConvertionWidget::slotSentClicked()
+void ConvertionWidget::slotSend()
 {
  QString msg=pmsgField->toPlainText();
  slotAppendMessageToDisplay("Вы: " + msg, QTime::currentTime());
@@ -50,7 +55,12 @@ void ConvertionWidget::slotSentClicked()
  QString destination=convertionName;
  emit sentClicked(DATATYPE::MESSAGE, msg, destination);
  pmsgField->clear();
- pcmdSent->setEnabled(false);
+ cmdSend->setEnabled(false);
+}
+
+void ConvertionWidget::slotSendFile()
+{
+ qDebug()<<"Send file";
 }
 
 void ConvertionWidget::slotClrDisplay()
@@ -61,7 +71,7 @@ void ConvertionWidget::slotClrDisplay()
 void ConvertionWidget::slotMsgChanged()
 {
  if(pmsgField->toPlainText()!="" && socketIsOpen)
-	pcmdSent->setEnabled(true);
+	cmdSend->setEnabled(true);
 }
 
 void ConvertionWidget::slotAppendMessageToDisplay(QString msg, const QTime &actionTime)

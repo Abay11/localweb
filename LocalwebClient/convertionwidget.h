@@ -15,7 +15,9 @@ class ConvertionWidget:public QWidget
 {
  Q_OBJECT
 private:
- QPushButton *pcmdSent,*pcmdClr;
+ QPushButton *cmdSend;
+ QPushButton *cmdSendFile;
+ QPushButton *cmdClr;
 
  QTextEdit *pdisplay,*pmsgField;
 
@@ -31,7 +33,8 @@ public:
 
 
 private slots:
- void slotSentClicked();
+ void slotSend();
+ void slotSendFile();
  void slotClrDisplay();
  void slotMsgChanged();
 

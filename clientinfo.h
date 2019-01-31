@@ -11,7 +11,8 @@ enum class DATATYPE:char{
  DISCONNECTION,
  NOTIFYING,
  CONNECT,
- MESSAGE
+ MESSAGE,
+ FILE
 };
 
 class ClientInfo

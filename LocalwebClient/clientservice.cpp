@@ -189,6 +189,7 @@ void ClientService::slotReadyRead()
 
 	switch (type) {
 	 case DATATYPE::REGISTRATION:
+		{
 		in>>time>>registrationResult;
 
 		emit returnRegistrationResult(registrationResult);
@@ -196,7 +197,7 @@ void ClientService::slotReadyRead()
 		qInfo()<<time.toString("[hh:mm:ss] ")
 					<<"Registration attempt. Result: "<<registrationResult;
 		break;
-
+		}
 	 case DATATYPE::CONNECT:
 	 {
 		 qDebug()<<"Receiving list of clients";
@@ -263,6 +264,29 @@ void ClientService::slotReadyRead()
 			}
 		 break;
 	 }
+	 case DATATYPE::FILE:
+		{
+		 qDebug()<<"прием файла";
+		 QString from;
+		 QString filename;
+		 QByteArray file;
+		 in>>time>>from>>filename>>file;
+		 emit(newMessageForNotification("***Прием файла***"));
+
+		 if(from=="Общий чат")
+			emit(newMessageForDisplay(msg, time));
+		 else {
+			 emit newMessageToForwarding(msg, from, time);
+			 qDebug()<<"from:"<<from<<"filename:"<<filename;
+
+			 if(file.isNull())
+				qDebug()<<"file is empty";
+			 else
+				qDebug()<<"file is NOT empty";
+
+			}
+		 break;
+		}
 	 default:
 		//что-то пошло не так, клиент не может получить иную команду
 		 qDebug()<<"что-то пошло не так я полагаю";
@@ -304,6 +328,12 @@ void ClientService::slotError(QAbstractSocket::SocketError nerr)
  psocket->close();
 }
 
+//void ClientService::slotSendFile(QString to, QString filename, QByteArray *file)
+//{
+// qDebug()<<"ClientService::slotSendFile";
+// slotSendToServer(DATATYPE::FILE, to);
+//}
+
 void ClientService::slotConnectToServer()
 {
  psocket->connectToHost(*pserverAddress,
@@ -317,7 +347,7 @@ void ClientService::slotDisconnectFromServer()
  psocket->close();
 }
 
-void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant additionData)
+void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstAddition)
 {
  QByteArray arrBlock;
  QDataStream out(&arrBlock, QIODevice::WriteOnly);
@@ -332,21 +362,26 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant additi
 	case DATATYPE::MESSAGE:
 	 {
 	 qDebug()<<"Client send message";
- /*//когда общая рассылка, другой клиент не сможет узнать,
- //кто прислал мсг, т.к. получит от сервера, поэтому отправителю
- //нужно приписать, что это он.
- //Если это будет Р2Р, возможно это будет не обяз. Нужно еще раз обдумать...
- //а пока так.*/
-	 QString destination=additionData.toString();
+	 QString destination=firstAddition.toString();
 	 out<<msg<<destination;
 	 break;
+	 }
+
+	case DATATYPE::FILE:
+	 {
+		qDebug()<<"ClientService: Sending file";
+		QString to=msg;
+		QString filename="test.file";
+		QByteArray file;
+		out<<to<<filename<<file;
+		break;
 	 }
 
 	case DATATYPE::REGISTRATION:
 	 {
 		qDebug()<<"Sending to server registration request";
 		QString *nick=&msg;
-		QString name=additionData.toString();
+		QString name=firstAddition.toString();
 		out<<*nick<<name;
 		break;
 	 }

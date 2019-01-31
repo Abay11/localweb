@@ -42,7 +42,7 @@ public slots:
  void slotAppendMessageToDisplay(QString msg, const QTime &actionTime);
 
 signals:
- void sentClicked(DATATYPE type, QString msg, QVariant to);
+ void sentClicked(DATATYPE type, QString stringData, QVariant variantData=0);
 };
 
 #endif // CONVERTIONWIDGET_H

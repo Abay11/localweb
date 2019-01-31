@@ -5,6 +5,9 @@ void ClientWidget::initConvertions()
  generalConvertion=new ConvertionWidget("Общий чат");
  convertionWidgets->insert("Общий чат", generalConvertion);
  currentCunvertion=generalConvertion;
+
+ connect(generalConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
+				 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
 }
 
 ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
@@ -48,8 +51,6 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 				SLOT(slotConnectClicked()));
  connect(pcmdDisconnect, SIGNAL(clicked()),
 				 pservice, SLOT(slotDisconnectFromServer()));
- connect(generalConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
-				 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
  connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
  connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
  connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));

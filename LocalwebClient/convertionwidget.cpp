@@ -52,15 +52,17 @@ void ConvertionWidget::slotSend()
  QString msg=pmsgField->toPlainText();
  slotAppendMessageToDisplay("Вы: " + msg, QTime::currentTime());
 
- QString destination=convertionName;
- emit sentClicked(DATATYPE::MESSAGE, msg, destination);
+ QString to=convertionName;
+ emit sentClicked(DATATYPE::MESSAGE, msg, to);
  pmsgField->clear();
  cmdSend->setEnabled(false);
 }
 
 void ConvertionWidget::slotSendFile()
 {
- qDebug()<<"Send file";
+ qDebug()<<"ConvertionWidget: Send file button clicked";
+ QString to=convertionName;
+ emit sentClicked(DATATYPE::FILE, to);
 }
 
 void ConvertionWidget::slotClrDisplay()

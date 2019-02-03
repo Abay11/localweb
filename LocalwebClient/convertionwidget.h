@@ -1,7 +1,8 @@
-#ifndef CONVERTIONWIDGET_H
+﻿#ifndef CONVERTIONWIDGET_H
 #define CONVERTIONWIDGET_H
 
 #include <QWidget>
+#include <QFileDialog>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QHBoxLayout>

@@ -270,8 +270,12 @@ void ClientService::slotReadyRead()
 		 QString from;
 		 QString filename;
 		 QByteArray file;
-		 in>>time>>from>>filename>>file;
+		 in>>time>>from>>filename;
+
 		 emit(newMessageForNotification("***Прием файла***"));
+
+		 //receive a file ciclical
+		 in>>file;
 
 		 if(from=="Общий чат")
 			emit(newMessageForDisplay(msg, time));
@@ -370,10 +374,20 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 	case DATATYPE::FILE:
 	 {
 		qDebug()<<"ClientService: Sending file";
-		QString to=msg;
-		QString filename="test.file";
+
+		QString filename=msg;
+
+		QString to=firstAddition.toString();
+
+
+		out<<to<<filename;
+
+		//open a file for reading
 		QByteArray file;
-		out<<to<<filename<<file;
+
+		//send the file cyclical
+		out<<file;
+
 		break;
 	 }
 

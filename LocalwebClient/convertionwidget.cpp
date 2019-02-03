@@ -61,8 +61,13 @@ void ConvertionWidget::slotSend()
 void ConvertionWidget::slotSendFile()
 {
  qDebug()<<"ConvertionWidget: Send file button clicked";
+
+ //invoke file selection dialog
+ QString filename="testfilename.txt";
+
  QString to=convertionName;
- emit sentClicked(DATATYPE::FILE, to);
+
+ emit sentClicked(DATATYPE::FILE, filename, to);
 }
 
 void ConvertionWidget::slotClrDisplay()

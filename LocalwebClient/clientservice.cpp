@@ -266,7 +266,7 @@ void ClientService::slotReadyRead()
 	 }
 	 case DATATYPE::FILE:
 		{
-		 qDebug()<<"прием файла";
+		 qDebug()<<"ClientService: receiving a file";
 		 QString from;
 		 QString filename;
 		 QByteArray file;
@@ -332,12 +332,6 @@ void ClientService::slotError(QAbstractSocket::SocketError nerr)
  psocket->close();
 }
 
-//void ClientService::slotSendFile(QString to, QString filename, QByteArray *file)
-//{
-// qDebug()<<"ClientService::slotSendFile";
-// slotSendToServer(DATATYPE::FILE, to);
-//}
-
 void ClientService::slotConnectToServer()
 {
  psocket->connectToHost(*pserverAddress,
@@ -373,9 +367,10 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 
 	case DATATYPE::FILE:
 	 {
-		qDebug()<<"ClientService: Sending file";
+		qDebug()<<"ClientService: Sending a file";
 
-		QString filename=msg;
+		QString fullFileName=msg;
+		QString filename=fullFileName.split("/").last();
 
 		QString to=firstAddition.toString();
 

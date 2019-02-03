@@ -68,9 +68,21 @@ void ConvertionWidget::slotSendFile()
 
  if(fullFileName!=nullptr)
 	{
-	 QString to=convertionName;
+	 QFile *file=new QFile(fullFileName);
+	 QFileInfo *fileInfo=new QFileInfo(*file);
 
-	 emit sentClicked(DATATYPE::FILE, fullFileName, to);
+	 if(fileInfo->isFile() && fileInfo->isReadable())
+		{
+		 QString to=convertionName;
+		 emit sentClicked(DATATYPE::FILE, fullFileName, to);
+		}
+	 else
+		{
+		 qWarning()<<"ConvertionWidget: Selected file is not a file or can't be read";
+		}
+
+	 delete file;
+	 delete fileInfo;
 	}
 }
 

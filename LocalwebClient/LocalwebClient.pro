@@ -35,7 +35,7 @@ SOURCES += \
     listdock.cpp \
     clientservice.cpp \
     mainwindow.cpp \
-    ../commonutilityfuncs.cpp
+    ../common.cpp
 
 HEADERS += \
     ../mylogger.h \
@@ -48,7 +48,7 @@ HEADERS += \
     listdock.h \
     clientservice.h \
     mainwindow.h \
-    ../commonutilityfuncs.h
+    ../common.h
 
 
 # Default rules for deployment.

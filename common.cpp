@@ -1,4 +1,4 @@
-#include "commonutilityfuncs.h"
+#include "common.h"
 
 
 QString formatTimeToString(const QTime &time)

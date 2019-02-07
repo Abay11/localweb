@@ -10,7 +10,7 @@
 #include <QTime>
 
 #include "../clientinfo.h"
-#include "../commonutilityfuncs.h"
+#include "../common.h"
 
 class ConvertionWidget:public QWidget
 {

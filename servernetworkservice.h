@@ -2,12 +2,14 @@
 #define SERVERNETWORKSERVICE_H
 
 #include "clientinfo.h"
+#include "common.h"
 
 #include <QObject>
 #include <QString>
 #include <QStringListModel>
 #include <QTime>
 #include <QFile>
+#include <QFileInfo>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QDataStream>

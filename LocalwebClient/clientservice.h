@@ -11,7 +11,7 @@
 #include <QLabel>
 
 #include "../clientinfo.h"
-#include "../commonutilityfuncs.h"
+#include "../common.h"
 
 #define CLIENTBASE QMap<QString, ClientInfo*>
 

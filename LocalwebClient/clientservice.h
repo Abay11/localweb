@@ -8,6 +8,7 @@
 #include <QStringListModel>
 #include <QListWidget>
 #include <QFile>
+#include <QFileInfo>
 #include <QLabel>
 
 #include "../clientinfo.h"

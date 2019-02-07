@@ -1,4 +1,4 @@
-﻿#include "clientservice.h"
+#include "clientservice.h"
 
 void ClientService::saveDataAndProperties()
 {
@@ -370,19 +370,32 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 		qDebug()<<"ClientService: Sending a file";
 
 		QString fullFileName=msg;
-		QString filename=fullFileName.split("/").last();
+		QFile file(fullFileName);
+		if(file.open(QFile::ReadOnly))
+		 {
+			QString filename=fullFileName.split("/").last();
 
-		QString to=firstAddition.toString();
+			QString to=firstAddition.toString();
 
+			QFileInfo fileInfo(file);
+			qint64 fileSize=fileInfo.size();
 
-		out<<to<<filename;
+			out<<to<<filename<<fileSize;
 
-		//open a file for reading
-		QByteArray file;
-
-		//send the file cyclical
-		out<<file;
-
+			//open a file for reading
+			QByteArray buffer;
+			short neededIters=static_cast<short>(fileSize/BUFFER_SIZE);
+			for(short i=0; i<neededIters; ++i)
+			 {
+				//send the file cyclical
+				buffer=file.read(BUFFER_SIZE);
+				out<<buffer;
+			 }
+		 }
+		else
+		 {
+			qWarning()<<"ClientService: Couldn't open a file to read";
+		 }
 		break;
 	 }
 

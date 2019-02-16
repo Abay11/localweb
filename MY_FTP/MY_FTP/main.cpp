@@ -13,16 +13,44 @@ int main(int argc, char *argv[])
 
  std::cout<<"THE PROGRAM STARTED"<<std::endl;
 
- FtpServer *server = new FtpServer;
- if(!server->start(21021))
-	qDebug()<<"Error occurred";
- else {
-	qDebug()<<"SERVER IS RUNNING";
-	}
+ enum MODE{CLIENT, SERVER};
 
- while(server->isRunning())
+ char mode=CLIENT;
+// char mode=SERVER;
+
+ switch(mode)
 	{
-	 QThread::sleep(10000);
+	case SERVER:
+	 {
+		FtpServer *server = new FtpServer;
+		if(!server->start(21021))
+		 qDebug()<<"Error occurred";
+		else {
+			qDebug()<<"SERVER IS RUNNING";
+		 }
+
+		while(server->isRunning())
+		 {
+			QThread::sleep(10000);
+		 }
+		break;
+	 }
+
+	case CLIENT:
+	 {
+		FtpClient client("localhost", 21021);
+
+		QString path = "/home/adygha/Desktop";
+		QString name = "tanks_3.png";
+
+		client.upload(path, name);
+
+		while(!client.isFinished)
+		 QThread::sleep(3000);
+
+		break;
+	 }
+	default: break;
 	}
 
  std::cout<<"THE PROGRAM ENDED"<<std::endl;

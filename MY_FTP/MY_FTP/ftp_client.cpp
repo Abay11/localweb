@@ -9,6 +9,7 @@ FtpClient::~FtpClient()
 
 void FtpClient::connectToServer()
 {
+ qDebug()<<"---Connecting to server...---";
  socket->connectToHost(serverAddress, port);
 }
 
@@ -19,26 +20,41 @@ void FtpClient::disconnect()
 
 void FtpClient::upload(const QString &path, const QString &filename)
 {
+ qDebug()<<"---Uploading a file...---";
+
+ while(socket->state() != QTcpSocket::SocketState::ConnectedState)
+	{
+	 QThread::sleep(5000);
+	}
+
  QFile file(path + filename);
 
  if(file.open(QFile::ReadOnly))
 	{
-	 QDataStream out(socket);
+	 QByteArray arrBlock;
+	 QDataStream out(&arrBlock, QIODevice::WriteOnly);
 	 out.setVersion(QDataStream::Qt_5_11);
 
 	 QFileInfo finfo(file);
 
 	 expectedSize=static_cast<quint64>(finfo.size());
 
+	 out<<expectedSize<<filename;
+	 socket->write(arrBlock);
+
 	 QByteArray buffer;
 	 buffer = file.read(100000000);
 	 socket->write(buffer);
 
 	 file.close();
+
+	 qDebug()<<"File uploading has finished";
 	}
  else {
 	 qWarning()<<"FTP_CLIENT: File openning error has occurred";
 	}
+
+ qDebug()<<"---The file uploaded---";
 }
 
 void FtpClient::slotDownload()

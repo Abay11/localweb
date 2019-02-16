@@ -23,16 +23,20 @@ private:
  QTcpSocket *socket;
 
 public:
- FtpClient(const QString &serverAddress);
+ FtpClient(const QString &serverAddress, quint16 port);
 
  virtual ~FtpClient();
 
  void connectToServer();
+
  void disconnect();
 
  void upload(const QString &path, const QString &filename);
 
+ bool isFinished=false;
+
 public slots:
+ void slotConnected();
  void slotDownload();
  void slotError(QAbstractSocket::SocketError);
 };

@@ -35,6 +35,9 @@ public:
 
  bool isFinished=false;
 
+signals:
+ void uploadingIsFinished();
+
 public slots:
  void slotConnected();
  void slotDownload();

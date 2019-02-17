@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <QThread>
+#include <QEventLoop>
 
 int main(int argc, char *argv[])
 {
@@ -29,10 +30,9 @@ int main(int argc, char *argv[])
 			qDebug()<<"SERVER IS RUNNING";
 		 }
 
-		while(server->isRunning())
-		 {
-			QThread::sleep(10000);
-		 }
+		QEventLoop loop;
+		loop.exec();
+
 		break;
 	 }
 
@@ -40,13 +40,13 @@ int main(int argc, char *argv[])
 	 {
 		FtpClient client("localhost", 21021);
 
-		QString path = "/home/adygha/Desktop";
+		QString path = "/home/adygha/Desktop/";
 		QString name = "tanks_3.png";
 
 		client.upload(path, name);
 
-		while(!client.isFinished)
-		 QThread::sleep(3000);
+		QEventLoop loop;
+		QObject::connect(&client, SIGNAL(uploadingIsFinished()), &loop, SLOT(quit()));
 
 		break;
 	 }
@@ -55,5 +55,4 @@ int main(int argc, char *argv[])
 
  std::cout<<"THE PROGRAM ENDED"<<std::endl;
 
- return a.exec();
 }

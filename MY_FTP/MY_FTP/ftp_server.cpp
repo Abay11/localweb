@@ -3,6 +3,11 @@
 FtpServer::FtpServer() : server(new QTcpServer)
 {
  qDebug()<<"---Starting the FTP server...---";
+
+ connect(server, SIGNAL(newConnection()), SLOT(slotNewConnection()));
+
+ connect(server, SIGNAL(acceptError(QAbstractSocket::SocketError)),
+				 SLOT(slotAcceptError(QAbstractSocket::SocketError)));
 }
 
 FtpServer::~FtpServer()
@@ -30,13 +35,18 @@ void FtpServer::stop()
 
 void FtpServer::slotNewConnection()
 {
+ qDebug()<<"New connection";
+
  QTcpSocket *newClient = server->nextPendingConnection();
+ if(!newClient) qWarning() << "FTP_SERVER: Pending connection is NULL!";
 
  connect(newClient, SIGNAL(readyRead()), SLOT(slotReadClient()));
 }
 
 void FtpServer::slotReadClient()
 {
+ qDebug()<<"---Start receiving a file---";
+
  QTcpSocket *client = static_cast<QTcpSocket*>(sender());
  QDataStream in(client);
  in.setVersion(QDataStream::Qt_5_11);
@@ -73,6 +83,8 @@ void FtpServer::slotReadClient()
 		expectedSize=0;
 		break;
 	 }
+
+	qDebug() << "File received";
  }
 }
 

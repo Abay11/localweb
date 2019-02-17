@@ -20,6 +20,7 @@ void FtpClient::connectToServer()
 {
  qDebug()<<"---Connecting to server...---";
  socket->connectToHost(serverAddress, port);
+ socket->waitForConnected(10000);
 }
 
 void FtpClient::disconnect()
@@ -29,14 +30,20 @@ void FtpClient::disconnect()
 
 void FtpClient::upload(const QString &path, const QString &filename)
 {
- qDebug()<<"---Uploading a file...---";
-
  isFinished=false;
 
- while(socket->state() != QTcpSocket::SocketState::ConnectedState)
+ if(socket->state() != QTcpSocket::SocketState::ConnectedState)
 	{
-	 QThread::sleep(5000);
+	 connectToServer();
 	}
+
+ if(socket->state() != QTcpSocket::SocketState::ConnectedState)
+	{
+	 qWarning()<<"FTP_CLIENT: ERROR: Time response is elapsed";
+	 return;
+	}
+
+ qDebug()<<"---Uploading a file...---";
 
  QFile file(path + filename);
 
@@ -51,14 +58,17 @@ void FtpClient::upload(const QString &path, const QString &filename)
 	 expectedSize=static_cast<quint64>(finfo.size());
 
 	 out<<expectedSize<<filename;
-	 socket->write(arrBlock);
+	 qint64 writedBytes;
+	 writedBytes = socket->write(arrBlock);
+	 qDebug() << "Writed bytes: " << writedBytes;
 
 	 QByteArray buffer;
 	 buffer = file.read(100000000);
 	 socket->write(buffer);
 
 	 file.close();
-	 isFinished=true;
+
+	 emit uploadingIsFinished();
 
 	 qDebug()<<"File uploading has finished";
 	}

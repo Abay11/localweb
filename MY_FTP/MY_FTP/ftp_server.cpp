@@ -59,32 +59,42 @@ void FtpServer::slotReadClient()
 			break;
 
 		in>>expectedSize;
+		qDebug() << "Expected: " << expectedSize;
 	 }
 
-	while(client->bytesAvailable() < static_cast<qint64>(sizeof(QString)))
+	while(client->bytesAvailable() <static_cast<qint64>(sizeof(QString)))
 	 break;
 
 	QString filename;
 	in>>filename;
+	qDebug()<<"Receiving filename:"<<filename;
 
 	QFile file(filename);
+	qint64 maxBufferSize=10240000;
 	if(file.open(QFile::WriteOnly))
 	 {
-		quint64 receivedSize=0;
+		qint64 receivedSize=0;
+		qint64 leaveSize=0;
 		QByteArray buffer;
 		while(receivedSize < expectedSize)
 		 {
-			in>>buffer;
-			receivedSize += static_cast<quint64>(buffer.size());
+			leaveSize = expectedSize - receivedSize;
+
+			client->waitForReadyRead();
+
+			buffer = client->read(maxBufferSize < leaveSize ? maxBufferSize : leaveSize);
+			receivedSize += (buffer.size());
+
+			qDebug()<<"Already received: "<<receivedSize;
 			file.write(buffer);
 		 }
 
 		file.close();
 		expectedSize=0;
-		break;
-	 }
 
-	qDebug() << "File received";
+		qDebug() << "File received";
+		return;
+	 }
  }
 }
 

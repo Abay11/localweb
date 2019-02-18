@@ -2,6 +2,7 @@
 #define FTP_SERVER_H
 
 #include <QObject>
+#include <QCoreApplication>
 #include <QDataStream>
 #include <QFile>
 #include <QDebug>
@@ -18,7 +19,7 @@ private:
 
  quint16 port;
 
- quint64 expectedSize=0;
+ qint64 expectedSize=0;
 
  bool isStateRunning=false;
 

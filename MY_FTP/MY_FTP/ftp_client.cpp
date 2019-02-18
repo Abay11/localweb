@@ -55,17 +55,24 @@ void FtpClient::upload(const QString &path, const QString &filename)
 
 	 QFileInfo finfo(file);
 
-	 expectedSize=static_cast<quint64>(finfo.size());
+	 expectedSize=finfo.size();
 
 	 out<<expectedSize<<filename;
 	 qint64 writedBytes;
 	 writedBytes = socket->write(arrBlock);
-	 qDebug() << "Writed bytes: " << writedBytes;
+	 socket->flush();
+	 qDebug() << "1. Writed bytes: " << writedBytes;
 
 	 QByteArray buffer;
-	 buffer = file.read(100000000);
-	 socket->write(buffer);
-
+	 qint64 sentSize = 0;
+	 while(sentSize < expectedSize)
+		{
+		 buffer = file.read(800000);
+		 //	 out<<buffer;
+		 writedBytes=socket->write(buffer);
+		 socket->flush();
+		 qDebug()<<"2. Writed bytes: "<<writedBytes;
+		}
 	 file.close();
 
 	 emit uploadingIsFinished();
@@ -92,4 +99,5 @@ void FtpClient::slotDownload()
 void FtpClient::slotError(QAbstractSocket::SocketError)
 {
  qWarning()<<"FTP_CLIENT: Connection error has occured!";
+ exit(-1);
 }

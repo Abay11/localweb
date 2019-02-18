@@ -18,7 +18,7 @@ private:
 
  quint16 port;
 
- quint64 expectedSize=0;
+ qint64 expectedSize=0;
 
  QTcpSocket *socket;
 

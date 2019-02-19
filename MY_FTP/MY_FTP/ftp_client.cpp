@@ -58,20 +58,18 @@ void FtpClient::upload(const QString &path, const QString &filename)
 	 expectedSize=finfo.size();
 
 	 out<<expectedSize<<filename;
-	 qint64 writedBytes;
-	 writedBytes = socket->write(arrBlock);
+	 socket->write(arrBlock);
 	 socket->flush();
-	 qDebug() << "1. Writed bytes: " << writedBytes;
 
 	 QByteArray buffer;
-	 qint64 sentSize = 0;
-	 while(sentSize < expectedSize)
+
+	 qint64 sentBytes = 0;
+	 while(sentBytes < expectedSize)
 		{
 		 buffer = file.read(800000);
-		 //	 out<<buffer;
-		 writedBytes=socket->write(buffer);
+		 socket->write(buffer);
 		 socket->flush();
-		 qDebug()<<"2. Writed bytes: "<<writedBytes;
+		 sentBytes += buffer.size();
 		}
 	 file.close();
 

@@ -28,4 +28,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     ftp_server.h \
-    ftp_client.h
+    ftp_client.h \
+    ftp_common.h

@@ -14,10 +14,13 @@ int main(int argc, char *argv[])
 
  std::cout<<"THE PROGRAM STARTED"<<std::endl;
 
+
  enum MODE{CLIENT, SERVER};
 
  char mode=CLIENT;
 // char mode=SERVER;
+
+
 
  switch(mode)
 	{
@@ -43,7 +46,8 @@ int main(int argc, char *argv[])
 		QString path = "/home/adygha/Desktop/";
 		QString name = "tanks_3.png";
 
-		client.upload(path, name);
+		client.sendRequest(DOWNLOAD, name);
+//		client.upload(path, name);
 
 		QEventLoop loop;
 		QObject::connect(&client, SIGNAL(uploadingIsFinished()), &loop, SLOT(quit()));
@@ -54,5 +58,5 @@ int main(int argc, char *argv[])
 	}
 
  std::cout<<"THE PROGRAM ENDED"<<std::endl;
-
+//*/
 }

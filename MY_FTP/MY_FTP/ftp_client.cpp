@@ -32,34 +32,19 @@ void FtpClient::upload(const QString &path, const QString &filename)
 {
  isFinished=false;
 
- if(socket->state() != QTcpSocket::SocketState::ConnectedState)
-	{
-	 connectToServer();
-	}
-
- if(socket->state() != QTcpSocket::SocketState::ConnectedState)
-	{
-	 qWarning()<<"FTP_CLIENT: ERROR: Time response is elapsed";
-	 return;
-	}
-
- qDebug()<<"---Uploading a file...---";
-
  QFile file(path + filename);
 
  if(file.open(QFile::ReadOnly))
 	{
-	 QByteArray arrBlock;
-	 QDataStream out(&arrBlock, QIODevice::WriteOnly);
-	 out.setVersion(QDataStream::Qt_5_11);
+	 if(!sendRequest(UPLOAD, filename)) return;
+
+	 qDebug()<<"---Uploading a file...---";
 
 	 QFileInfo finfo(file);
 
 	 expectedSize=finfo.size();
 
-	 out<<expectedSize<<filename;
-	 socket->write(arrBlock);
-	 socket->flush();
+	 socket->write(reinterpret_cast<char *>(expectedSize));
 
 	 QByteArray buffer;
 
@@ -82,6 +67,62 @@ void FtpClient::upload(const QString &path, const QString &filename)
 	}
 
  qDebug()<<"---The file uploaded---";
+}
+
+void FtpClient::download(const QString &path, const QString &filename)
+{
+ isFinished = false;
+
+ if(socket->state() != QTcpSocket::SocketState::ConnectedState)
+	{
+	 connectToServer();
+	}
+
+ if(socket->state() != QTcpSocket::SocketState::ConnectedState)
+	{
+	 qWarning()<<"FTP_CLIENT: ERROR: Time response is elapsed";
+	 return;
+	}
+
+ qDebug()<<"---Downloading a file...---";
+
+ QFile file(path + filename);
+
+ if(file.open(QFile::WriteOnly))
+	{
+//	 QByteArray buffer;
+
+//	 buffer<<;
+//	 socket->write()
+	}
+}
+
+bool FtpClient::sendRequest(qint8 request, const QString &filename)
+{
+ if(socket->state() != QTcpSocket::SocketState::ConnectedState)
+	{
+	 connectToServer();
+	}
+
+ if(socket->state() != QTcpSocket::SocketState::ConnectedState)
+	{
+	 qWarning()<<"FTP_CLIENT: ERROR: Time response is elapsed";
+	 return false;
+	}
+
+ QByteArray arrBlock;
+ QDataStream out(&arrBlock, QIODevice::WriteOnly);
+ out.setVersion(QDataStream::Qt_5_11);
+
+ out << request<< filename;
+
+ qint64 wroteBytes = 0;
+ wroteBytes = socket->write(arrBlock);
+ socket->flush();
+
+ qDebug()<<"Wrote bytes:"<<wroteBytes;
+
+ return true;
 }
 
 void FtpClient::slotConnected()

@@ -1,6 +1,8 @@
 #ifndef FTP_SERVER_H
 #define FTP_SERVER_H
 
+#include "ftp_common.h"
+
 #include <QObject>
 #include <QCoreApplication>
 #include <QDataStream>
@@ -33,6 +35,10 @@ public:
  void stop();
 
  bool isRunning(){return isStateRunning;}
+
+ void uploading();
+
+ void downloading();
 
 public slots:
  void slotNewConnection();

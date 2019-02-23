@@ -33,6 +33,16 @@ void FtpServer::stop()
  isStateRunning=false;
 }
 
+void FtpServer::uploading()
+{
+
+}
+
+void FtpServer::downloading()
+{
+
+}
+
 void FtpServer::slotNewConnection()
 {
  qDebug()<<"New connection";
@@ -51,51 +61,72 @@ void FtpServer::slotReadClient()
  QDataStream in(client);
  in.setVersion(QDataStream::Qt_5_11);
 
- forever
- {
-	if(!expectedSize)
+ qDebug() << "INIT SIZE" << INIT_MSG_SIZE;
+
+ if(client->bytesAvailable() < INIT_MSG_SIZE)
+	{
+	 qDebug() << "Available:" << client->bytesAvailable();
+	 return;
+	}
+
+ qint8 code;
+ QString filename;
+
+ in >> code;
+ in >> filename;
+
+ qDebug() << "Expected code:" << code;
+ qDebug() << "Filename:" << filename;
+
+ if(code == DOWNLOAD)
+	{
+
+	}
+ else if(code == UPLOAD)
+	{
+	 forever
 	 {
-		if(client->bytesAvailable() < static_cast<qint64>(sizeof(qint64)))
-			break;
-
-		in>>expectedSize;
-		qDebug() << "Expected: " << expectedSize;
-	 }
-
-	while(client->bytesAvailable() <static_cast<qint64>(sizeof(QString)))
-	 break;
-
-	QString filename;
-	in>>filename;
-	qDebug()<<"Receiving filename:"<<filename;
-
-	QFile file(filename);
-	qint64 maxBufferSize=10240000;
-	if(file.open(QFile::WriteOnly))
-	 {
-		qint64 receivedSize=0;
-		qint64 leaveSize=0;
-		QByteArray buffer;
-		while(receivedSize < expectedSize)
+		if(!expectedSize)
 		 {
-			leaveSize = expectedSize - receivedSize;
+			if(client->bytesAvailable() < static_cast<qint64>(sizeof(qint64)))
+			 break;
 
-			client->waitForReadyRead();
-
-			buffer = client->read(maxBufferSize < leaveSize ? maxBufferSize : leaveSize);
-			receivedSize += (buffer.size());
-
-			qDebug()<<"Already received: "<<receivedSize;
-			file.write(buffer);
+			in>>expectedSize;
+			qDebug() << "Expected: " << expectedSize;
 		 }
 
-		file.close();
-		expectedSize=0;
+		QString filename;
+		in>>filename;
+		qDebug()<<"Receiving filename:"<<filename;
 
-		qDebug() << "File received";
-		return;
+		QFile file(filename);
+		if(file.open(QFile::WriteOnly))
+		 {
+			qint64 receivedSize=0;
+			qint64 leaveSize=0;
+			QByteArray buffer;
+			while(receivedSize < expectedSize)
+			 {
+				leaveSize = expectedSize - receivedSize;
+
+				client->waitForReadyRead();
+
+				buffer = client->read(BUFFER_SIZE < leaveSize ? BUFFER_SIZE : leaveSize);
+				receivedSize += (buffer.size());
+
+				qDebug()<<"Already received: "<<receivedSize;
+				file.write(buffer);
+			 }
+
+			file.close();
+			expectedSize=0;
+
+			qDebug() << "File received";
+			return;
+		 }
 	 }
- }
+
+	}
 }
 
 void FtpServer::slotAcceptError(QAbstractSocket::SocketError socketError)

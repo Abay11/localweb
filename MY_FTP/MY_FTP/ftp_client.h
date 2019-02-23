@@ -2,6 +2,7 @@
 #define FTP_CLIENT_H
 
 #include "ftp_server.h"
+#include "ftp_common.h"
 
 #include <QObject>
 #include <QTcpSocket>
@@ -33,7 +34,11 @@ public:
 
  void upload(const QString &path, const QString &filename);
 
+ void download(const QString &path, const QString &filename);
+
  bool isFinished=false;
+
+ bool sendRequest(qint8 request, const QString &filename);
 
 signals:
  void uploadingIsFinished();

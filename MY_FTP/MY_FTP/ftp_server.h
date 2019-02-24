@@ -36,7 +36,7 @@ public:
 
  bool isRunning(){return isStateRunning;}
 
- void uploading();
+ bool uploading(QTcpSocket *client, const QString &filename);
 
  void downloading();
 

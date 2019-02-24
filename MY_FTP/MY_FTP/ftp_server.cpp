@@ -33,9 +33,47 @@ void FtpServer::stop()
  isStateRunning=false;
 }
 
-void FtpServer::uploading()
+bool FtpServer::uploading(QTcpSocket *client, const QString &filename)
 {
+		if(!expectedSize)
+		 {
+			if(client->bytesAvailable() < static_cast<qint64>(sizeof(qint64))) return false;
 
+			client->read(reinterpret_cast<char *>(&expectedSize), sizeof(qint64));
+//			in>>expectedSize;
+			qDebug() << "Expected: " << expectedSize;
+		 }
+
+		QFile file(filename);
+		if(file.open(QFile::WriteOnly))
+		 {
+			qint64 receivedSize=0;
+			qint64 leaveSize=0;
+			QByteArray buffer;
+			while(receivedSize < expectedSize)
+			 {
+				leaveSize = expectedSize - receivedSize;
+
+				client->waitForReadyRead();
+
+				buffer = client->read(BUFFER_SIZE < leaveSize ? BUFFER_SIZE : leaveSize);
+				receivedSize += (buffer.size());
+
+				qDebug()<<"Already received: "<<receivedSize;
+				file.write(buffer);
+			 }
+
+			file.close();
+			expectedSize=0;
+
+			qDebug() << "File received";
+			return true;
+		 }
+		else
+		 {
+			qWarning() << "Error: couldn't open a file to write";
+			return true;
+		 }
 }
 
 void FtpServer::downloading()
@@ -75,57 +113,14 @@ void FtpServer::slotReadClient()
  in >> code;
  in >> filename;
 
- qDebug() << "Expected code:" << code;
- qDebug() << "Filename:" << filename;
-
  if(code == DOWNLOAD)
 	{
-
+	 downloading();
 	}
  else if(code == UPLOAD)
 	{
-	 forever
-	 {
-		if(!expectedSize)
-		 {
-			if(client->bytesAvailable() < static_cast<qint64>(sizeof(qint64)))
-			 break;
-
-			in>>expectedSize;
-			qDebug() << "Expected: " << expectedSize;
-		 }
-
-		QString filename;
-		in>>filename;
-		qDebug()<<"Receiving filename:"<<filename;
-
-		QFile file(filename);
-		if(file.open(QFile::WriteOnly))
-		 {
-			qint64 receivedSize=0;
-			qint64 leaveSize=0;
-			QByteArray buffer;
-			while(receivedSize < expectedSize)
-			 {
-				leaveSize = expectedSize - receivedSize;
-
-				client->waitForReadyRead();
-
-				buffer = client->read(BUFFER_SIZE < leaveSize ? BUFFER_SIZE : leaveSize);
-				receivedSize += (buffer.size());
-
-				qDebug()<<"Already received: "<<receivedSize;
-				file.write(buffer);
-			 }
-
-			file.close();
-			expectedSize=0;
-
-			qDebug() << "File received";
-			return;
-		 }
-	 }
-
+	 qDebug() << "UPLOADING MODE";
+	 while(!uploading(client, filename)){client->waitForReadyRead();}
 	}
 }
 

@@ -46,8 +46,8 @@ int main(int argc, char *argv[])
 		QString path = "/home/adygha/Desktop/";
 		QString name = "tanks_3.png";
 
-		client.sendRequest(DOWNLOAD, name);
-//		client.upload(path, name);
+//		client.sendRequest(DOWNLOAD, name);
+		client.upload(path, name);
 
 		QEventLoop loop;
 		QObject::connect(&client, SIGNAL(uploadingIsFinished()), &loop, SLOT(quit()));

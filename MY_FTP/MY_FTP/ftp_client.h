@@ -45,7 +45,6 @@ signals:
 
 public slots:
  void slotConnected();
- void slotDownload();
  void slotError(QAbstractSocket::SocketError);
 };
 

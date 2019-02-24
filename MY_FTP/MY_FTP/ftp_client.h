@@ -34,7 +34,7 @@ public:
 
  void upload(const QString &path, const QString &filename);
 
- void download(const QString &path, const QString &filename);
+ bool download(const QString &path, const QString &filename);
 
  bool isFinished=false;
 

@@ -36,7 +36,11 @@ void FtpClient::upload(const QString &path, const QString &filename)
 
  if(file.open(QFile::ReadOnly))
 	{
-	 if(!sendRequest(UPLOAD, filename)) return;
+	 if(!sendRequest(UPLOAD, filename))
+		{
+		 qWarning() << "An error has occurred: a request didn't send";
+		 return;
+		}
 
 	 qDebug()<<"---Uploading a file...---";
 
@@ -63,39 +67,65 @@ void FtpClient::upload(const QString &path, const QString &filename)
 
 	 qDebug()<<"File uploading has finished";
 	 qDebug()<<"Sent bytes:"<<sentBytes;
+
+	 expectedSize = 0;
 	}
  else {
 	 qWarning()<<"FTP_CLIENT: File openning error has occurred";
 	}
-
- qDebug()<<"---The file uploaded---";
 }
 
-void FtpClient::download(const QString &path, const QString &filename)
+bool FtpClient::download(const QString &path, const QString &filename)
 {
  isFinished = false;
-
- if(socket->state() != QTcpSocket::SocketState::ConnectedState)
-	{
-	 connectToServer();
-	}
-
- if(socket->state() != QTcpSocket::SocketState::ConnectedState)
-	{
-	 qWarning()<<"FTP_CLIENT: ERROR: Time response is elapsed";
-	 return;
-	}
-
- qDebug()<<"---Downloading a file...---";
 
  QFile file(path + filename);
 
  if(file.open(QFile::WriteOnly))
 	{
-//	 QByteArray buffer;
+	 if(!sendRequest(DOWNLOAD, filename))
+		{
+		 qWarning() << "An error has occurred: a request didn't send";
+		 return true;
+		}
 
-//	 buffer<<;
-//	 socket->write()
+	 qDebug()<<"---Downloading a file...---";
+
+	 if(!expectedSize)
+		{
+		 if(socket->bytesAvailable() < static_cast<qint64>(sizeof(qint64))) return false;
+
+		 socket->read(reinterpret_cast<char *>(&expectedSize), sizeof(qint64));
+		 qDebug() << "Expected:" << expectedSize;
+		}
+
+	 qint64 receivedSize=0;
+	 qint64 leaveSize=0;
+	 QByteArray buffer;
+	 while(receivedSize < expectedSize)
+		{
+		 leaveSize = expectedSize - receivedSize;
+
+		 socket->waitForReadyRead();
+
+		 buffer = socket->read(BUFFER_SIZE < leaveSize ? BUFFER_SIZE : leaveSize);
+		 receivedSize += (buffer.size());
+
+		 qDebug()<<"Already received: "<<receivedSize;
+		 file.write(buffer);
+		}
+
+	 file.close();
+
+	 qDebug()<<"---The file received---";
+
+	 expectedSize = 0;
+	 return true;
+	}
+ else
+	{
+	 qWarning() << "Couldn't open a file to write";
+	 return true;
 	}
 }
 
@@ -118,8 +148,7 @@ bool FtpClient::sendRequest(qint8 request, const QString &filename)
 
  out << request<< filename;
 
- qint64 wroteBytes = 0;
- wroteBytes = socket->write(arrBlock);
+ socket->write(arrBlock);
  socket->flush();
 
  return true;

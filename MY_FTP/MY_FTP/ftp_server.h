@@ -7,6 +7,7 @@
 #include <QCoreApplication>
 #include <QDataStream>
 #include <QFile>
+#include <QFileInfo>
 #include <QDebug>
 
 #include <QTcpServer>
@@ -38,7 +39,7 @@ public:
 
  bool uploading(QTcpSocket *client, const QString &filename);
 
- void downloading();
+ void downloading(QTcpSocket *client, const QString &filename);
 
 public slots:
  void slotNewConnection();

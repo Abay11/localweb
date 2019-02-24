@@ -40,7 +40,6 @@ bool FtpServer::uploading(QTcpSocket *client, const QString &filename)
 			if(client->bytesAvailable() < static_cast<qint64>(sizeof(qint64))) return false;
 
 			client->read(reinterpret_cast<char *>(&expectedSize), sizeof(qint64));
-//			in>>expectedSize;
 			qDebug() << "Expected: " << expectedSize;
 		 }
 
@@ -76,9 +75,24 @@ bool FtpServer::uploading(QTcpSocket *client, const QString &filename)
 		 }
 }
 
-void FtpServer::downloading()
+void FtpServer::downloading(QTcpSocket *client, const QString &filename)
 {
+ QFile file(filename);
 
+ if(file.open(QFile::ReadOnly))
+	{
+	 qDebug() << "Start sending a file";
+
+	 QFileInfo finfo(file);
+	 expectedSize=finfo.size();
+
+	 client->write(reinterpret_cast<char *>(&expectedSize), sizeof(qint64));
+	 qDebug() << "Sending to client file size:" << expectedSize;
+	}
+ else
+	{
+	 qWarning() << "Couldn't open a file";
+	}
 }
 
 void FtpServer::slotNewConnection()
@@ -115,7 +129,8 @@ void FtpServer::slotReadClient()
 
  if(code == DOWNLOAD)
 	{
-	 downloading();
+	 qDebug() << "DOWNLOADING MODE";
+	 downloading(client, filename);
 	}
  else if(code == UPLOAD)
 	{

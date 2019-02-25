@@ -20,8 +20,6 @@ int main(int argc, char *argv[])
  char mode=CLIENT;
 // char mode=SERVER;
 
-
-
  switch(mode)
 	{
 	case SERVER:
@@ -44,10 +42,12 @@ int main(int argc, char *argv[])
 		FtpClient client("localhost", 21021);
 
 		QString path = "/home/adygha/Desktop/";
+		QString dest = "/home/adygha/Desktop/LocalWeb_downloads/";
 		QString name = "tanks_3.png";
 
 //		client.sendRequest(DOWNLOAD, name);
-		client.upload(path, name);
+//		client.upload(path, name);
+		client.download(dest, name);
 
 		QEventLoop loop;
 		QObject::connect(&client, SIGNAL(uploadingIsFinished()), &loop, SLOT(quit()));

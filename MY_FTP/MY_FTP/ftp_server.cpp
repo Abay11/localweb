@@ -87,7 +87,25 @@ void FtpServer::downloading(QTcpSocket *client, const QString &filename)
 	 expectedSize=finfo.size();
 
 	 client->write(reinterpret_cast<char *>(&expectedSize), sizeof(qint64));
-	 qDebug() << "Sending to client file size:" << expectedSize;
+	 qDebug() << "Sending file size to client:" << expectedSize;
+
+	 qint64 sentBytes = 0;
+	 QByteArray buffer;
+	 while(sentBytes < expectedSize)
+		{
+		 buffer = file.read(800000);
+		 qDebug() << "Wrote bytes" << client->write(buffer);
+		 qDebug() << "Is flushed" << client->flush();
+		 sentBytes += buffer.size();
+
+		 qDebug()<<"Already sent bytes:"<<sentBytes;
+		}
+
+	 file.close();
+
+	 expectedSize = 0;
+
+	 qDebug() << "The download of file is finished";
 	}
  else
 	{
@@ -113,13 +131,8 @@ void FtpServer::slotReadClient()
  QDataStream in(client);
  in.setVersion(QDataStream::Qt_5_11);
 
- qDebug() << "INIT SIZE" << INIT_MSG_SIZE;
-
  if(client->bytesAvailable() < INIT_MSG_SIZE)
-	{
-	 qDebug() << "Available:" << client->bytesAvailable();
 	 return;
-	}
 
  qint8 code;
  QString filename;

@@ -6,7 +6,6 @@ FtpClient::FtpClient(const QString &address, quint16 port)
  ,socket(new QTcpSocket)
 {
  connect(socket, SIGNAL(connected()), SLOT(slotConnected()));
-// connect(socket, SIGNAL(readyRead()), SLOT(slotDownload()));
  connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
 				 this, SLOT(slotError(QAbstractSocket::SocketError)));
 }
@@ -75,7 +74,7 @@ void FtpClient::upload(const QString &path, const QString &filename)
 	}
 }
 
-bool FtpClient::download(const QString &path, const QString &filename)
+void FtpClient::download(const QString &path, const QString &filename)
 {
  isFinished = false;
 
@@ -86,14 +85,14 @@ bool FtpClient::download(const QString &path, const QString &filename)
 	 if(!sendRequest(DOWNLOAD, filename))
 		{
 		 qWarning() << "An error has occurred: a request didn't send";
-		 return true;
+		 return;
 		}
 
 	 qDebug()<<"---Downloading a file...---";
 
 	 if(!expectedSize)
 		{
-		 if(socket->bytesAvailable() < static_cast<qint64>(sizeof(qint64))) return false;
+		 while(socket->bytesAvailable() < static_cast<qint64>(sizeof(qint64))){socket->waitForReadyRead();}
 
 		 socket->read(reinterpret_cast<char *>(&expectedSize), sizeof(qint64));
 		 qDebug() << "Expected:" << expectedSize;
@@ -106,7 +105,8 @@ bool FtpClient::download(const QString &path, const QString &filename)
 		{
 		 leaveSize = expectedSize - receivedSize;
 
-		 socket->waitForReadyRead();
+		 if(socket->bytesAvailable() < 1)
+			socket->waitForReadyRead();
 
 		 buffer = socket->read(BUFFER_SIZE < leaveSize ? BUFFER_SIZE : leaveSize);
 		 receivedSize += (buffer.size());
@@ -116,16 +116,13 @@ bool FtpClient::download(const QString &path, const QString &filename)
 		}
 
 	 file.close();
+	 expectedSize = 0;
 
 	 qDebug()<<"---The file received---";
-
-	 expectedSize = 0;
-	 return true;
 	}
  else
 	{
 	 qWarning() << "Couldn't open a file to write";
-	 return true;
 	}
 }
 

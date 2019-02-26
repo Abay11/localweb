@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 
 		QString path = "/home/adygha/Desktop/";
 		QString dest = "/home/adygha/Desktop/LocalWeb_downloads/";
-		QString name = "tanks_3.png";
+		QString name = "tanks_3.jpg";
 
 //		client.sendRequest(DOWNLOAD, name);
 //		client.upload(path, name);

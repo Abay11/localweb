@@ -81,6 +81,8 @@ void FtpServer::downloading(QTcpSocket *client, const QString &filename)
 
  if(file.open(QFile::ReadOnly))
 	{
+	 client->write(reinterpret_cast<const char *>(&OK), sizeof (qint8));
+
 	 qDebug() << "Start sending a file";
 
 	 QFileInfo finfo(file);
@@ -109,7 +111,8 @@ void FtpServer::downloading(QTcpSocket *client, const QString &filename)
 	}
  else
 	{
-	 qWarning() << "Couldn't open a file";
+	 client->write(reinterpret_cast<const char *>(&FILE_NOT_FOUND), sizeof (qint8));
+	 qWarning() << "A file not found";
 	}
 }
 

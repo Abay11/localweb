@@ -74,7 +74,7 @@ void FtpClient::upload(const QString &path, const QString &filename)
 	}
 }
 
-void FtpClient::download(const QString &path, const QString &filename)
+qint8 FtpClient::download(const QString &path, const QString &filename)
 {
  isFinished = false;
 
@@ -85,10 +85,27 @@ void FtpClient::download(const QString &path, const QString &filename)
 	 if(!sendRequest(DOWNLOAD, filename))
 		{
 		 qWarning() << "An error has occurred: a request didn't send";
-		 return;
+		 return FAIL;
 		}
 
 	 qDebug()<<"---Downloading a file...---";
+
+	 qint8 status;
+	 while(socket->bytesAvailable() < static_cast<qint64>(sizeof(qint8)))
+		socket->waitForReadyRead();
+
+	 socket->read(reinterpret_cast<char*>(&status), sizeof(qint8));
+
+	 if(status == FILE_NOT_FOUND)
+		{
+		 qDebug() << "STATUS: FILE NOT FOUND";
+
+		 return status;
+		}
+	 else
+		{
+		 qDebug() << "STATUS: OK";
+		}
 
 	 if(!expectedSize)
 		{
@@ -119,10 +136,13 @@ void FtpClient::download(const QString &path, const QString &filename)
 	 expectedSize = 0;
 
 	 qDebug()<<"---The file received---";
+
+	 return OK;
 	}
  else
 	{
 	 qWarning() << "Couldn't open a file to write";
+	 return FAIL;
 	}
 }
 

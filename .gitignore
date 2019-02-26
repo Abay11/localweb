@@ -1,0 +1,8 @@
+
+build-LocalwebClient-Desktop_Qt_5_11_1_GCC_64bit-Debug/
+
+MY_FTP/build-MY_FTP-Desktop_Qt_5_11_1_GCC_64bit-Debug/
+
+*.stash
+
+build-LocalwebClient-Desktop_Qt_5_11_1_GCC_64bit-Debug_copy/

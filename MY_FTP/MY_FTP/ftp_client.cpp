@@ -100,6 +100,8 @@ qint8 FtpClient::download(const QString &path, const QString &filename)
 		{
 		 qDebug() << "STATUS: FILE NOT FOUND";
 
+		 file.remove();
+
 		 return status;
 		}
 	 else

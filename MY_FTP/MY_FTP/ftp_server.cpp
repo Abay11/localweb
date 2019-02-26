@@ -53,7 +53,8 @@ bool FtpServer::uploading(QTcpSocket *client, const QString &filename)
 			 {
 				leaveSize = expectedSize - receivedSize;
 
-				client->waitForReadyRead();
+				if(client->bytesAvailable() < 1)
+				 client->waitForReadyRead();
 
 				buffer = client->read(BUFFER_SIZE < leaveSize ? BUFFER_SIZE : leaveSize);
 				receivedSize += (buffer.size());

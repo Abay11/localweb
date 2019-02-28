@@ -28,14 +28,17 @@ SOURCES += \
     mylogger.cpp \
     clientinfo.cpp \
     servernetworkservice.cpp \
-    common.cpp
+    common.cpp \
+    MY_FTP/MY_FTP/ftp_server.cpp
 
 HEADERS += \
         mywidget.h \
     mylogger.h \
     clientinfo.h \
     servernetworkservice.h \
-    common.h
+    common.h \
+    MY_FTP/MY_FTP/ftp_common.h \
+    MY_FTP/MY_FTP/ftp_server.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -35,7 +35,8 @@ SOURCES += \
     listdock.cpp \
     clientservice.cpp \
     mainwindow.cpp \
-    ../common.cpp
+    ../common.cpp \
+    ../MY_FTP/MY_FTP/ftp_client.cpp
 
 HEADERS += \
     ../mylogger.h \
@@ -48,7 +49,9 @@ HEADERS += \
     listdock.h \
     clientservice.h \
     mainwindow.h \
-    ../common.h
+    ../common.h \
+    ../MY_FTP/MY_FTP/ftp_client.h \
+    ../MY_FTP/MY_FTP/ftp_common.h
 
 
 # Default rules for deployment.

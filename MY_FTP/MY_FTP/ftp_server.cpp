@@ -96,7 +96,7 @@ void FtpServer::downloading(QTcpSocket *client, const QString &filename)
 	 QByteArray buffer;
 	 while(sentBytes < expectedSize)
 		{
-		 buffer = file.read(800000);
+		 buffer = file.read(BUFFER_SIZE);
 		 qDebug() << "Wrote bytes" << client->write(buffer);
 		 qDebug() << "Is flushed" << client->flush();
 		 sentBytes += buffer.size();

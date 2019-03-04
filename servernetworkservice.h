@@ -3,6 +3,7 @@
 
 #include "clientinfo.h"
 #include "common.h"
+#include "MY_FTP/MY_FTP/ftp_server.h"
 
 #include <QObject>
 #include <QString>
@@ -28,6 +29,8 @@ private:
  QString address;
  QTcpServer *ptcpServer;
  QStringListModel *pmodel;
+
+ FtpServer *ftp;
 
  CLIENTBASE *clientbase;
  QMap<QTcpSocket *, QString> *socketsAndNicksOfOnlines;

@@ -67,6 +67,8 @@ ClientService::ClientService(QWidget *prnt)
 {
  restoreDataAndProperties();
 
+ ftp = new FtpClient(*pserverAddress, MY_FTP::PORT);
+
  connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
  connect(psocket, SIGNAL(connected()), SIGNAL(connected()));
  connect(psocket, SIGNAL(disconnected()), SLOT(slotDisconnected()));
@@ -373,16 +375,20 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 		QFile file(fullFileName);
 		if(file.open(QFile::ReadOnly))
 		 {
-			QString filename=fullFileName.split("/").last();
+//			QString filename=fullFileName.split("/").last();
 
 			QString to=firstAddition.toString();
 
 			QFileInfo fileInfo(file);
-			qint64 fileSize=fileInfo.size();
+//			qint64 fileSize=fileInfo.size();
 
-			out<<to<<filename<<fileSize;
+			qDebug()<<"File path and name:"<<fileInfo.path() << fileInfo.fileName();
+
+			out<<to<<fileInfo.fileName(); //<<fileSize;
+			ftp->upload(fileInfo.path() + "/", fileInfo.fileName());
 
 			//open a file for reading
+			/*
 			QByteArray buffer;
 			short neededIters=static_cast<short>(fileSize/BUFFER_SIZE);
 			for(short i=0; i<neededIters; ++i)
@@ -391,6 +397,7 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 				buffer=file.read(BUFFER_SIZE);
 				out<<buffer;
 			 }
+			 */
 		 }
 		else
 		 {

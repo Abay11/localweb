@@ -5,6 +5,8 @@ ServerNetworkService::ServerNetworkService(QObject *parent)
 {
  ptcpServer=new QTcpServer(this);
 
+ ftp = new FtpServer;
+
  foreach (const QHostAddress &addr, QNetworkInterface::allAddresses()) {
 	 if (addr.protocol() == QAbstractSocket::IPv4Protocol
 			 && addr!= QHostAddress(QHostAddress::LocalHost))
@@ -37,13 +39,11 @@ quint16 ServerNetworkService::listeningPort()
 
 void ServerNetworkService::setPort(quint16 nport)
 {
- qDebug()<<"Received new port";
  this->nport=nport;
 }
 
 quint16 ServerNetworkService::getPort()
 {
- qDebug()<<"getPort() called "<<nport;
  return nport;
 }
 
@@ -94,7 +94,6 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 	case DATATYPE::REGISTRATION:
 	 {
 		bool registrationResult=data.toBool();
-		qDebug()<<"Sending to a client registration result:"<<registrationResult;
 
 		out<<QTime().currentTime()<<registrationResult;
 
@@ -102,7 +101,6 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 	 }
 	case DATATYPE::DISCONNECTION:
 	 {
-		qDebug()<<"sending clients about client disconnection";
 		QString disconnected=data.toString();
 		out<<disconnected;
 		break;
@@ -113,7 +111,6 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 		out<<clientbase->size();
 		if(clientbase->size() != clientBaseSize)
 		 {
-			qDebug()<<"Server sent a base with size:"<<clientbase->size();
 			out<<*clientbase;
 		 }
 
@@ -124,7 +121,6 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 	 }
 	case DATATYPE::NOTIFYING:
 	 {
-		qDebug()<<"Notifying users";
 		QString nick=data.toString();
 		out<<nick;
 		break;
@@ -138,11 +134,11 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 	 }
 	case DATATYPE::FILE:
 	 {
-        qDebug()<<"ServerNetworkService: Transfer file";
-		QByteArray file=data.toByteArray();
+		qDebug()<<"ServerNetworkService: Transfer file";
+		QTime time=data.toTime();
 		QString filename=addition2.toString();
-		QTime *time=static_cast<QTime*>(paddition);
-		out<<*time<<from<<filename<<file;
+//		QString *time=static_cast<QTime*>(paddition);
+		out<<time<<from<<filename;
 		break;
 
 	 }
@@ -187,7 +183,6 @@ void ServerNetworkService::addToBase(const QString &nick,
 
 void ServerNetworkService::addToModel(const QString &nick)
 {
- qDebug()<<"Adding to model";
  int nIndex=pmodel->rowCount();
  pmodel->insertRow(nIndex);
  pmodel->setData(pmodel->index(nIndex), nick);
@@ -235,7 +230,7 @@ QStringList ServerNetworkService::getClientsList()
 bool ServerNetworkService::slotStartServer()
 {
  return ptcpServer->listen(QHostAddress::Any,
-								 static_cast<quint16>(nport));
+								 static_cast<quint16>(nport)) & ftp->start(MY_FTP::PORT);
 }
 
 void ServerNetworkService::slotStopServer()
@@ -245,13 +240,13 @@ void ServerNetworkService::slotStopServer()
  for(auto c : socketsAndNicksOfOnlines->keys()) //disconnect of all clients
 	c->disconnectFromHost();
 
+ ftp->stop();
+
  qInfo()<<"Сервер остановлен.";
 }
 
 void ServerNetworkService::slotNewConnection()
 {
- qDebug()<<"A new pending connection";
-
  QTcpSocket *pclient=ptcpServer->nextPendingConnection();
  connect(pclient, SIGNAL(disconnected()), SLOT(slotDisconnection()));
  connect(pclient, SIGNAL(readyRead()), SLOT(slotReadClient()));
@@ -270,7 +265,7 @@ void ServerNetworkService::slotDisconnection()
 
 void ServerNetworkService::slotReadClient()
 {
- qDebug()<<"read client";
+ qDebug()<<"ServerNetworkService: Reading a client";
 
  QTcpSocket* pclient=static_cast<QTcpSocket*>(sender());
  QDataStream in(pclient);
@@ -298,8 +293,6 @@ void ServerNetworkService::slotReadClient()
 	 {
 	 case DATATYPE::REGISTRATION:
 		{
-		 qDebug()<<"A user is trying to register";
-
 		 QString nick;
 		 QString name;
 		 in>>nick>>name;
@@ -317,7 +310,7 @@ void ServerNetworkService::slotReadClient()
 		 QString from;
 		 QString to;
 		 in>>msg>>to;
-		 qDebug()<<"Received message"<<msg;
+		 qDebug()<<"ServerNetworkService: A message has received"<<msg;
 		 if(to=="Общий чат")
 			{
 			//a broadcast message
@@ -355,13 +348,13 @@ void ServerNetworkService::slotReadClient()
 	 }
 	 case DATATYPE::FILE:
 		{
-         qDebug()<<"ServerNetworkService: Received a file for transfer";
+		 qDebug()<<"ServerNetworkService: Receiving a file to transfer";
 		 QString filename;
 		 QString from;
 		 QString to;
 		 QByteArray file;
-		 in>>to>>filename>>file;
-		 qDebug()<<"Received file";
+		 in>>to>>filename;
+		 qDebug()<<"ServerNetworkService: The receiving of the file finished";
 		 if(to=="Общий чат")
 			{}
 		 else
@@ -376,9 +369,9 @@ void ServerNetworkService::slotReadClient()
 			 //get sender's nick
 			 from=socketsAndNicksOfOnlines->find(pclient).value();
 			 if(toSocket)
-				sendToClient(toSocket, DATATYPE::FILE, file, &time, from, filename);
+				sendToClient(toSocket, DATATYPE::FILE, time, nullptr, from, filename);
 			 else
-                qDebug()<<"ServerNetworkService: User is not online for transferring a file";
+				qDebug()<<"ServerNetworkService: User is not online for transferring a file";
 			}
 		 break;
 		}

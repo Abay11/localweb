@@ -1,6 +1,10 @@
 #ifndef CLIENTSERVICE_H
 #define CLIENTSERVICE_H
 
+#include "../clientinfo.h"
+#include "../common.h"
+#include "../MY_FTP/MY_FTP/ftp_client.h"
+
 #include <QTime>
 #include <QMap>
 #include <QTcpSocket>
@@ -10,9 +14,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QLabel>
-
-#include "../clientinfo.h"
-#include "../common.h"
 
 #define CLIENTBASE QMap<QString, ClientInfo*>
 
@@ -29,6 +30,8 @@ protected:
  CLIENTBASE *clients;
  QStringListModel *ponlineModel;
  QStringListModel *pofflineModel;
+
+ FtpClient *ftp;
 
  void addAllUsersToOfflineModel();
  void addNewOnlineToModel(QString nick);

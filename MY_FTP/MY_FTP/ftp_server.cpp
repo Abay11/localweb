@@ -2,8 +2,6 @@
 
 FtpServer::FtpServer() : server(new QTcpServer)
 {
- qDebug()<<"---Starting the FTP server...---";
-
  connect(server, SIGNAL(newConnection()), SLOT(slotNewConnection()));
 
  connect(server, SIGNAL(acceptError(QAbstractSocket::SocketError)),
@@ -19,11 +17,13 @@ FtpServer::~FtpServer()
 
 bool FtpServer::start(quint16 port)
 {
+ qDebug()<<"---Starting the FTP server...---";
+
  this->port=port;
 
- isStateRunning=true;
+ isStateRunning=server->listen(QHostAddress::Any, port);
 
- return server->listen(QHostAddress::Any, port);
+ return isStateRunning;
 }
 
 void FtpServer::stop()
@@ -56,8 +56,7 @@ bool FtpServer::uploading(QTcpSocket *client, const QString &filename)
 				if(client->bytesAvailable() < 1)
 				 client->waitForReadyRead();
 
-				buffer = client->read(BUFFER_SIZE < leaveSize ? BUFFER_SIZE : leaveSize);
-				receivedSize += (buffer.size());
+				buffer = client->read(MY_FTP::BUFFER_SIZE < leaveSize ? MY_FTP::BUFFER_SIZE : leaveSize); receivedSize += (buffer.size());
 
 				qDebug()<<"Already received: "<<receivedSize;
 				file.write(buffer);
@@ -82,7 +81,7 @@ void FtpServer::downloading(QTcpSocket *client, const QString &filename)
 
  if(file.open(QFile::ReadOnly))
 	{
-	 client->write(reinterpret_cast<const char *>(&OK), sizeof (qint8));
+	 client->write(reinterpret_cast<const char *>(&MY_FTP::OK), sizeof (qint8));
 
 	 qDebug() << "Start sending a file";
 
@@ -96,7 +95,7 @@ void FtpServer::downloading(QTcpSocket *client, const QString &filename)
 	 QByteArray buffer;
 	 while(sentBytes < expectedSize)
 		{
-		 buffer = file.read(BUFFER_SIZE);
+		 buffer = file.read(MY_FTP::BUFFER_SIZE);
 		 qDebug() << "Wrote bytes" << client->write(buffer);
 		 qDebug() << "Is flushed" << client->flush();
 		 sentBytes += buffer.size();
@@ -112,7 +111,7 @@ void FtpServer::downloading(QTcpSocket *client, const QString &filename)
 	}
  else
 	{
-	 client->write(reinterpret_cast<const char *>(&FILE_NOT_FOUND), sizeof (qint8));
+	 client->write(reinterpret_cast<const char *>(&MY_FTP::FILE_NOT_FOUND), sizeof (qint8));
 	 qWarning() << "A file not found";
 	}
 }
@@ -135,7 +134,7 @@ void FtpServer::slotReadClient()
  QDataStream in(client);
  in.setVersion(QDataStream::Qt_5_11);
 
- if(client->bytesAvailable() < INIT_MSG_SIZE)
+ if(client->bytesAvailable() < MY_FTP::INIT_MSG_SIZE)
 	 return;
 
  qint8 code;
@@ -144,12 +143,12 @@ void FtpServer::slotReadClient()
  in >> code;
  in >> filename;
 
- if(code == DOWNLOAD)
+ if(code == MY_FTP::DOWNLOAD)
 	{
 	 qDebug() << "DOWNLOADING MODE";
 	 downloading(client, filename);
 	}
- else if(code == UPLOAD)
+ else if(code == MY_FTP::UPLOAD)
 	{
 	 qDebug() << "UPLOADING MODE";
 	 while(!uploading(client, filename)){client->waitForReadyRead();}

@@ -35,7 +35,7 @@ void FtpClient::upload(const QString &path, const QString &filename)
 
  if(file.open(QFile::ReadOnly))
 	{
-	 if(!sendRequest(UPLOAD, filename))
+	 if(!sendRequest(MY_FTP::UPLOAD, filename))
 		{
 		 qWarning() << "An error has occurred: a request didn't send";
 		 return;
@@ -55,7 +55,7 @@ void FtpClient::upload(const QString &path, const QString &filename)
 	 qint64 sentBytes = 0;
 	 while(sentBytes < expectedSize)
 		{
-		 buffer = file.read(BUFFER_SIZE);
+		 buffer = file.read(MY_FTP::BUFFER_SIZE);
 		 socket->write(buffer);
 		 socket->flush();
 		 sentBytes += buffer.size();
@@ -82,10 +82,10 @@ qint8 FtpClient::download(const QString &path, const QString &filename)
 
  if(file.open(QFile::WriteOnly))
 	{
-	 if(!sendRequest(DOWNLOAD, filename))
+	 if(!sendRequest(MY_FTP::DOWNLOAD, filename))
 		{
 		 qWarning() << "An error has occurred: a request didn't send";
-		 return FAIL;
+		 return MY_FTP::FAIL;
 		}
 
 	 qDebug()<<"---Downloading a file...---";
@@ -96,7 +96,7 @@ qint8 FtpClient::download(const QString &path, const QString &filename)
 
 	 socket->read(reinterpret_cast<char*>(&status), sizeof(qint8));
 
-	 if(status == FILE_NOT_FOUND)
+	 if(status == MY_FTP::FILE_NOT_FOUND)
 		{
 		 qDebug() << "STATUS: FILE NOT FOUND";
 
@@ -127,7 +127,7 @@ qint8 FtpClient::download(const QString &path, const QString &filename)
 		 if(socket->bytesAvailable() < 1)
 			socket->waitForReadyRead();
 
-		 buffer = socket->read(BUFFER_SIZE < leaveSize ? BUFFER_SIZE : leaveSize);
+		 buffer = socket->read(MY_FTP::BUFFER_SIZE < leaveSize ? MY_FTP::BUFFER_SIZE : leaveSize);
 		 receivedSize += (buffer.size());
 
 		 qDebug()<<"Already received: "<<receivedSize;
@@ -139,12 +139,12 @@ qint8 FtpClient::download(const QString &path, const QString &filename)
 
 	 qDebug()<<"---The file received---";
 
-	 return OK;
+	 return MY_FTP::OK;
 	}
  else
 	{
 	 qWarning() << "Couldn't open a file to write";
-	 return FAIL;
+	 return MY_FTP::FAIL;
 	}
 }
 

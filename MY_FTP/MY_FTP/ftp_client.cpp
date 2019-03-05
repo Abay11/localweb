@@ -2,9 +2,10 @@
 
 FtpClient::FtpClient(const QString &address, quint16 port)
  :serverAddress(address)
- ,port(port)
  ,socket(new QTcpSocket)
 {
+ this->port = port;
+
  connect(socket, SIGNAL(connected()), SLOT(slotConnected()));
  connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
 				 this, SLOT(slotError(QAbstractSocket::SocketError)));
@@ -17,7 +18,8 @@ FtpClient::~FtpClient()
 
 void FtpClient::connectToServer()
 {
- qDebug()<<"---Connecting to server...---";
+ qDebug()<<"FTPClient: Connecting to server...";
+ qDebug()<<"FTPClient: port"<<port;
  socket->connectToHost(serverAddress, port);
  socket->waitForConnected(10000);
 }
@@ -37,18 +39,17 @@ void FtpClient::upload(const QString &path, const QString &filename)
 	{
 	 if(!sendRequest(MY_FTP::UPLOAD, filename))
 		{
-		 qWarning() << "An error has occurred: a request didn't send";
+		 qWarning() << "FTPClient: An error has occurred: a request didn't send";
 		 return;
 		}
 
-	 qDebug()<<"---Uploading a file...---";
+	 qDebug()<<"FTPClient: Uploading a file";
 
 	 QFileInfo finfo(file);
 
 	 expectedSize=finfo.size();
 
 	 socket->write(reinterpret_cast<char *>(&expectedSize), sizeof(qint64));
-	 qDebug() << "upload:: Expected" << expectedSize;
 
 	 QByteArray buffer;
 
@@ -64,13 +65,12 @@ void FtpClient::upload(const QString &path, const QString &filename)
 
 	 emit uploadingIsFinished();
 
-	 qDebug()<<"File uploading has finished";
-	 qDebug()<<"Sent bytes:"<<sentBytes;
+	 qDebug()<<"FTPClient: File uploading has finished";
 
 	 expectedSize = 0;
 	}
  else {
-	 qWarning()<<"FTP_CLIENT: File openning error has occurred";
+	 qWarning()<<"FTPClient: File openning error has occurred";
 	}
 }
 
@@ -84,11 +84,11 @@ qint8 FtpClient::download(const QString &path, const QString &filename)
 	{
 	 if(!sendRequest(MY_FTP::DOWNLOAD, filename))
 		{
-		 qWarning() << "An error has occurred: a request didn't send";
+		 qWarning() << "FTPClient: An error has occurred: a request didn't send";
 		 return MY_FTP::FAIL;
 		}
 
-	 qDebug()<<"---Downloading a file...---";
+	 qDebug()<<"FTPClient: Downloading a file";
 
 	 qint8 status;
 	 while(socket->bytesAvailable() < static_cast<qint64>(sizeof(qint8)))
@@ -98,7 +98,7 @@ qint8 FtpClient::download(const QString &path, const QString &filename)
 
 	 if(status == MY_FTP::FILE_NOT_FOUND)
 		{
-		 qDebug() << "STATUS: FILE NOT FOUND";
+		 qDebug() << "FTPClient: STATUS: FILE NOT FOUND";
 
 		 file.remove();
 
@@ -106,7 +106,7 @@ qint8 FtpClient::download(const QString &path, const QString &filename)
 		}
 	 else
 		{
-		 qDebug() << "STATUS: OK";
+		 qDebug() << "FTPClient: STATUS: OK";
 		}
 
 	 if(!expectedSize)
@@ -114,7 +114,6 @@ qint8 FtpClient::download(const QString &path, const QString &filename)
 		 while(socket->bytesAvailable() < static_cast<qint64>(sizeof(qint64))){socket->waitForReadyRead();}
 
 		 socket->read(reinterpret_cast<char *>(&expectedSize), sizeof(qint64));
-		 qDebug() << "Expected:" << expectedSize;
 		}
 
 	 qint64 receivedSize=0;
@@ -130,20 +129,20 @@ qint8 FtpClient::download(const QString &path, const QString &filename)
 		 buffer = socket->read(MY_FTP::BUFFER_SIZE < leaveSize ? MY_FTP::BUFFER_SIZE : leaveSize);
 		 receivedSize += (buffer.size());
 
-		 qDebug()<<"Already received: "<<receivedSize;
+		 qDebug()<<"FTPClient: Already received: "<<receivedSize;
 		 file.write(buffer);
 		}
 
 	 file.close();
 	 expectedSize = 0;
 
-	 qDebug()<<"---The file received---";
+	 qDebug()<<"FTPClient: The file received";
 
 	 return MY_FTP::OK;
 	}
  else
 	{
-	 qWarning() << "Couldn't open a file to write";
+	 qWarning() << "FTPClient: Couldn't open a file to write";
 	 return MY_FTP::FAIL;
 	}
 }
@@ -157,7 +156,7 @@ bool FtpClient::sendRequest(qint8 request, const QString &filename)
 
  if(socket->state() != QTcpSocket::SocketState::ConnectedState)
 	{
-	 qWarning()<<"FTP_CLIENT: ERROR: Time response is elapsed";
+	 qWarning()<<"FTPClient: ERROR: Time response is elapsed";
 	 return false;
 	}
 
@@ -175,12 +174,12 @@ bool FtpClient::sendRequest(qint8 request, const QString &filename)
 
 void FtpClient::slotConnected()
 {
- qDebug()<<"---Connecting to the server is done---";
+ qDebug()<<"FTPClient: Connected to the server";
 }
 
 
 void FtpClient::slotError(QAbstractSocket::SocketError)
 {
- qWarning()<<"FTP_CLIENT: Connection error has occured!";
+ qWarning()<<"FTPClient: Connection error has occured!";
  exit(-1);
 }

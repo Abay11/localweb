@@ -10,14 +10,14 @@ FtpServer::FtpServer() : server(new QTcpServer)
 
 FtpServer::~FtpServer()
 {
- qDebug()<<"---Stopping the FTP server...---";
+ qDebug()<<"FTPServer: Stopping the FTP server";
 
  delete server;
 }
 
 bool FtpServer::start(quint16 port)
 {
- qDebug()<<"---Starting the FTP server...---";
+ qDebug()<<"FTPServer: Starting the FTP server...";
 
  this->port=port;
 
@@ -40,7 +40,6 @@ bool FtpServer::uploading(QTcpSocket *client, const QString &filename)
 			if(client->bytesAvailable() < static_cast<qint64>(sizeof(qint64))) return false;
 
 			client->read(reinterpret_cast<char *>(&expectedSize), sizeof(qint64));
-			qDebug() << "Expected: " << expectedSize;
 		 }
 
 		QFile file(filename);
@@ -65,12 +64,12 @@ bool FtpServer::uploading(QTcpSocket *client, const QString &filename)
 			file.close();
 			expectedSize=0;
 
-			qDebug() << "File received";
+			qDebug() << "FTPServer: File received";
 			return true;
 		 }
 		else
 		 {
-			qWarning() << "Error: couldn't open a file to write";
+			qWarning() << "FTPServer: Error: couldn't open a file to write";
 			return true;
 		 }
 }
@@ -83,52 +82,51 @@ void FtpServer::downloading(QTcpSocket *client, const QString &filename)
 	{
 	 client->write(reinterpret_cast<const char *>(&MY_FTP::OK), sizeof (qint8));
 
-	 qDebug() << "Start sending a file";
+	 qDebug() << "FTPServer: Start sending a file";
 
 	 QFileInfo finfo(file);
 	 expectedSize=finfo.size();
 
 	 client->write(reinterpret_cast<char *>(&expectedSize), sizeof(qint64));
-	 qDebug() << "Sending file size to client:" << expectedSize;
 
 	 qint64 sentBytes = 0;
 	 QByteArray buffer;
 	 while(sentBytes < expectedSize)
 		{
 		 buffer = file.read(MY_FTP::BUFFER_SIZE);
-		 qDebug() << "Wrote bytes" << client->write(buffer);
-		 qDebug() << "Is flushed" << client->flush();
+		 client->write(buffer);
+		 client->flush();
 		 sentBytes += buffer.size();
 
-		 qDebug()<<"Already sent bytes:"<<sentBytes;
+		 qDebug()<<"FTPServer: Already sent bytes:"<<sentBytes;
 		}
 
 	 file.close();
 
 	 expectedSize = 0;
 
-	 qDebug() << "The download of file is finished";
+	 qDebug() << "FTPServer: The download of file is finished";
 	}
  else
 	{
 	 client->write(reinterpret_cast<const char *>(&MY_FTP::FILE_NOT_FOUND), sizeof (qint8));
-	 qWarning() << "A file not found";
+	 qWarning() << "FTPServer: A file not found";
 	}
 }
 
 void FtpServer::slotNewConnection()
 {
- qDebug()<<"New connection";
+ qDebug()<<"FTPServer: New connection";
 
  QTcpSocket *newClient = server->nextPendingConnection();
- if(!newClient) qWarning() << "FTP_SERVER: Pending connection is NULL!";
+ if(!newClient) qWarning() << "FTPServer: Pending connection is NULL!";
 
  connect(newClient, SIGNAL(readyRead()), SLOT(slotReadClient()));
 }
 
 void FtpServer::slotReadClient()
 {
- qDebug()<<"---Start receiving a file---";
+ qDebug()<<"FTPServer: Start receiving a file---";
 
  QTcpSocket *client = static_cast<QTcpSocket*>(sender());
  QDataStream in(client);

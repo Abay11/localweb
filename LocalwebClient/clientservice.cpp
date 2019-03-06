@@ -276,29 +276,20 @@ void ClientService::slotReadyRead()
 
 		 emit(newMessageForNotification("***Прием файла***"));
 
-		 //receive a file ciclical
-		 in>>file;
+		 ftp->download(MY_NETWORK::DOWNLOAD_PATH, filename);
+
+		 msg = "Прием файла " + filename;
 
 		 if(from=="Общий чат")
 			emit(newMessageForDisplay(msg, time));
 		 else {
 			 emit newMessageToForwarding(msg, from, time);
 			 qDebug()<<"from:"<<from<<"filename:"<<filename;
-
-			 if(file.isNull())
-				qDebug()<<"file is empty";
-			 else
-				qDebug()<<"file is NOT empty";
-
 			}
 		 break;
 		}
 	 default:
 		//что-то пошло не так, клиент не может получить иную команду
-		 qDebug()<<"что-то пошло не так я полагаю";
-		 qDebug()<<"но что?!?!";
-		 qDebug()<<"но это уже не моя забота";
-
 		 qCritical()<<"Неизвестная ошибка при получении сообщения.";
 	 }
 
@@ -375,29 +366,12 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 		QFile file(fullFileName);
 		if(file.open(QFile::ReadOnly))
 		 {
-//			QString filename=fullFileName.split("/").last();
-
 			QString to=firstAddition.toString();
 
 			QFileInfo fileInfo(file);
-//			qint64 fileSize=fileInfo.size();
 
-			qDebug()<<"File path and name:"<<fileInfo.path() << fileInfo.fileName();
-
-			out<<to<<fileInfo.fileName(); //<<fileSize;
+			out<<to<<fileInfo.fileName();
 			ftp->upload(fileInfo.path() + "/", fileInfo.fileName());
-
-			//open a file for reading
-			/*
-			QByteArray buffer;
-			short neededIters=static_cast<short>(fileSize/BUFFER_SIZE);
-			for(short i=0; i<neededIters; ++i)
-			 {
-				//send the file cyclical
-				buffer=file.read(BUFFER_SIZE);
-				out<<buffer;
-			 }
-			 */
 		 }
 		else
 		 {

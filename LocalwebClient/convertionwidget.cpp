@@ -74,6 +74,9 @@ void ConvertionWidget::slotSendFile()
 	 if(fileInfo->isFile() && fileInfo->isReadable())
 		{
 		 QString to=convertionName;
+
+		 slotAppendMessageToDisplay("Вы: Отправка файла " + fileInfo->fileName(), QTime::currentTime());
+
 		 emit sentClicked(DATATYPE::FILE, fullFileName, to);
 		}
 	 else

@@ -78,6 +78,18 @@ qint8 FtpClient::download(const QString &path, const QString &filename)
 {
  isFinished = false;
 
+ QDir dir(path);
+
+ if(!dir.exists())
+	{
+	 if(!dir.mkpath("./"))
+		{
+		 qWarning() << "FTPClient: Couldn't create a download directory";
+
+		 return MY_FTP::FAIL;
+		}
+	}
+
  QFile file(path + filename);
 
  if(file.open(QFile::WriteOnly))

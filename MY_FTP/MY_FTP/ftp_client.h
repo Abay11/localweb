@@ -8,6 +8,7 @@
 #include <QTcpSocket>
 #include <QFile>
 #include <QFileInfo>
+#include <QDir>
 #include <QThread>
 
 class FtpClient : public QObject

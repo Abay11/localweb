@@ -33,8 +33,19 @@ void FtpServer::stop()
  isStateRunning=false;
 }
 
-bool FtpServer::uploading(QTcpSocket *client, const QString &filename)
+bool FtpServer::uploading(QTcpSocket *client, const QString &path, const QString &filename)
 {
+ QDir dir(path);
+
+ if(!dir.exists())
+	{
+	 if(!dir.mkpath("./"))
+		{
+		 qWarning() << "FTPServer: Couldn't create a download directory";
+
+		 return MY_FTP::FAIL;
+		}
+	}
 		if(!expectedSize)
 		 {
 			if(client->bytesAvailable() < static_cast<qint64>(sizeof(qint64))) return false;
@@ -42,7 +53,7 @@ bool FtpServer::uploading(QTcpSocket *client, const QString &filename)
 			client->read(reinterpret_cast<char *>(&expectedSize), sizeof(qint64));
 		 }
 
-		QFile file(filename);
+		QFile file(path + "/" + filename);
 		if(file.open(QFile::WriteOnly))
 		 {
 			qint64 receivedSize=0;
@@ -74,9 +85,9 @@ bool FtpServer::uploading(QTcpSocket *client, const QString &filename)
 		 }
 }
 
-void FtpServer::downloading(QTcpSocket *client, const QString &filename)
+void FtpServer::downloading(QTcpSocket *client,const QString &path,  const QString &filename)
 {
- QFile file(filename);
+ QFile file(path + "/" + filename);
 
  if(file.open(QFile::ReadOnly))
 	{
@@ -144,12 +155,12 @@ void FtpServer::slotReadClient()
  if(code == MY_FTP::DOWNLOAD)
 	{
 	 qDebug() << "DOWNLOADING MODE";
-	 downloading(client, filename);
+	 downloading(client, MY_NETWORK::DOWNLOAD_PATH, filename);
 	}
  else if(code == MY_FTP::UPLOAD)
 	{
 	 qDebug() << "UPLOADING MODE";
-	 while(!uploading(client, filename)){client->waitForReadyRead();}
+	 while(!uploading(client, MY_NETWORK::DOWNLOAD_PATH, filename)){client->waitForReadyRead();}
 	}
 }
 

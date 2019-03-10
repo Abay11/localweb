@@ -2,12 +2,14 @@
 #define FTP_SERVER_H
 
 #include "ftp_common.h"
+#include "../../common.h"
 
 #include <QObject>
 #include <QCoreApplication>
 #include <QDataStream>
 #include <QFile>
 #include <QFileInfo>
+#include <QDir>
 #include <QDebug>
 
 #include <QTcpServer>
@@ -37,9 +39,9 @@ public:
 
  bool isRunning(){return isStateRunning;}
 
- bool uploading(QTcpSocket *client, const QString &filename);
+ bool uploading(QTcpSocket *client, const QString &path, const QString &filename);
 
- void downloading(QTcpSocket *client, const QString &filename);
+ void downloading(QTcpSocket *client, const QString &path, const QString &filename);
 
 public slots:
  void slotNewConnection();

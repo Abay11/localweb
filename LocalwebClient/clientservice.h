@@ -87,7 +87,7 @@ signals:
  void disconnected();
  void returnRegistrationResult(bool);
  void socketError(QString title, QString info);
- void newMessageForDisplay(QString msg, const QTime &time=QTime::currentTime());
+ void newMessageForDisplay(QString msg, const QTime &time=QTime::currentTime(), QString from=nullptr);
  void newMessageToForwarding(QString msg, QString from, const QTime &time=QTime::currentTime());
  void newMessageForNotification(QString msg);
 };

@@ -40,7 +40,7 @@ private slots:
  void slotMsgChanged();
 
 public slots:
- void slotAppendMessageToDisplay(QString msg, const QTime &actionTime);
+ void slotAppendMessageToDisplay(QString msg, const QTime &actionTime, QString from=nullptr);
 
 signals:
  void sentClicked(DATATYPE type, QString stringData, QVariant variantData=0);

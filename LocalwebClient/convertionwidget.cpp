@@ -100,7 +100,14 @@ void ConvertionWidget::slotMsgChanged()
 	cmdSend->setEnabled(true);
 }
 
-void ConvertionWidget::slotAppendMessageToDisplay(QString msg, const QTime &actionTime)
+void ConvertionWidget::slotAppendMessageToDisplay(QString msg, const QTime &actionTime, QString from)
 {
- pdisplay->append(formatTimeToString(actionTime) +" " + msg);
+ QString str = formatTimeToString(actionTime);
+
+ if(from != nullptr)
+	str += " " + from + ":";
+
+ str += " " + msg;
+
+ pdisplay->append(str);
 }

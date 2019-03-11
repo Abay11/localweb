@@ -129,7 +129,9 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 	 {
 		QString msg=data.toString();
 		QTime *time=static_cast<QTime*>(paddition);
-		out<<*time<<msg<<from;
+		QString to = addition2.toString();
+
+		out<<*time<<msg<<from<<to;
 		break;
 	 }
 	case DATATYPE::FILE:
@@ -310,20 +312,24 @@ void ServerNetworkService::slotReadClient()
 		 QString from;
 		 QString to;
 		 in>>msg>>to;
+
+		 from=socketsAndNicksOfOnlines->find(pclient).value();
+
 		 qDebug()<<"ServerNetworkService: A message has received"<<msg;
+
 		 if(to=="Общий чат")
 			{
 			//a broadcast message
 			 qDebug()<<"received broadcast a message";
 
 			//set general chat as a receiver
-			from=to;
+//			from=to;
 			for(auto it=socketsAndNicksOfOnlines->begin();
 					it!=socketsAndNicksOfOnlines->end();
 					++it)
 			 {
 				if(pclient != it.key()) //пропускаем, чтобы клиент не получил сообщение от самого себя
-				 sendToClient(it.key(), DATATYPE::MESSAGE, msg, &time, from);
+				 sendToClient(it.key(), DATATYPE::MESSAGE, msg, &time, from, to);
 			 }
 			}
 		 else
@@ -338,9 +344,9 @@ void ServerNetworkService::slotReadClient()
 					 toSocket=it.key();
 
 			 //get sender's nick
-			 from=socketsAndNicksOfOnlines->find(pclient).value();
+//			 from=socketsAndNicksOfOnlines->find(pclient).value();
 			 if(toSocket)
-				sendToClient(toSocket, DATATYPE::MESSAGE, msg, &time, from);
+				sendToClient(toSocket, DATATYPE::MESSAGE, msg, &time, from, to);
 			 else
 				qDebug()<<"User is not online";
 			}

@@ -201,7 +201,7 @@ void ClientService::slotReadyRead()
 		break;
 		}
 	 case DATATYPE::CONNECT:
-	 {
+		{
 		 qDebug()<<"Receiving list of clients";
 
 		 //если база сервера не совпадает с нашим,
@@ -255,12 +255,15 @@ void ClientService::slotReadyRead()
 	 {
 		 qDebug()<<"новое сообщение";
 		 QString from;
-		 in>>time>>msg>>from;
+		 QString to;
+
+		 in>>time>>msg>>from>>to;
+
 		 receivedMessage=msg;
 		 emit(newMessageForNotification("***Новое сообщение***"));
 
-		 if(from=="Общий чат")
-			emit(newMessageForDisplay(msg, time));
+		 if(to=="Общий чат")
+			emit(newMessageForDisplay(msg, time, from));
 		 else {
 			 emit newMessageToForwarding(msg, from, time);
 			}
@@ -353,8 +356,8 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 	case DATATYPE::MESSAGE:
 	 {
 	 qDebug()<<"Client send message";
-	 QString destination=firstAddition.toString();
-	 out<<msg<<destination;
+	 QString to=firstAddition.toString();
+	 out<<msg<<to;
 	 break;
 	 }
 

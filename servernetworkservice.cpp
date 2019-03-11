@@ -138,11 +138,11 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 	 {
 		qDebug()<<"ServerNetworkService: Transfer file";
 		QTime time=data.toTime();
+		QString *to = static_cast<QString *>(paddition);
 		QString filename=addition2.toString();
-//		QString *time=static_cast<QTime*>(paddition);
-		out<<time<<from<<filename;
-		break;
 
+		out<<time<<from<<filename<<*to;
+		break;
 	 }
 	default:
 	 qWarning()<<"Unknown datatype for sending to client";
@@ -309,21 +309,20 @@ void ServerNetworkService::slotReadClient()
 		}
 	 case DATATYPE::MESSAGE:
 	 {
-		 QString from;
+		 qDebug()<<"ServerNetworkService: Receiving a message"<<msg;
+
 		 QString to;
 		 in>>msg>>to;
 
+			 //get sender's nick
+		 QString from;
 		 from=socketsAndNicksOfOnlines->find(pclient).value();
-
-		 qDebug()<<"ServerNetworkService: A message has received"<<msg;
 
 		 if(to=="Общий чат")
 			{
 			//a broadcast message
 			 qDebug()<<"received broadcast a message";
 
-			//set general chat as a receiver
-//			from=to;
 			for(auto it=socketsAndNicksOfOnlines->begin();
 					it!=socketsAndNicksOfOnlines->end();
 					++it)
@@ -343,8 +342,6 @@ void ServerNetworkService::slotReadClient()
 				 if(it.value()==to)
 					 toSocket=it.key();
 
-			 //get sender's nick
-//			 from=socketsAndNicksOfOnlines->find(pclient).value();
 			 if(toSocket)
 				sendToClient(toSocket, DATATYPE::MESSAGE, msg, &time, from, to);
 			 else
@@ -354,30 +351,45 @@ void ServerNetworkService::slotReadClient()
 	 }
 	 case DATATYPE::FILE:
 		{
-		 qDebug()<<"ServerNetworkService: Receiving a file to transfer";
+		 qDebug()<<"ServerNetworkService: Receiving a file";
+
 		 QString filename;
-		 QString from;
 		 QString to;
-		 QByteArray file;
+
 		 in>>to>>filename;
-		 qDebug()<<"ServerNetworkService: The receiving of the file finished";
+
+		 //get sender's nick
+		 QString from;
+		 from=socketsAndNicksOfOnlines->find(pclient).value();
+
 		 if(to=="Общий чат")
-			{}
+			{
+			 //sending to all of online user
+
+			for(auto it=socketsAndNicksOfOnlines->begin();
+					it!=socketsAndNicksOfOnlines->end();
+					++it)
+			 {
+				if(pclient != it.key()) //проверяем, чтобы клиент не получил сообщение от самого себя
+				 sendToClient(it.key(), DATATYPE::FILE, time, &to, from, filename);
+			 }
+			}
 		 else
 			{
 			 QTcpSocket *toSocket=nullptr;
+
 			 for (auto it=socketsAndNicksOfOnlines->begin();
 						it!=socketsAndNicksOfOnlines->end() && !toSocket;
 						++it)
-				if(it.value()==to)
-				 toSocket=it.key();
+				{
+				 if(it.value()==to)
+					toSocket=it.key();
 
-			 //get sender's nick
-			 from=socketsAndNicksOfOnlines->find(pclient).value();
-			 if(toSocket)
-				sendToClient(toSocket, DATATYPE::FILE, time, nullptr, from, filename);
-			 else
-				qDebug()<<"ServerNetworkService: User is not online for transferring a file";
+				 if(toSocket)
+					sendToClient(toSocket, DATATYPE::FILE, time, &to, from, filename);
+				 else
+					qDebug()<<"ServerNetworkService: User is not online for transferring a file";
+				}
 			}
 		 break;
 		}

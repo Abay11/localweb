@@ -274,8 +274,9 @@ void ClientService::slotReadyRead()
 		 qDebug()<<"ClientService: receiving a file";
 		 QString from;
 		 QString filename;
-		 QByteArray file;
-		 in>>time>>from>>filename;
+		 QString to;
+
+		 in>>time>>from>>filename>>to;
 
 		 emit(newMessageForNotification("***Прием файла***"));
 
@@ -283,10 +284,11 @@ void ClientService::slotReadyRead()
 
 		 msg = "Прием файла " + filename;
 
-		 if(from=="Общий чат")
-			emit(newMessageForDisplay(msg, time));
+		 if(to=="Общий чат")
+			emit(newMessageForDisplay(msg, time, from));
 		 else {
 			 emit newMessageToForwarding(msg, from, time);
+
 			 qDebug()<<"from:"<<from<<"filename:"<<filename;
 			}
 		 break;

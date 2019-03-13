@@ -6,3 +6,19 @@ MY_FTP/build-MY_FTP-Desktop_Qt_5_11_1_GCC_64bit-Debug/
 *.stash
 
 build-LocalwebClient-Desktop_Qt_5_11_1_GCC_64bit-Debug_copy/
+
+start_with_copy\.sh
+
+only_start\.sh
+
+data\.bin
+
+*.user
+
+Downloads/
+
+build-LocalwebClient-Desktop_Qt_5_11_1_GCC_64bit-Debug_copy \(copy\)/
+
+copy/
+
+reset_all\.sh

@@ -117,7 +117,12 @@ void ClientWidget::slotForwardToDestination(QString msg, QString from, const QTi
  auto it=convertionWidgets->find(from);
 
  if(it==convertionWidgets->end())
+	{
 	 it=convertionWidgets->insert(from, new ConvertionWidget(from, this));
+
+	 connect(*it, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
+					 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
+	}
 
  (*it)->slotAppendMessageToDisplay(msg, time);
 }

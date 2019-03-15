@@ -195,7 +195,16 @@ void ServerNetworkService::addToOnlines(QTcpSocket *client, const QString &nick)
  socketsAndNicksOfOnlines->insert(client, nick);
 }
 
-void ServerNetworkService::notifyOthersAboutDisconnection(QString nick)
+void ServerNetworkService::notifyOthersNewConnection(const QString &nick)
+{
+ for(auto iter=socketsAndNicksOfOnlines->begin();
+		 iter!=socketsAndNicksOfOnlines->end();
+		 ++iter)
+	if(iter.value() != nick)
+	 sendToClient(iter.key(), DATATYPE::NOTIFYING, nick);
+}
+
+void ServerNetworkService::notifyOthersAboutDisconnection(const QString &nick)
 {
  for (auto i = socketsAndNicksOfOnlines->begin();
 			i!=socketsAndNicksOfOnlines->end();
@@ -304,7 +313,14 @@ void ServerNetworkService::slotReadClient()
 														name,
 														pclient);
 		 sendToClient(pclient, DATATYPE::REGISTRATION, registrationResult);
-		 qInfo()<<"Зарегистрирован новый пользователь " + nick;
+
+		 if(registrationResult)
+			{
+			 qInfo()<<"Зарегистрирован новый пользователь " + nick;
+
+			 notifyOthersNewConnection(nick);
+			}
+
 		 break;
 		}
 	 case DATATYPE::MESSAGE:
@@ -403,15 +419,7 @@ void ServerNetworkService::slotReadClient()
 		 if(!nick.isEmpty())
 			{
 			 if(iter!=clientbase->end())
-				{
-			 //		  notifying other users
-				 for(auto iter=socketsAndNicksOfOnlines->begin();
-						 iter!=socketsAndNicksOfOnlines->end();
-						 ++iter)
-					{
-					 sendToClient(iter.key(), DATATYPE::NOTIFYING, nick);
-					}
-				}
+				notifyOthersNewConnection(nick);
 
 			 addToOnlines(pclient, nick);
 			}

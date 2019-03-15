@@ -50,7 +50,8 @@ public:
 								const QString &address, const QString &nport);
  void addToModel(const QString &nick);
  void addToOnlines(QTcpSocket *client, const QString &nick);
- void notifyOthersAboutDisconnection(QString nick);
+ void notifyOthersNewConnection(const QString& nick);
+ void notifyOthersAboutDisconnection(const QString& nick);
  void removeFromOnlines(QTcpSocket *client);
  void setDataFromBaseToModel();
  CLIENTBASE *getClientBase() const;

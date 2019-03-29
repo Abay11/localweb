@@ -39,6 +39,8 @@ IOHandler::IOHandler(QObject* parent)
 void IOHandler::startRecording()
 {
  microphone->start(inputBuffer);
+
+ speakers->start(outputBuffer);
 }
 
 void IOHandler::readInput()
@@ -48,7 +50,7 @@ void IOHandler::readInput()
  emit readyToSend(data);
 }
 
-void IOHandler::readyToRead()
+void IOHandler::readyToRead(QByteArray& data)
 {
-
+ outputBuffer->write(data);
 }

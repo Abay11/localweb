@@ -35,7 +35,7 @@ private slots:
  void readInput();
 
 public slots:
- void readyToRead();
+ void readyToRead(QByteArray& data);
 };
 
 #endif // IOHANDLER_H

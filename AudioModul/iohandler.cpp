@@ -32,4 +32,23 @@ IOHandler::IOHandler(QObject* parent)
 	}
 
 	speakers = new QAudioOutput(outputFormat, this);
+
+	connect(inputBuffer, SIGNAL(readRead()), SLOT(readInput()));
+}
+
+void IOHandler::startRecording()
+{
+ microphone->start(inputBuffer);
+}
+
+void IOHandler::readInput()
+{
+ QByteArray data = inputBuffer->readAll();
+
+ emit readyToSend(data);
+}
+
+void IOHandler::readyToRead()
+{
+
 }

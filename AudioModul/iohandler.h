@@ -24,8 +24,15 @@ class IOHandler : public QObject
 public:
  IOHandler(QObject* parent = nullptr);
 
+ void startRecording();
+
+ void stopRecording();
+
 signals:
- void readyToSend();
+ void readyToSend(QByteArray& data);
+
+private slots:
+ void readInput();
 
 public slots:
  void readyToRead();

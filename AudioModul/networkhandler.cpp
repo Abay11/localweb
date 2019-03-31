@@ -5,26 +5,39 @@ NetworkHandler::NetworkHandler(const QString& host, quint16 port)
  ,host(host)
  ,port(port)
 {
- connect(socket, SIGNAL(slotReadyRead()), SLOT(slotReadyRead()));
+ connect(socket, SIGNAL(readyRead()), SLOT(slotReadyRead()));
 }
 
 void NetworkHandler::startListen()
 {
  socket->bind(QHostAddress::Any, port);
+
+ if(!socket->open(QIODevice::ReadWrite))
+	qDebug() << "SOCKET IS NOT OPEN";
 }
 
-void NetworkHandler::slotWriteData(QByteArray &data)
+void NetworkHandler::stopListen()
 {
- QByteArray compressed = qCompress(data);
+ socket->close();
+}
 
- socket->writeDatagram(compressed, host, port);
+void NetworkHandler::slotWriteData(QByteArray data)
+{
+ qDebug() << "Socket: Data to write with size:" << data.size();
+// QByteArray compressed = qCompress(data);
+
+// socket->writeDatagram(compressed, host, port);
+ socket->writeDatagram(data, host, port);
 }
 
 void NetworkHandler::slotReadyRead()
 {
+
  QByteArray incomeData = socket->readAll();
 
- auto decompressed = qUncompress(incomeData);
+ qDebug() << "Socket: Data to read with size:" << incomeData.size();
 
- emit readyRead(decompressed);
+// auto decompressed = qUncompress(incomeData);
+
+ emit readyRead(incomeData);
 }

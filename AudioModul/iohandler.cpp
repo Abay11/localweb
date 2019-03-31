@@ -33,24 +33,49 @@ IOHandler::IOHandler(QObject* parent)
 
 	speakers = new QAudioOutput(outputFormat, this);
 
-	connect(inputBuffer, SIGNAL(readRead()), SLOT(readInput()));
+	inputBuffer = new QBuffer;
+	connect(inputBuffer, SIGNAL(readyRead()), SLOT(readInput()));
+
+	outputBuffer = new QBuffer;
 }
 
-void IOHandler::startRecording()
+void IOHandler::startRecording(int type)
 {
+ qInfo() << "Start recording...";
+
+ if(type == 1)
+	{
+ inputBuffer->open(QIODevice::ReadWrite);
+
  microphone->start(inputBuffer);
+	}
+
+ outputBuffer->open(QIODevice::ReadWrite);
 
  speakers->start(outputBuffer);
 }
 
-void IOHandler::readInput()
+void IOHandler::stopRecording()
 {
- QByteArray data = inputBuffer->readAll();
+ qInfo() << "Stop recording";
 
- emit readyToSend(data);
+ microphone->stop();
+
+ speakers->stop();
 }
 
-void IOHandler::readyToRead(QByteArray& data)
+void IOHandler::readInput()
+{
+ qApp->processEvents();
+
+ QByteArray data = inputBuffer->readAll();
+
+ qDebug() << "IOHandler: Input buffer size:" << data.size();
+
+ emit readySend(data);
+}
+
+void IOHandler::slotReadyRead(QByteArray data)
 {
  outputBuffer->write(data);
 }

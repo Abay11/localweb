@@ -18,11 +18,13 @@ public:
 
  void startListen();
 
+ void stopListen();
+
 signals:
- void readyRead(QByteArray& data);
+ void readyRead(QByteArray data);
 
 public slots:
- void slotWriteData(QByteArray& data);
+ void slotWriteData(QByteArray data);
 
  void slotReadyRead();
 };

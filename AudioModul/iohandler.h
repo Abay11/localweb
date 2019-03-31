@@ -4,6 +4,7 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QBuffer>
+#include <QCoreApplication>
 
 #include <QDebug>
 
@@ -24,18 +25,18 @@ class IOHandler : public QObject
 public:
  IOHandler(QObject* parent = nullptr);
 
- void startRecording();
+ void startRecording(int type);
 
  void stopRecording();
 
 signals:
- void readyToSend(QByteArray& data);
+ void readySend(QByteArray data);
 
 private slots:
  void readInput();
 
 public slots:
- void readyToRead(QByteArray& data);
+ void slotReadyRead(QByteArray data);
 };
 
 #endif // IOHANDLER_H

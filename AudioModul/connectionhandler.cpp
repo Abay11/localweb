@@ -16,7 +16,11 @@ void ConnectionHandler::startListen()
 
 void ConnectionHandler::slotReadDataFrom()
 {
+ auto compressed = socket->readAll();
 
+ auto data = qUncompress(compressed);
+
+ emit dataArrived(data);
 }
 
 void ConnectionHandler::slotWriteDataTo(QByteArray& data)

@@ -38,7 +38,7 @@ void IOHandler::slotReadAudioInput()
 {
  QByteArray data = inputDev->readAll();
 
- auto compressed = qCompress(data);
+ emit readData(data);
 
- qDebug() << "Read inputDev(compressed):" << compressed.size();
+ qDebug() << "Read inputDev:" << data.size();
 }

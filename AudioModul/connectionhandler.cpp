@@ -23,5 +23,7 @@ void ConnectionHandler::slotWriteDataTo(QByteArray& data)
 {
  auto compressed = qCompress(data);
 
- qDebug() << "Connection handler: Received data to write(compressed size:" <<compressed.size();
+ qint64 wrote_bytes = socket->writeDatagram(compressed, host, port);
+
+ qDebug() << "Connection handler: Received data to write(compressed size:" <<compressed.size() << "wrote: " << wrote_bytes;
 }

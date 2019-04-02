@@ -18,6 +18,8 @@ private:
 public:
  IOHandler();
 
+ void startRecording();
+
 signals:
 
  public slots:

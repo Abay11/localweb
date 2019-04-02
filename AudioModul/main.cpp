@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
  QCoreApplication a(argc, argv);
 
  IOHandler handler;
+ handler.startRecording();
 
 	qDebug() << "MAIN FINISHED";
 

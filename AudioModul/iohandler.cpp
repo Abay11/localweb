@@ -9,7 +9,7 @@ IOHandler::IOHandler()
  format.setChannelCount(1);
  format.setCodec("audio/pcm");
  format.setByteOrder(QAudioFormat::LittleEndian);
- format.setSampleType(QAudioFormat::SignedInt);
+ format.setSampleType(QAudioFormat::UnSignedInt);
 
  QAudioDeviceInfo inputInfo = QAudioDeviceInfo::defaultInputDevice();
  if (!inputInfo.isFormatSupported(format))
@@ -23,18 +23,22 @@ IOHandler::IOHandler()
  buffer = new QBuffer(this);
  buffer->open(QIODevice::ReadWrite);
 
- connect(buffer, SIGNAL(readyRead()), SLOT(slotReadAudioInput()));
- audioInput->start(buffer);
+}
 
-// inputDev->open(QIODevice::ReadWrite);
-
+void IOHandler::startRecording()
+{
  qDebug() << "Start recording...";
 
+ inputDev = audioInput->start();
+
+ connect(inputDev, SIGNAL(readyRead()), SLOT(slotReadAudioInput()));
 }
 
 void IOHandler::slotReadAudioInput()
 {
  QByteArray data = inputDev->readAll();
 
- qDebug() << "Read inputDev:" << data.size();
+ auto compressed = qCompress(data);
+
+ qDebug() << "Read inputDev(compressed):" << compressed.size();
 }

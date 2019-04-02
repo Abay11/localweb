@@ -14,6 +14,8 @@ private:
 
  QIODevice* inputDev;
 
+ QIODevice* outputDev;
+
  QBuffer* buffer;
 public:
  IOHandler();
@@ -23,8 +25,11 @@ public:
 signals:
  void readData(QByteArray&);
 
- public slots:
+ private slots:
  void slotReadAudioInput();
+
+ public slots:
+ void slotWriteAudioOutput(QByteArray& data);
 };
 
 #endif // IOHANDLER_H

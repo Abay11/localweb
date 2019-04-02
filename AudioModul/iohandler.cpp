@@ -42,3 +42,9 @@ void IOHandler::slotReadAudioInput()
 
  qDebug() << "Read inputDev:" << data.size();
 }
+
+void IOHandler::slotWriteAudioOutput(QByteArray &data)
+{
+ qDebug() << "Size of writing data to output:" << data.size();
+ outputDev->write(data);
+}

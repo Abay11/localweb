@@ -21,6 +21,7 @@ public:
  void startRecording();
 
 signals:
+ void readData(QByteArray&);
 
  public slots:
  void slotReadAudioInput();

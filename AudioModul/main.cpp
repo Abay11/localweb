@@ -14,7 +14,11 @@ int main(int argc, char *argv[])
 
  ConnectionHandler connectionHandler(5000);
 
+ //writing voice
  QObject::connect(&voiceIO, SIGNAL(readData(QByteArray&)), &connectionHandler, SLOT(slotWriteDataTo(QByteArray&)));
+
+ //receiving voice
+ QObject::connect(&connectionHandler, SIGNAL(dataArrived(QByteArray&)), &connectionHandler, SLOT(slotWriteDataTo(QByteArray&)));
 
  voiceIO.startRecording();
 

@@ -2,6 +2,7 @@
 #define IOHANDLER_H
 
 #include <QAudioInput>
+#include <QAudioOutput>
 #include <QDebug>
 #include <QBuffer>
 
@@ -12,11 +13,14 @@ class IOHandler : public QObject
 private:
  QAudioInput* audioInput;
 
+ QAudioOutput* audioOutput;
+
  QIODevice* inputDev;
 
  QIODevice* outputDev;
 
  QBuffer* buffer;
+
 public:
  IOHandler();
 

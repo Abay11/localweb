@@ -12,17 +12,23 @@ IOHandler::IOHandler()
  format.setSampleType(QAudioFormat::UnSignedInt);
 
  QAudioDeviceInfo inputInfo = QAudioDeviceInfo::defaultInputDevice();
- if (!inputInfo.isFormatSupported(format))
+ QAudioFormat inputFormat = format;
+ if (!inputInfo.isFormatSupported(inputFormat))
  {
-		 qWarning() << "Default format not supported, trying to use the nearest.";
-		 format = inputInfo.nearestFormat(format);
+		 qWarning() << "Default input format not supported, trying to use the nearest.";
+
+		 inputFormat = inputInfo.nearestFormat(inputFormat);
  }
 
- audioInput = new QAudioInput(format, this);
+ audioInput = new QAudioInput(inputFormat, this);
 
- buffer = new QBuffer(this);
- buffer->open(QIODevice::ReadWrite);
+ QAudioDeviceInfo outputInfo = QAudioDeviceInfo::defaultOutputDevice();
+ if (!outputInfo.isFormatSupported(format))
+ {
+		 qWarning() << "ERROR: Default output format not supported!";
+ }
 
+ audioOutput = new QAudioOutput(format, this);
 }
 
 void IOHandler::startRecording()
@@ -32,6 +38,8 @@ void IOHandler::startRecording()
  inputDev = audioInput->start();
 
  connect(inputDev, SIGNAL(readyRead()), SLOT(slotReadAudioInput()));
+
+ outputDev = audioOutput->start();
 }
 
 void IOHandler::slotReadAudioInput()

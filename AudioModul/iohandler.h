@@ -2,41 +2,26 @@
 #define IOHANDLER_H
 
 #include <QAudioInput>
-#include <QAudioOutput>
-#include <QBuffer>
-#include <QCoreApplication>
-
 #include <QDebug>
+#include <QBuffer>
 
 class IOHandler : public QObject
 {
  Q_OBJECT
 
- QAudioInput* microphone;
+private:
+ QAudioInput* audioInput;
 
- QAudioOutput* speakers;
+ QIODevice* inputDev;
 
- QAudioFormat* format;
-
- QBuffer* inputBuffer;
-
- QBuffer* outputBuffer;
-
+ QBuffer* buffer;
 public:
- IOHandler(QObject* parent = nullptr);
-
- void startRecording(int type);
-
- void stopRecording();
+ IOHandler();
 
 signals:
- void readySend(QByteArray data);
 
-private slots:
- void readInput();
-
-public slots:
- void slotReadyRead(QByteArray data);
+ public slots:
+ void slotReadAudioInput();
 };
 
 #endif // IOHANDLER_H

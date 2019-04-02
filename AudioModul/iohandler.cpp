@@ -1,81 +1,40 @@
 #include "iohandler.h"
 
-IOHandler::IOHandler(QObject* parent)
- :QObject (parent)
+
+IOHandler::IOHandler()
 {
- QAudioFormat defaultFormat;
-	// Set up the format, eg.
-	defaultFormat.setSampleRate(8000);
-	defaultFormat.setChannelCount(1);
-	defaultFormat.setSampleSize(8);
-	defaultFormat.setCodec("audio/pcm");
-	defaultFormat.setByteOrder(QAudioFormat::LittleEndian);
-	defaultFormat.setSampleType(QAudioFormat::UnSignedInt);
+ QAudioFormat format;
+ format.setSampleRate(8000); // 22050
+ format.setSampleSize(8);    // 16
+ format.setChannelCount(1);
+ format.setCodec("audio/pcm");
+ format.setByteOrder(QAudioFormat::LittleEndian);
+ format.setSampleType(QAudioFormat::SignedInt);
 
-	QAudioDeviceInfo inputInfo(QAudioDeviceInfo::defaultOutputDevice());
+ QAudioDeviceInfo inputInfo = QAudioDeviceInfo::defaultInputDevice();
+ if (!inputInfo.isFormatSupported(format))
+ {
+		 qWarning() << "Default format not supported, trying to use the nearest.";
+		 format = inputInfo.nearestFormat(format);
+ }
 
-	QAudioFormat inputFormat = defaultFormat;
+ audioInput = new QAudioInput(format, this);
 
-	if (!inputInfo.isFormatSupported(inputFormat)) {
-			qWarning() << "Default format not supported, trying to use the nearest.";
+ buffer = new QBuffer(this);
+ buffer->open(QIODevice::ReadWrite);
 
-			inputFormat = inputInfo.nearestFormat(inputFormat);
-	}
+ connect(buffer, SIGNAL(readyRead()), SLOT(slotReadAudioInput()));
+ audioInput->start(buffer);
 
-	microphone = new QAudioInput(inputFormat, this);
+// inputDev->open(QIODevice::ReadWrite);
 
-	QAudioFormat outputFormat = defaultFormat;
+ qDebug() << "Start recording...";
 
-	QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
-	if (!info.isFormatSupported(outputFormat)) {
-			qWarning() << "Raw audio format not supported by backend, cannot play audio.";
-	}
-
-	speakers = new QAudioOutput(outputFormat, this);
-
-	inputBuffer = new QBuffer;
-	connect(inputBuffer, SIGNAL(readyRead()), SLOT(readInput()));
-
-	outputBuffer = new QBuffer;
 }
 
-void IOHandler::startRecording(int type)
+void IOHandler::slotReadAudioInput()
 {
- qInfo() << "Start recording...";
+ QByteArray data = inputDev->readAll();
 
- if(type == 1)
-	{
- inputBuffer->open(QIODevice::ReadWrite);
-
- microphone->start(inputBuffer);
-	}
-
- outputBuffer->open(QIODevice::ReadWrite);
-
- speakers->start(outputBuffer);
-}
-
-void IOHandler::stopRecording()
-{
- qInfo() << "Stop recording";
-
- microphone->stop();
-
- speakers->stop();
-}
-
-void IOHandler::readInput()
-{
- qApp->processEvents();
-
- QByteArray data = inputBuffer->readAll();
-
- qDebug() << "IOHandler: Input buffer size:" << data.size();
-
- emit readySend(data);
-}
-
-void IOHandler::slotReadyRead(QByteArray data)
-{
- outputBuffer->write(data);
+ qDebug() << "Read inputDev:" << data.size();
 }

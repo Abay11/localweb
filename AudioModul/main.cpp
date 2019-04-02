@@ -12,13 +12,20 @@ int main(int argc, char *argv[])
 
  IOHandler voiceIO;
 
- ConnectionHandler connectionHandler(5000);
+ QString port_str("15999");
+
+ if(argc > 1)
+	QString port_str = argv[1];
+
+ ConnectionHandler connectionHandler(static_cast<quint16>(port_str.toInt()));
 
  //writing voice
  QObject::connect(&voiceIO, SIGNAL(readData(QByteArray&)), &connectionHandler, SLOT(slotWriteDataTo(QByteArray&)));
 
  //receiving voice
- QObject::connect(&connectionHandler, SIGNAL(dataArrived(QByteArray&)), &connectionHandler, SLOT(slotWriteDataTo(QByteArray&)));
+ QObject::connect(&connectionHandler, SIGNAL(dataArrived(QByteArray&)), &voiceIO, SLOT(slotWriteAudioOutput(QByteArray&)));
+
+ connectionHandler.startListen();
 
  voiceIO.startRecording();
 

@@ -4,13 +4,19 @@
 #include <iostream>
 
 #include "iohandler.h"
+#include "connectionhandler.h"
 
 int main(int argc, char *argv[])
 {
  QCoreApplication a(argc, argv);
 
- IOHandler handler;
- handler.startRecording();
+ IOHandler voiceIO;
+
+ ConnectionHandler connectionHandler(5000);
+
+ QObject::connect(&voiceIO, SIGNAL(readData(QByteArray&)), &connectionHandler, SLOT(slotWriteDataTo(QByteArray&)));
+
+ voiceIO.startRecording();
 
 	qDebug() << "MAIN FINISHED";
 

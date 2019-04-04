@@ -20,6 +20,8 @@ public:
 
  void startListen();
 
+ void stopListen();
+
 signals:
  void dataArrived(QByteArray&);
 

@@ -18,8 +18,15 @@ void ConnectionHandler::startListen()
 	qWarning() << "Couldn't open a port to read and write";
 }
 
+void ConnectionHandler::stopListen()
+{
+ socket->close();
+}
+
 void ConnectionHandler::slotReadDataFrom()
 {
+ qDebug() << "ConnectionHandler: Received data to read";
+
  auto datagramSize = socket->pendingDatagramSize();
 
  QByteArray compressed;

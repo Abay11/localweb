@@ -3,8 +3,7 @@
 #include <QDebug>
 #include <iostream>
 
-#include "iohandler.h"
-#include "connectionhandler.h"
+#include "clientside.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,17 +16,9 @@ int main(int argc, char *argv[])
  if(argc > 1)
 	QString port_str = argv[1];
 
- ConnectionHandler connectionHandler(static_cast<quint16>(port_str.toInt()));
+ ClientSide client(port_str.toInt());
 
- //writing voice
- QObject::connect(&voiceIO, SIGNAL(readData(QByteArray&)), &connectionHandler, SLOT(slotWriteDataTo(QByteArray&)));
-
- //receiving voice
- QObject::connect(&connectionHandler, SIGNAL(dataArrived(QByteArray&)), &voiceIO, SLOT(slotWriteAudioOutput(QByteArray&)));
-
- connectionHandler.startListen();
-
- voiceIO.startRecording();
+ client.start();
 
 	qDebug() << "MAIN FINISHED";
 

@@ -42,6 +42,13 @@ void IOHandler::startRecording()
  outputDev = audioOutput->start();
 }
 
+void IOHandler::stopRecording()
+{
+ audioInput->stop();
+
+ audioOutput->stop();
+}
+
 void IOHandler::slotReadAudioInput()
 {
  QByteArray data = inputDev->readAll();

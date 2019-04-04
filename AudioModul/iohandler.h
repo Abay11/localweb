@@ -26,6 +26,8 @@ public:
 
  void startRecording();
 
+ void stopRecording();
+
 signals:
  void readData(QByteArray&);
 

@@ -19,7 +19,8 @@ SOURCES += \
         main.cpp \
     iohandler.cpp \
     connectionhandler.cpp \
-    clientside.cpp
+    clientside.cpp \
+    serverside.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -29,4 +30,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     iohandler.h \
     connectionhandler.h \
-    clientside.h
+    clientside.h \
+    serverside.h

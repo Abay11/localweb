@@ -3,16 +3,30 @@
 ConnectionHandler::ConnectionHandler(quint16 port, const QHostAddress& host, QObject *parent)
  :QObject (parent)
  ,socket(new QUdpSocket)
- ,host(host)
- ,port(port)
+ ,serverhost(host)
+ ,server_port(port)
 {
  connect(socket, SIGNAL(readyRead()), SLOT(slotReadDataFrom()));
 }
 
 void ConnectionHandler::startListen()
 {
- if(!socket->bind(QHostAddress::Any, port))
+ QTimer timeout;
+ timeout.start(3000);
+
+ bool isBound = false;
+ while(!(isBound = socket->bind(QHostAddress::Any, binding_port))
+			 && timeout.remainingTime() > 0)
+	{
+	 ++binding_port;
+	}
+
+ if(!isBound)
 	qWarning() << "Couldn't bind a port";
+ else
+	qDebug() << "binding port" << binding_port;
+
+ socket->state();
 
  if(!socket->open(QAbstractSocket::ReadWrite))
 	qWarning() << "Couldn't open a port to read and write";
@@ -43,7 +57,7 @@ void ConnectionHandler::slotWriteDataTo(QByteArray& data)
 {
  auto compressed = qCompress(data, 5);
 
- qint64 wrote_bytes = socket->writeDatagram(compressed, host, port);
+ qint64 wrote_bytes = socket->writeDatagram(compressed, serverhost, server_port);
 
  qDebug() << "Connection handler: Received data to write(compressed size:" <<compressed.size() << "wrote: " << wrote_bytes;
 }

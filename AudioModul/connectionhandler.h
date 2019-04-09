@@ -2,7 +2,7 @@
 #define CONNECTIONHANDLER_H
 
 #include <QUdpSocket>
-//#include <
+#include <QTimer>
 
 class ConnectionHandler : public QObject
 {
@@ -11,12 +11,14 @@ class ConnectionHandler : public QObject
  private:
  QUdpSocket* socket;
 
- QHostAddress host;
+ QHostAddress serverhost;
 
- quint16 port;
+ quint16 server_port;
+
+ quint16 binding_port = 5000;
 
 public:
- explicit ConnectionHandler(quint16 port, const QHostAddress& host = QHostAddress("localhost"), QObject* parent=nullptr);
+ explicit ConnectionHandler(quint16 server_port, const QHostAddress& serverhost = QHostAddress("localhost"), QObject* parent=nullptr);
 
  void startListen();
 

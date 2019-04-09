@@ -20,16 +20,18 @@ private:
 
  QVector<QPair<QHostAddress, quint16>> connectedClients;
 
- void startListening();
-
- void insertClient(const QHostAddress& host, quint16 port);
-
  void sendIndividual(QByteArray& data, QHostAddress&, quint16);
 
  void sendBroadcast(QByteArray& data);
 
 public:
  explicit ServerSide(quint16 listeningPort, QObject *parent = nullptr);
+
+ void startListening();
+
+ void stopListening();
+
+ void setClients(QVector<QPair<QHostAddress, quint16>>& clients);
 
 signals:
 

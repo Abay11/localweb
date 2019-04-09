@@ -4,11 +4,20 @@ void ServerSide::startListening()
 {
  if(!socket->bind(listeningPort))
 	qWarning() << DTAG + "Couldn't bind to a port!";
+	else
+	qDebug() << DTAG + "Server start listening!";
 }
 
-void ServerSide::insertClient(const QHostAddress& address,  quint16 port)
+void ServerSide::stopListening()
 {
- connectedClients.push_back(qMakePair(address, port));
+ socket->close();
+
+ qDebug() << DTAG + "Server stopped!";
+}
+
+void ServerSide::setClients(QVector<QPair<QHostAddress, quint16> > &clients)
+{
+ connectedClients = clients;
 }
 
 void ServerSide::sendIndividual(QByteArray &data, QHostAddress& address, quint16 port)
@@ -39,4 +48,6 @@ void ServerSide::slotReadyRead()
  QHostAddress from_address;
  quint16 from_port;
  socket->readDatagram(receivedData.data(), dataSize, &from_address, &from_port);
+
+ qDebug() << "Receive a datagram from:" << from_address << from_port;
 }

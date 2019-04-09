@@ -2,23 +2,48 @@
 
 #include <QDebug>
 #include <iostream>
+#include <string.h>
 
 #include "clientside.h"
+#include "serverside.h"
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) /*expected parameters: program port mode*/
 {
  QCoreApplication a(argc, argv);
 
  IOHandler voiceIO;
 
- QString port_str("15999");
+ qDebug() << "args: " << argv[1] << argv[2];
 
  if(argc > 1)
-	QString port_str = argv[1];
+	{
+	 if(argv[1] == QString("server"))
+		{
+		 QString listening_port("15999");
 
- ClientSide client(port_str.toInt());
+		 if(argc > 2)
+			listening_port = argv[2];
 
- client.start();
+		 ServerSide server(static_cast<quint16>(listening_port.toInt()));
+
+		 server.startListening();
+		}
+	 else
+		{
+		 QString server_port("15999");
+
+		 if(argc > 2)
+			{
+			server_port = argv[2];
+			}
+
+		 ClientSide client(static_cast<quint16>(server_port.toInt()));
+
+		 client.start();
+		}
+	}
+
+
 
 	qDebug() << "MAIN FINISHED";
 

@@ -17,16 +17,16 @@ int main(int argc, char *argv[]) /*expected parameters: program port mode*/
 
  if(argc > 1)
 	{
-	 if(argv[1] == QString("server"))
+	 if(argv[1] == QString("s"))
 		{
-		 QString listening_port("15999");
+		 QString listening_port("16000");
 
 		 if(argc > 2)
 			listening_port = argv[2];
 
-		 ServerSide server(static_cast<quint16>(listening_port.toInt()));
+		 ServerSide* server = new ServerSide(static_cast<quint16>(listening_port.toInt()));
 
-		 server.startListening();
+		 server->startListening();
 		}
 	 else
 		{
@@ -37,9 +37,9 @@ int main(int argc, char *argv[]) /*expected parameters: program port mode*/
 			server_port = argv[2];
 			}
 
-		 ClientSide client(static_cast<quint16>(server_port.toInt()));
+		 ClientSide* client = new ClientSide(static_cast<quint16>(server_port.toInt()));
 
-		 client.start();
+		 client->start();
 		}
 	}
 

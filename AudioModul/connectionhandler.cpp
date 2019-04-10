@@ -26,8 +26,6 @@ void ConnectionHandler::startListen()
  else
 	qDebug() << "binding port" << binding_port;
 
- socket->state();
-
  if(!socket->open(QAbstractSocket::ReadWrite))
 	qWarning() << "Couldn't open a port to read and write";
 }

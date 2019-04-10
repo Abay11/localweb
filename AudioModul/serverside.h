@@ -13,6 +13,15 @@ static QString DTAG("AudioModule::ServerSide:");
 class ServerSide : public QObject
 {
  Q_OBJECT
+public:
+ explicit ServerSide(quint16 listeningPort, QObject *parent = nullptr);
+
+ void startListening();
+
+ void stopListening();
+
+ void setClients(QVector<QPair<QHostAddress, quint16>>& clients);
+
 private:
  quint16 listeningPort;
 
@@ -24,14 +33,6 @@ private:
 
  void sendBroadcast(QByteArray& data);
 
-public:
- explicit ServerSide(quint16 listeningPort, QObject *parent = nullptr);
-
- void startListening();
-
- void stopListening();
-
- void setClients(QVector<QPair<QHostAddress, quint16>>& clients);
 
 signals:
 

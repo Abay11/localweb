@@ -18,7 +18,7 @@ class ConnectionHandler : public QObject
  quint16 binding_port = 5000;
 
 public:
- explicit ConnectionHandler(quint16 server_port, const QHostAddress& serverhost = QHostAddress("localhost"), QObject* parent=nullptr);
+ explicit ConnectionHandler(quint16 server_port, const QHostAddress& serverhost = QHostAddress("127.0.0.1"), QObject* parent=nullptr);
 
  void startListen();
 

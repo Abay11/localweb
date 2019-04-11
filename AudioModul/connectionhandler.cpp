@@ -53,6 +53,19 @@ void ConnectionHandler::slotReadDataFrom()
 
 void ConnectionHandler::slotWriteDataTo(QByteArray& data)
 {
+ QString address = serverhost.toString();
+
+ QString preheader;
+ preheader += static_cast<char>(address.length());
+ preheader += address;
+
+ QString port = QString::number(server_port);
+ char port_length = static_cast<char>(port.length());
+ preheader += port_length;
+ preheader += port;
+
+ data.insert(0, preheader);
+
  auto compressed = qCompress(data, 5);
 
  qint64 wrote_bytes = socket->writeDatagram(compressed, serverhost, server_port);

@@ -50,25 +50,21 @@ void ServerSide::slotReadyRead()
  quint16 from_port;
  socket->readDatagram(receivedData.data(), dataSize, &from_address, &from_port);
 
- QByteArray decompressed = qUncompress(receivedData);
-// QByteArray decompressed = (receivedData);
-
- //extract destination header
- uint address_size = static_cast<uint>(decompressed.at(0) + 1);
- decompressed.remove(0, 1);
+ //extract destination info
+ uint address_size = static_cast<uint>(receivedData.at(0) + 1);
+ receivedData.remove(0, 1);
 
  char dest_address[address_size];
- qstrncpy(dest_address, decompressed.data(), address_size);
- decompressed.remove(0, (address_size-1));
+ qstrncpy(dest_address, receivedData.data(), address_size);
+ receivedData.remove(0, (address_size-1));
 
- uint port_size = static_cast<uint>(decompressed.at(0) + 1);
- decompressed.remove(0, 1);
+ uint port_size = static_cast<uint>(receivedData.at(0) + 1);
+ receivedData.remove(0, 1);
 
  char dest_port[port_size];
- qstrncpy(dest_port, decompressed.data(), port_size);
- decompressed.remove(0, port_size-1);
- ////////////////////////////
+ qstrncpy(dest_port, receivedData.data(), port_size);
+ receivedData.remove(0, port_size-1);
 
-// qDebug() << DTAG << "Receiving a datagram from:" << from_address << from_port;
- qDebug() << DTAG << "Dest addr: " << dest_address << "dest: port" << dest_port;
+ qDebug() << DTAG << "Receiving a datagram from:" << from_address << from_port;
+ qDebug() << DTAG << "Dest addr: " << dest_address << "dest port:" << dest_port;
 }

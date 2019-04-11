@@ -29,3 +29,13 @@ void ClientSide::stop()
 
  voiceIO->stopRecording();
 }
+
+void ClientSide::setDestination(const QHostAddress &addr, quint16 port)
+{
+ connectionHandler->setDestination(addr, port);
+}
+
+void ClientSide::setBroadcast()
+{
+ connectionHandler->setDestination(QHostAddress("255.255.255.255"), 0);
+}

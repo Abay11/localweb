@@ -17,6 +17,9 @@ public:
 
  void stop();
 
+ void setDestination(const QHostAddress& addr, quint16 port);
+ void setBroadcast();
+
 signals:
 
 public slots:

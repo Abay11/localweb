@@ -35,6 +35,12 @@ void ConnectionHandler::stopListen()
  socket->close();
 }
 
+void ConnectionHandler::setDestination(const QHostAddress &host, quint16 port)
+{
+ dest_host=host;
+ dest_port=port;
+}
+
 void ConnectionHandler::slotReadDataFrom()
 {
  qDebug() << "ConnectionHandler: Received data to read";
@@ -55,19 +61,21 @@ void ConnectionHandler::slotWriteDataTo(QByteArray& data)
 {
  auto compressed = qCompress(data, 5);
 
- QString address = serverhost.toString();
+ QString address = dest_host.toString();
 
  QString preheader;
  preheader += static_cast<char>(address.length());
  preheader += address;
 
- QString port = QString::number(server_port);
- char port_length = static_cast<char>(port.length());
- preheader += port_length;
- preheader += port;
+ if(address != "BROADCAST")
+	{
+	 QString port = QString::number(dest_port);
+	 char port_length = static_cast<char>(port.length());
+	 preheader += port_length;
+	 preheader += port;
+	}
 
  compressed.insert(0, preheader);
-
 
  qint64 wrote_bytes = socket->writeDatagram(compressed, serverhost, server_port);
 

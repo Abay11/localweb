@@ -13,7 +13,11 @@ class ConnectionHandler : public QObject
 
  QHostAddress serverhost;
 
+ QHostAddress dest_host;
+
  quint16 server_port;
+
+ quint16 dest_port;
 
  quint16 binding_port = 5000;
 
@@ -24,6 +28,8 @@ public:
 
  void stopListen();
 
+ void setDestination(const QHostAddress& host, quint16 port);
+
 signals:
  void dataArrived(QByteArray&);
 
@@ -32,9 +38,6 @@ private slots:
 
 public slots:
  void slotWriteDataTo(QByteArray&);
-
-
-
 };
 
 #endif // CONNECTIONHANDLER_H

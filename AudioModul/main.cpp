@@ -38,6 +38,8 @@ int main(int argc, char *argv[]) /*expected parameters: program port mode*/
 			}
 
 		 ClientSide* client = new ClientSide(static_cast<quint16>(server_port.toInt()));
+//		 client->setBroadcast();
+		 client->setDestination(QHostAddress("195.195.195.195"), 55555);
 
 		 client->start();
 		}

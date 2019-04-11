@@ -56,15 +56,25 @@ void ServerSide::slotReadyRead()
 
  char dest_address[address_size];
  qstrncpy(dest_address, receivedData.data(), address_size);
- receivedData.remove(0, (address_size-1));
+ receivedData.remove(0, static_cast<int>(address_size-uint(1)));
 
  uint port_size = static_cast<uint>(receivedData.at(0) + 1);
  receivedData.remove(0, 1);
 
  char dest_port[port_size];
  qstrncpy(dest_port, receivedData.data(), port_size);
- receivedData.remove(0, port_size-1);
+ receivedData.remove(0, static_cast<int>(port_size-uint(1)));
+
+ if(qstrcmp(dest_address, "255.255.255.255") == 0)
+	{
+	 //do broadcast
+	 qDebug() << DTAG << "DO BROADCAST";
+	}
+ else
+	{
+	 //send to receiver
+	 qDebug() << DTAG << "SEND TO RECEIVER. ADDR & PORT:" << dest_address << dest_port;
+	}
 
  qDebug() << DTAG << "Receiving a datagram from:" << from_address << from_port;
- qDebug() << DTAG << "Dest addr: " << dest_address << "dest port:" << dest_port;
 }

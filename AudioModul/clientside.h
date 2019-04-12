@@ -18,7 +18,12 @@ public:
  void stop();
 
  void setDestination(const QHostAddress& addr, quint16 port);
+
  void setBroadcast();
+
+ void turnOffMicrophone();
+
+ void turnOnMicrophone();
 
 signals:
 
@@ -26,6 +31,7 @@ public slots:
 
 private:
  quint16 serverPort;
+
  QHostAddress serverAddress;
 
  IOHandler* voiceIO;

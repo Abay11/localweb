@@ -39,3 +39,13 @@ void ClientSide::setBroadcast()
 {
  connectionHandler->setDestination(QHostAddress("255.255.255.255"), 0);
 }
+
+void ClientSide::turnOffMicrophone()
+{
+
+}
+
+void ClientSide::turnOnMicrophone()
+{
+
+}

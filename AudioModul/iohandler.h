@@ -28,6 +28,10 @@ public:
 
  void stopRecording();
 
+ void turnOnInput();
+
+ void turnOffInput();
+
 signals:
  void readData(QByteArray&);
 

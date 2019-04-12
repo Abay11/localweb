@@ -29,7 +29,7 @@ private:
 
  QVector<QPair<QHostAddress, quint16>> connectedClients;
 
- void sendIndividual(QByteArray& data, QHostAddress&, quint16);
+ void sendIndividual(QByteArray& data, const QHostAddress&, quint16);
 
  void sendBroadcast(QByteArray& data);
 

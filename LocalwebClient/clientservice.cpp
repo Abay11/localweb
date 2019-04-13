@@ -416,6 +416,11 @@ void ClientService::slotSetAddress(QString addr, QString port)
  *pserverPort=port;
 }
 
+void ClientService::slotMakeCall(QString nick)
+{
+ qDebug() << "Make call to" << nick;
+}
+
 void ClientService::removeOnlinesFromOfflines(QStringList onlines)
 {
  QStringList offlines=pofflineModel->stringList();

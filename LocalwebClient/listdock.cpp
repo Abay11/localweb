@@ -44,9 +44,12 @@ void ListDock::setOfflineModel(QStringListModel *pmodel)
 void ListDock::setupListviewContextMenu()
 {
  ponline->setContextMenuPolicy(Qt::CustomContextMenu);
+
  poffline->setContextMenuPolicy(Qt::CustomContextMenu);
+
  connect(ponline, SIGNAL(customContextMenuRequested(const QPoint &)),
 				 SLOT(slotShowContextMenu(const QPoint &)));
+
  connect(poffline, SIGNAL(customContextMenuRequested(const QPoint &)),
 				 SLOT(slotShowContextMenu(const QPoint &)));
 }
@@ -54,22 +57,30 @@ void ListDock::setupListviewContextMenu()
 void ListDock::slotShowContextMenu(const QPoint &pos)
 {
  qDebug()<<"context menu requested";
+
  bool isOfflineView = sender()==poffline;
+
  static QMenu *menu=nullptr;
+
  if(menu==nullptr)
 	{
 	 menu=new QMenu(this);
 	 menu->addAction("Открыть беседу", this, SLOT(slotOpenConvertion()));
-	 menu->addAction("Аудиозвонок");
+	 menu->addAction("Аудиозвонок", this, SLOT(slotMakeCall()));
 	 menu->addAction("Видеозвонок");
 	 menu->addAction("Показать информацию");
 	}
+
  auto model=ponline->model();
+
  if(isOfflineView || model->rowCount()>0)
 	{
 	 auto index = isOfflineView ? poffline->indexAt(pos) : ponline->indexAt(pos);
+
 	 bool isOwner=index.data().toString().startsWith("Вы: ");
+
 	 bool isGeneral=index.row()==1;
+
 	 //need to disable some actions if it's the owner or the general chat
 	 auto actions=menu->actions();
 	 actions[0]->setEnabled(!(isOwner));
@@ -89,4 +100,18 @@ void ListDock::slotOpenConvertion()
 
  qDebug()<<"slot open convertion:"<<model->data(curIndex).toString();
  emit openConvertion(model->data(curIndex).toString());
+}
+
+void ListDock::slotMakeCall()
+{
+ bool isOnlineView = focusWidget()==ponline;
+
+ if(isOnlineView)
+	{
+	 auto curIndex = ponline->currentIndex();
+	 QString nick = ponline->model()->data(curIndex).toString();
+
+	 qDebug() << "Emit make a call to" << nick;
+	 emit makeCall(nick);
+	}
 }

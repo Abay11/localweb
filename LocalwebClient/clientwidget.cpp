@@ -3,7 +3,9 @@
 void ClientWidget::initConvertions()
 {
  generalConvertion=new ConvertionWidget("Общий чат");
+
  convertionWidgets->insert("Общий чат", generalConvertion);
+
  currentCunvertion=generalConvertion;
 
  connect(generalConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
@@ -49,20 +51,32 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 
  connect(pcmdConnect, SIGNAL(clicked()),
 				SLOT(slotConnectClicked()));
+
  connect(pcmdDisconnect, SIGNAL(clicked()),
 				 pservice, SLOT(slotDisconnectFromServer()));
+
  connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
+
  connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
+
  connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));
+
  connect(pservice, SIGNAL(newMessageToForwarding(QString, QString, const QTime &)),
 				 SLOT(slotForwardToDestination(QString, QString, const QTime &)));
+
  connect(pservice, SIGNAL(newMessageForDisplay(QString, const QTime &, QString)),
 				 generalConvertion, SLOT(slotAppendMessageToDisplay(QString, const QTime &, QString)));
+
  connect(pservice, SIGNAL(newMessageForNotification(QString)), this, SLOT(slotShowNotification(QString)));
+
  connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
+
  connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
+
  connect(plistdock, SIGNAL(openConvertion(QString)),
 				 SLOT(slotSwitchConversions(QString)));
+
+ connect(plistdock, SIGNAL(makeCall(QString)), pservice, SLOT(slotMakeCall(QString)));
 
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 

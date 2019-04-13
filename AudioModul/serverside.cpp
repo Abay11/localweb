@@ -12,6 +12,9 @@ bool ServerSide::startListening()
  bool isListening = socket->bind(QHostAddress::Any, listeningPort);
 
 	 if(!isListening)qWarning() << DTAG << "Couldn't bind to a port!";
+	 else {
+		 qDebug() << DTAG << "Starting the audio module server...";
+		}
 
  return isListening;
 }

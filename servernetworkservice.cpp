@@ -7,6 +7,8 @@ ServerNetworkService::ServerNetworkService(QObject *parent)
 
  ftp = new FtpServer;
 
+ initAudioServerModule(AUDIOMODULE_IP);
+
  foreach (const QHostAddress &addr, QNetworkInterface::allAddresses()) {
 	 if (addr.protocol() == QAbstractSocket::IPv4Protocol
 			 && addr!= QHostAddress(QHostAddress::LocalHost))
@@ -246,7 +248,9 @@ QStringList ServerNetworkService::getClientsList()
 bool ServerNetworkService::slotStartServer()
 {
  return ptcpServer->listen(QHostAddress::Any,
-								 static_cast<quint16>(nport)) & ftp->start(MY_FTP::PORT);
+								 static_cast<quint16>(nport))
+	 & ftp->start(MY_FTP::PORT)
+	 & audioServerModule->startListening();
 }
 
 void ServerNetworkService::slotStopServer()

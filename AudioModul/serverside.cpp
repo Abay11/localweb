@@ -7,12 +7,13 @@ ServerSide::ServerSide(quint16 nport, QObject *parent) : QObject(parent)
  connect(socket, SIGNAL(readyRead()), SLOT(slotReadyRead()));
 }
 
-void ServerSide::startListening()
+bool ServerSide::startListening()
 {
- if(!socket->bind(QHostAddress::Any, listeningPort))
-	qWarning() << DTAG << "Couldn't bind to a port!";
-	else
-	qDebug() << DTAG << "Server start listening!";
+ bool isListening = socket->bind(QHostAddress::Any, listeningPort);
+
+	 if(!isListening)qWarning() << DTAG << "Couldn't bind to a port!";
+
+ return isListening;
 }
 
 void ServerSide::stopListening()

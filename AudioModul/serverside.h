@@ -16,7 +16,7 @@ class ServerSide : public QObject
 public:
  explicit ServerSide(quint16 listeningPort, QObject *parent = nullptr);
 
- void startListening();
+ bool startListening();
 
  void stopListening();
 

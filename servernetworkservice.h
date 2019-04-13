@@ -4,6 +4,7 @@
 #include "clientinfo.h"
 #include "common.h"
 #include "MY_FTP/MY_FTP/ftp_server.h"
+#include "AudioModul/serverside.h"
 
 #include <QObject>
 #include <QString>
@@ -35,9 +36,14 @@ private:
  CLIENTBASE *clientbase;
  QMap<QTcpSocket *, QString> *socketsAndNicksOfOnlines;
 
+ ServerSide* audioServerModule;
+
 public:
  explicit ServerNetworkService(QObject *parent = nullptr);
  ~ServerNetworkService();
+
+ void initAudioServerModule(quint16 listeningPort);
+
  quint16 listeningPort();
  void setPort(quint16 nport);
  quint16 getPort();

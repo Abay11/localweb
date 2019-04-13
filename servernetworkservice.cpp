@@ -32,6 +32,11 @@ ServerNetworkService::~ServerNetworkService()
  if(!saveData()) qWarning()<<"Не удалось сохранить данные";
 }
 
+void ServerNetworkService::initAudioServerModule(quint16 listeningPort)
+{
+ audioServerModule = new ServerSide(listeningPort, this);
+}
+
 quint16 ServerNetworkService::listeningPort()
 {
  return ptcpServer->serverPort();

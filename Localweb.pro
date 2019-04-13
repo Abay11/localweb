@@ -29,7 +29,8 @@ SOURCES += \
     clientinfo.cpp \
     servernetworkservice.cpp \
     common.cpp \
-    MY_FTP/MY_FTP/ftp_server.cpp
+    MY_FTP/MY_FTP/ftp_server.cpp \
+    AudioModul/serverside.cpp
 
 HEADERS += \
         mywidget.h \
@@ -38,7 +39,8 @@ HEADERS += \
     servernetworkservice.h \
     common.h \
     MY_FTP/MY_FTP/ftp_common.h \
-    MY_FTP/MY_FTP/ftp_server.h
+    MY_FTP/MY_FTP/ftp_server.h  \
+    AudioModul/serverside.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

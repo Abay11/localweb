@@ -8,11 +8,12 @@
 
 #include <QDebug>
 
-static QString DTAG("AudioModule::ServerSide:");
+static const QString DTAG("AudioModule::ServerSide:");
 
 class ServerSide : public QObject
 {
  Q_OBJECT
+
 public:
  explicit ServerSide(quint16 listeningPort, QObject *parent = nullptr);
 
@@ -32,7 +33,6 @@ private:
  void sendIndividual(QByteArray& data, const QHostAddress&, quint16);
 
  void sendBroadcast(QByteArray& data);
-
 
 signals:
 

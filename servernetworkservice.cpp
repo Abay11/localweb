@@ -262,6 +262,8 @@ void ServerNetworkService::slotStopServer()
 
  ftp->stop();
 
+ audioServerModule->stopListening();
+
  qInfo()<<"Сервер остановлен.";
 }
 

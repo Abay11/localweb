@@ -23,6 +23,8 @@ static QString defaultServerPort="9999";
 
 static QString defaultSavingFile="data.bin";
 
+static const QString DTAG = "ClientService:";
+
 class ClientService : public QObject
 {
  Q_OBJECT

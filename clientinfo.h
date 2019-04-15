@@ -30,9 +30,6 @@ public:
             bool status=false);
  virtual ~ClientInfo();
 
- const QString& nickname() const;
- QString& nickname();
-
  const QString& fullName()const;
  QString& fullName();
  const QString& address()const;

@@ -41,6 +41,11 @@ void ConnectionHandler::setDestination(const QHostAddress &host, quint16 port)
  dest_port=port;
 }
 
+quint16 ConnectionHandler::getPort()
+{
+ return binding_port;
+}
+
 void ConnectionHandler::slotReadDataFrom()
 {
  qDebug() << "ConnectionHandler: Received data to read";

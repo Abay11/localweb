@@ -25,6 +25,8 @@ public:
 
  void turnOnMicrophone();
 
+ quint16 getPort();
+
 signals:
 
 public slots:

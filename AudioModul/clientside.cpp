@@ -49,3 +49,8 @@ void ClientSide::turnOnMicrophone()
 {
 
 }
+
+quint16 ClientSide::getPort()
+{
+ return connectionHandler->getPort();
+}

@@ -30,6 +30,8 @@ public:
 
  void setDestination(const QHostAddress& host, quint16 port);
 
+ quint16 getPort();
+
 signals:
  void dataArrived(QByteArray&);
 

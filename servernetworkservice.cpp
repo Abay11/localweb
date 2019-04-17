@@ -172,7 +172,7 @@ bool ServerNetworkService::addUserIfNickNotBusy(const QString &nick,
 	{
 	 addToBase(lowerNick, name,
 						 client->localAddress().toString(),
-						 QString::number(client->localPort()));
+						 QString::number(client->peerPort()));
 	 addToModel(nick);
 	 addToOnlines(client, nick);
 	}
@@ -422,6 +422,7 @@ void ServerNetworkService::slotReadClient()
 		}
 	 case DATATYPE::CONNECT:
 	 {
+		 qDebug() << DTAG << "Peer port" << pclient->peerPort();
 		 QString nick;
 		 int clientBaseSize;
 		 in>>nick>>clientBaseSize;

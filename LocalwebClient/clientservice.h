@@ -4,6 +4,7 @@
 #include "../clientinfo.h"
 #include "../common.h"
 #include "../MY_FTP/MY_FTP/ftp_client.h"
+#include "../AudioModul/clientside.h"
 
 #include <QTime>
 #include <QMap>
@@ -41,6 +42,8 @@ protected:
  QStringListModel *pofflineModel;
 
  FtpClient *ftp;
+
+ ClientSide* audioModule;
 
  void addAllUsersToOfflineModel();
 

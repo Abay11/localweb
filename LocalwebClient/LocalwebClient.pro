@@ -36,7 +36,10 @@ SOURCES += \
     clientservice.cpp \
     mainwindow.cpp \
     ../common.cpp \
-    ../MY_FTP/MY_FTP/ftp_client.cpp
+    ../MY_FTP/MY_FTP/ftp_client.cpp \
+../AudioModul/clientside.cpp \
+../AudioModul/connectionhandler.cpp \
+../AudioModul/iohandler.cpp
 
 HEADERS += \
     ../mylogger.h \
@@ -51,7 +54,11 @@ HEADERS += \
     mainwindow.h \
     ../common.h \
     ../MY_FTP/MY_FTP/ftp_client.h \
-    ../MY_FTP/MY_FTP/ftp_common.h
+    ../MY_FTP/MY_FTP/ftp_common.h \
+../AudioModul/clientside.h \
+../AudioModul/connectionhandler.h \
+../AudioModul/iohandler.h
+
 
 
 # Default rules for deployment.

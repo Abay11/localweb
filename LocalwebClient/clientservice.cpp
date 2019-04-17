@@ -69,6 +69,8 @@ ClientService::ClientService(QWidget *prnt)
 
  ftp = new FtpClient(*pserverAddress, MY_FTP::PORT);
 
+ audioModule = new ClientSide(AUDIOMODULE_IP, QHostAddress(*pserverAddress));
+
  connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
  connect(psocket, SIGNAL(connected()), SIGNAL(connected()));
  connect(psocket, SIGNAL(disconnected()), SLOT(slotDisconnected()));
@@ -397,7 +399,7 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 	case DATATYPE::CONNECT:
 	 {
 	 qDebug()<<"Sending to server size of base:"<<clients->size();
-	 out<<nick<<clients->size();
+	 out << nick << clients->size();
 	 break;
 	 }
 
@@ -419,6 +421,23 @@ void ClientService::slotSetAddress(QString addr, QString port)
 void ClientService::slotMakeCall(QString nick)
 {
  qDebug() << "Make call to" << nick;
+
+ auto c = clients->find(nick);
+
+ /*
+	if(c != clients->end())
+	 qDebug() << TAG << "Make a call to a client" << nick << "with address and port" << c.value()->address() << c.value()->port();
+	else
+	 qWarning() << TAG << "Not found user with a such nickname to make a call";
+	 */
+
+ qDebug() << DTAG << "Clients info";
+ for(auto it = clients->begin(); it != clients->end(); ++ it)
+	{
+	 qDebug() << it.key() <<  it.value()->address() << it.value()->port();
+	}
+
+
 }
 
 void ClientService::removeOnlinesFromOfflines(QStringList onlines)

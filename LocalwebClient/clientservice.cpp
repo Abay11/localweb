@@ -392,14 +392,14 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 		qDebug()<<"Sending to server registration request";
 		QString *nick=&msg;
 		QString name=firstAddition.toString();
-		out<<*nick<<name;
+		out << *nick << name << audioModule->getPort();
 		break;
 	 }
 
 	case DATATYPE::CONNECT:
 	 {
 	 qDebug()<<"Sending to server size of base:"<<clients->size();
-	 out << nick << clients->size();
+	 out << nick << audioModule->getPort() << clients->size();
 	 break;
 	 }
 

@@ -317,7 +317,8 @@ void ServerNetworkService::slotReadClient()
 		{
 		 QString nick;
 		 QString name;
-		 in>>nick>>name;
+		 quint16 audioPort;
+		 in>>nick>>name >> audioPort;
 		 nick=nick.toLower();
 
 		 bool registrationResult=addUserIfNickNotBusy(nick,
@@ -334,6 +335,26 @@ void ServerNetworkService::slotReadClient()
 
 		 break;
 		}
+	 case DATATYPE::CONNECT:
+	 {
+		 qDebug() << DTAG << "Peer port" << pclient->peerPort();
+		 QString nick;
+		 int clientBaseSize;
+		 quint16 audioPort;
+		 in >> nick >> audioPort >> clientBaseSize;
+
+		 auto iter=clientbase->find(nick);
+		 if(!nick.isEmpty())
+			{
+			 if(iter!=clientbase->end())
+				notifyOthersNewConnection(nick);
+
+			 addToOnlines(pclient, nick);
+			}
+
+		 sendToClient(pclient, DATATYPE::CONNECT, clientBaseSize);
+		 break;
+	 }
 	 case DATATYPE::MESSAGE:
 	 {
 		 qDebug()<<"ServerNetworkService: Receiving a message"<<msg;
@@ -420,25 +441,6 @@ void ServerNetworkService::slotReadClient()
 			}
 		 break;
 		}
-	 case DATATYPE::CONNECT:
-	 {
-		 qDebug() << DTAG << "Peer port" << pclient->peerPort();
-		 QString nick;
-		 int clientBaseSize;
-		 in>>nick>>clientBaseSize;
-
-		 auto iter=clientbase->find(nick);
-		 if(!nick.isEmpty())
-			{
-			 if(iter!=clientbase->end())
-				notifyOthersNewConnection(nick);
-
-			 addToOnlines(pclient, nick);
-			}
-
-		 sendToClient(pclient, DATATYPE::CONNECT, clientBaseSize);
-		 break;
-	 }
 	 default:
 		qWarning()<<"Unknown datatype";
 		break;

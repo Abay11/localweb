@@ -25,26 +25,6 @@ class ServerNetworkService : public QObject
 {
  Q_OBJECT
 
-private:
-
- quint16 nextBlockSize=0;
-
- quint16 nport;
-
- QString address;
-
- QTcpServer *ptcpServer;
-
- QStringListModel *pmodel;
-
- FtpServer *ftp;
-
- CLIENTBASE *clientbase;
-
- QMap<QTcpSocket *, QString> *socketsAndNicksOfOnlines;
-
- ServerSide* audioServerModule;
-
 public:
 
  explicit ServerNetworkService(QObject *parent = nullptr);
@@ -76,6 +56,8 @@ public:
 
  void addToOnlines(QTcpSocket *client, const QString &nick);
 
+ void updateClientInfo(CLIENTBASE::iterator* item, quint16 audioPort);
+
  void notifyOthersNewConnection(const QString& nick);
 
  void notifyOthersAboutDisconnection(const QString& nick);
@@ -89,6 +71,25 @@ public:
  QStringListModel *getModel();
 
  QStringList getClientsList();
+
+private:
+ quint16 nextBlockSize=0;
+
+ quint16 nport;
+
+ QString address;
+
+ QTcpServer *ptcpServer;
+
+ QStringListModel *pmodel;
+
+ FtpServer *ftp;
+
+ CLIENTBASE *clientbase;
+
+ QMap<QTcpSocket *, QString> *socketsAndNicksOfOnlines;
+
+ ServerSide* audioServerModule;
 
 signals:
 

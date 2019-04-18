@@ -202,6 +202,11 @@ void ServerNetworkService::addToOnlines(QTcpSocket *client, const QString &nick)
  socketsAndNicksOfOnlines->insert(client, nick);
 }
 
+void ServerNetworkService::updateClientInfo(CLIENTBASE::iterator* item, quint16 audioPort)
+{
+ item->value()->audioPort() = audioPort;
+}
+
 void ServerNetworkService::notifyOthersNewConnection(const QString &nick)
 {
  for(auto iter=socketsAndNicksOfOnlines->begin();
@@ -337,11 +342,12 @@ void ServerNetworkService::slotReadClient()
 		}
 	 case DATATYPE::CONNECT:
 	 {
-		 qDebug() << DTAG << "Peer port" << pclient->peerPort();
 		 QString nick;
 		 int clientBaseSize;
 		 quint16 audioPort;
 		 in >> nick >> audioPort >> clientBaseSize;
+
+		 qDebug() << DTAG << "connected client's audio port" << audioPort;
 
 		 auto iter=clientbase->find(nick);
 		 if(!nick.isEmpty())
@@ -350,6 +356,8 @@ void ServerNetworkService::slotReadClient()
 				notifyOthersNewConnection(nick);
 
 			 addToOnlines(pclient, nick);
+
+			 updateClientInfo(&iter, audioPort);
 			}
 
 		 sendToClient(pclient, DATATYPE::CONNECT, clientBaseSize);

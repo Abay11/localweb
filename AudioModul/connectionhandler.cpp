@@ -22,17 +22,22 @@ void ConnectionHandler::startListen()
 	}
 
  if(!isBound)
-	qWarning() << "Couldn't bind a port";
+	qWarning() << DTAG << "Couldn't bind a port";
  else
-	qDebug() << "binding port" << binding_port;
+	qDebug() << DTAG << "binding port" << binding_port;
 
  if(!socket->open(QAbstractSocket::ReadWrite))
-	qWarning() << "Couldn't open a port to read and write";
+	qWarning()<< DTAG  << "Couldn't open a port to read and write";
+ else {
+	 qDebug() << DTAG << "Start listen";
+	}
 }
 
 void ConnectionHandler::stopListen()
 {
  socket->close();
+
+ qDebug() << DTAG << "Stop listen";
 }
 
 void ConnectionHandler::setDestination(const QHostAddress &host, quint16 port)
@@ -48,8 +53,6 @@ quint16 ConnectionHandler::getPort()
 
 void ConnectionHandler::slotReadDataFrom()
 {
- qDebug() << "ConnectionHandler: Received data to read";
-
  auto datagramSize = socket->pendingDatagramSize();
 
  QByteArray compressed;
@@ -82,7 +85,6 @@ void ConnectionHandler::slotWriteDataTo(QByteArray& data)
 
  compressed.insert(0, preheader);
 
- qint64 wrote_bytes = socket->writeDatagram(compressed, serverhost, server_port);
+ socket->writeDatagram(compressed, serverhost, server_port);
 
- qDebug() << "Connection handler: Received data to write(compressed size:" <<compressed.size() << "wrote: " << wrote_bytes;
 }

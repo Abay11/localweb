@@ -24,6 +24,8 @@ private:
 
  QString mport;
 
+ quint16 audioPort_;
+
  bool mstatus=false;
 
 public:
@@ -49,6 +51,10 @@ public:
  const bool& status() const;
 
  bool& status();
+
+ quint16 audioPort() const;
+
+ quint16& audioPort();
 };
 
 QDataStream& operator>>(QDataStream& out, ClientInfo *&cinfo);

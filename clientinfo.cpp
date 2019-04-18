@@ -31,6 +31,16 @@ bool &ClientInfo::status()
  return mstatus;
 }
 
+quint16 ClientInfo::audioPort() const
+{
+ return audioPort_;
+}
+
+quint16 &ClientInfo::audioPort()
+{
+ return audioPort_;
+}
+
 QDataStream &operator>>(QDataStream &out, ClientInfo *&cinfo)
 {
  cinfo=new ClientInfo;

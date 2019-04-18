@@ -7,6 +7,8 @@ ClientSide::ClientSide(quint16 serverPort, const QHostAddress &serverAddress, QO
  ,voiceIO(new IOHandler)
  ,connectionHandler(new ConnectionHandler(serverPort, serverAddress))
 {
+ connectionHandler->startListen();
+
  //writing voice
  connect(voiceIO, SIGNAL(readData(QByteArray&)), connectionHandler, SLOT(slotWriteDataTo(QByteArray&)));
 
@@ -14,20 +16,9 @@ ClientSide::ClientSide(quint16 serverPort, const QHostAddress &serverAddress, QO
  connect(connectionHandler, SIGNAL(dataArrived(QByteArray&)), voiceIO, SLOT(slotWriteAudioOutput(QByteArray&)));
 }
 
-void ClientSide::start()
-{
- qDebug() << "ClientSide: started";
-
- connectionHandler->startListen();
-
- voiceIO->startRecording();
-}
-
-void ClientSide::stop()
+ClientSide::~ClientSide()
 {
  connectionHandler->stopListen();
-
- voiceIO->stopRecording();
 }
 
 void ClientSide::setDestination(const QHostAddress &addr, quint16 port)
@@ -42,12 +33,12 @@ void ClientSide::setBroadcast()
 
 void ClientSide::turnOffMicrophone()
 {
-
+ voiceIO->startRecording();
 }
 
 void ClientSide::turnOnMicrophone()
 {
-
+ voiceIO->stopRecording();
 }
 
 quint16 ClientSide::getPort()

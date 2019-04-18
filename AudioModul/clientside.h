@@ -13,9 +13,7 @@ class ClientSide : public QObject
 public:
  explicit ClientSide(quint16 serverPort, const QHostAddress& serverAddress=QHostAddress("localhost"), QObject *parent = nullptr);
 
- void start();
-
- void stop();
+ ~ClientSide();
 
  void setDestination(const QHostAddress& addr, quint16 port);
 
@@ -39,6 +37,8 @@ private:
  IOHandler* voiceIO;
 
  ConnectionHandler* connectionHandler;
+
+ const QString DTAG = "AudioModule::ClientSide:";
 };
 
 #endif // CLIENTSIDE_H

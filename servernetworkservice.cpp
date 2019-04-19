@@ -377,16 +377,23 @@ void ServerNetworkService::slotReadClient()
 		 if(!nick.isEmpty())
 			{
 			 if(iter!=clientbase->end())
-				notifyOthersNewConnection(nick);
+				{
+				 notifyOthersNewConnection(nick);
 
-			 addToOnlines(pclient, nick);
+				 updateClientInfo(&iter, audioPort);
 
-			 updateClientInfo(&iter, audioPort);
+				 addToOnlines(pclient, nick);
+				}
+			 else {
+				 qWarning() << DTAG << "A connected client not found in the base";
+				}
+
 			}
 
 		 sendToClient(pclient, DATATYPE::CONNECT, clientBaseSize);
 		 break;
 	 }
+
 	 case DATATYPE::MESSAGE:
 	 {
 		 qDebug()<<"ServerNetworkService: Receiving a message"<<msg;

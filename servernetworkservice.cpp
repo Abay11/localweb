@@ -151,6 +151,30 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 		out<<time<<from<<filename<<*to;
 		break;
 	 }
+
+	case DATATYPE::GETACTUALDATA:
+	 {
+		qDebug() << DTAG << "Sending to a client an updated data";
+
+		QString nick = data.toString();
+		auto clientinfo = clientbase->find(nick);
+
+		quint16 audioPort = 0;
+
+		if(clientinfo == clientbase->end())
+			{
+			 qWarning() << DTAG << "Not found a client in the clientbase to respond to a request GETACTUALDATE";
+			 //if client is not in the base, we send a value which is equal 0 what means an error
+			}
+		 else {
+			audioPort = clientinfo.value()->audioPort();
+			}
+
+		out << audioPort;
+
+		break;
+	 }
+
 	default:
 	 qWarning()<<"Unknown datatype for sending to client";
 	 break;

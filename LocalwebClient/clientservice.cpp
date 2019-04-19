@@ -464,24 +464,33 @@ void ClientService::slotSetAddress(QString addr, QString port)
 
 void ClientService::slotMakeCall(QString nick)
 {
- qDebug() << "Make call to" << nick;
+ qDebug() << "Make a call to" << nick;
 
- auto c = clients->find(nick);
+ auto iter = clients->find(nick);
 
- /*
-	if(c != clients->end())
-	 qDebug() << TAG << "Make a call to a client" << nick << "with address and port" << c.value()->address() << c.value()->port();
-	else
-	 qWarning() << TAG << "Not found user with a such nickname to make a call";
-	 */
-
- qDebug() << DTAG << "Clients info";
- for(auto it = clients->begin(); it != clients->end(); ++ it)
+ if(iter == clients->end())
 	{
-	 qDebug() << it.key() <<  it.value()->address() << it.value()->port();
+	 qWarning() << DTAG << "Not found such nick to make a call";
+
+	 return;
 	}
 
+ slotSendToServer(DATATYPE::GETACTUALDATA, nick);
 
+ QEventLoop* loop = new QEventLoop;
+ //block until we get a client's info;
+ connect(this, SIGNAL(clientInfoUpdated()), loop, SLOT(quit()));
+ loop->exec();
+
+ qDebug() << DTAG << "Making a call to a client" << nick << "with address and port" << iter.value()->address()
+					<< iter.value()->audioPort();
+
+ QHostAddress destAddress(iter.value()->address());
+ quint16 destPort = iter.value()->audioPort();
+
+ audioModule->setDestination(destAddress, destPort);
+
+ audioModule->turnOnMicrophone();
 }
 
 void ClientService::removeOnlinesFromOfflines(QStringList onlines)

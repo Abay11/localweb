@@ -295,6 +295,29 @@ void ClientService::slotReadyRead()
 			}
 		 break;
 		}
+
+	 case DATATYPE::GETACTUALDATA:
+	 {
+		 QString nick;
+		 quint16 audioPort;
+		 in >> nick >> audioPort;
+
+		 auto it = clients->find(nick);
+
+		 if(it == clients->end())
+			{
+			 qWarning() << DTAG << "A client not found to update data";
+			}
+		 else {
+			 it.value()->audioPort() = audioPort;
+			}
+
+		 //need emit even a client was not found to interupt a waiting event loop
+		 emit clientInfoUpdated();
+
+		 break;
+	 }
+
 	 default:
 		//что-то пошло не так, клиент не может получить иную команду
 		 qCritical()<<"Неизвестная ошибка при получении сообщения.";

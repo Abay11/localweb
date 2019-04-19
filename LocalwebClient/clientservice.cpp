@@ -298,15 +298,17 @@ void ClientService::slotReadyRead()
 
 	 case DATATYPE::GETACTUALDATA:
 	 {
+		 qDebug() << DTAG << "Receving updated client info";
+
 		 QString nick;
 		 quint16 audioPort;
 		 in >> nick >> audioPort;
 
 		 auto it = clients->find(nick);
 
-		 if(it == clients->end())
+		 if(it == clients->end() || audioPort == 0)
 			{
-			 qWarning() << DTAG << "A client not found to update data";
+			 qWarning() << DTAG << "A client or the server not found such nick to update data";
 			}
 		 else {
 			 it.value()->audioPort() = audioPort;

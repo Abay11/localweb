@@ -449,6 +449,20 @@ void ServerNetworkService::slotReadClient()
 			}
 		 break;
 		}
+
+	 case DATATYPE::GETACTUALDATA:
+		{
+		 qDebug() << DTAG << "Received the GETACTUALDATA request";
+		 QString nick;
+
+		 in >> nick;
+
+		 //checking if is the client in the base happens in the sending method
+		 sendToClient(pclient, type, nick);
+
+		 break;
+		}
+
 	 default:
 		qWarning()<<"Unknown datatype";
 		break;

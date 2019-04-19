@@ -91,6 +91,8 @@ private:
 
  ServerSide* audioServerModule;
 
+ const QString DTAG = "ServerNetworkService:";
+
 signals:
 
 public slots:

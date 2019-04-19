@@ -135,6 +135,8 @@ signals:
  void newMessageToForwarding(QString msg, QString from, const QTime &time=QTime::currentTime());
 
  void newMessageForNotification(QString msg);
+
+ void clientInfoUpdated();
 };
 
 #endif // CLIENTSERVICE_H

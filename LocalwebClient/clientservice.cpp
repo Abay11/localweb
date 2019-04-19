@@ -426,6 +426,16 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 	 break;
 	 }
 
+	case DATATYPE::GETACTUALDATA:
+	 {
+		qDebug() << DTAG << "Sendting to the server a responce to update client's info";
+
+		QString& updatingClient = msg;
+
+		out << updatingClient;
+
+		break;
+	 }
 	default: break;
 	}
 

@@ -202,6 +202,7 @@ void ClientService::slotReadyRead()
 					<<"Registration attempt. Result: "<<registrationResult;
 		break;
 		}
+
 	 case DATATYPE::CONNECT:
 		{
 		 qDebug()<<"Receiving list of clients";
@@ -226,6 +227,7 @@ void ClientService::slotReadyRead()
 		 removeOnlinesFromOfflines(onlines);
 		 break;
 	 }
+
 	 case DATATYPE::DISCONNECTION:
 		{
 		 qDebug()<<"кто-то отсоединился";
@@ -240,6 +242,7 @@ void ClientService::slotReadyRead()
 		 emit(newMessageForDisplay(msg));
 		 break;
 		}
+
 	 case DATATYPE::NOTIFYING:
 		{
 		 QString connectedUserNick;
@@ -253,6 +256,7 @@ void ClientService::slotReadyRead()
 		 emit(newMessageForDisplay(msg));
 		 break;
 		}
+
 	 case DATATYPE::MESSAGE:
 	 {
 		 qDebug()<<"новое сообщение";
@@ -271,6 +275,7 @@ void ClientService::slotReadyRead()
 			}
 		 break;
 	 }
+
 	 case DATATYPE::FILE:
 		{
 		 qDebug()<<"ClientService: receiving a file";
@@ -306,9 +311,13 @@ void ClientService::slotReadyRead()
 
 		 auto it = clients->find(nick);
 
-		 if(it == clients->end() || audioPort == 0)
+		 if(it == clients->end())
 			{
-			 qWarning() << DTAG << "A client or the server not found such nick to update data";
+			 qWarning() << DTAG << "A client not found such nick to update data";
+			}
+		 else if(audioPort == 0)
+			{
+			 qWarning() << DTAG << "The server not found such nick to update data";
 			}
 		 else {
 			 it.value()->audioPort() = audioPort;

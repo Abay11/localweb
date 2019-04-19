@@ -170,7 +170,7 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 			audioPort = clientinfo.value()->audioPort();
 			}
 
-		out << audioPort;
+		out << nick << audioPort;
 
 		break;
 	 }
@@ -228,6 +228,7 @@ void ServerNetworkService::addToOnlines(QTcpSocket *client, const QString &nick)
 
 void ServerNetworkService::updateClientInfo(CLIENTBASE::iterator* item, quint16 audioPort)
 {
+ qDebug() << DTAG << "updating clientinfo audioport: " << audioPort;
  item->value()->audioPort() = audioPort;
 }
 

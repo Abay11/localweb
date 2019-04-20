@@ -6,6 +6,7 @@ ConvertionWidget::ConvertionWidget(QString name,
  ,cmdSend(new QPushButton("Отправить"))
  ,cmdSendFile(new QPushButton("Отправить файл"))
  ,cmdClr(new QPushButton("Очистить"))
+ ,cmdMakeCall(new QPushButton("Позвонить"))
  ,pdisplay(new QTextEdit)
  ,pmsgField(new QTextEdit)
 {
@@ -22,6 +23,7 @@ ConvertionWidget::ConvertionWidget(QString name,
  pvlay->addWidget(pmsgField, 1);
 
  QHBoxLayout *phlay=new QHBoxLayout;
+ phlay->addWidget(cmdMakeCall);
  phlay->addWidget(cmdSend);
  phlay->addWidget(cmdSendFile);
  phlay->addWidget(cmdClr);
@@ -39,7 +41,9 @@ ConvertionWidget::ConvertionWidget(QString name,
 void ConvertionWidget::setSocketState(bool isOpen)
 {
  socketIsOpen=isOpen;
+
  cmdSendFile->setEnabled(isOpen);
+ cmdMakeCall->setEnabled(isOpen);
 }
 
 void ConvertionWidget::setSentEnabled(bool value)
@@ -98,6 +102,11 @@ void ConvertionWidget::slotMsgChanged()
 {
  if(pmsgField->toPlainText()!="" && socketIsOpen)
 	cmdSend->setEnabled(true);
+}
+
+void ConvertionWidget::slotMakeCall()
+{
+ emit makeCallClicked(convertionName);
 }
 
 void ConvertionWidget::slotAppendMessageToDisplay(QString msg, const QTime &actionTime, QString from)

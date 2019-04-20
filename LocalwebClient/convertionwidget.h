@@ -20,6 +20,8 @@ private:
  QPushButton *cmdSendFile;
  QPushButton *cmdClr;
 
+ QPushButton* cmdMakeCall;
+
  QTextEdit *pdisplay,*pmsgField;
 
  bool socketIsOpen=false;
@@ -38,12 +40,15 @@ private slots:
  void slotSendFile();
  void slotClrDisplay();
  void slotMsgChanged();
+ void slotMakeCall();
 
 public slots:
  void slotAppendMessageToDisplay(QString msg, const QTime &actionTime, QString from=nullptr);
 
 signals:
  void sentClicked(DATATYPE type, QString stringData, QVariant variantData=0);
+
+ void makeCallClicked(QString nick);
 };
 
 #endif // CONVERTIONWIDGET_H

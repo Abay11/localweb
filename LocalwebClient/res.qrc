@@ -9,5 +9,10 @@
         <file>Icons/client.png</file>
         <file>Sounds/definite.mp3</file>
         <file>Icons/exit.png</file>
+        <file>Icons/rejectCall.png</file>
+        <file>Icons/acceptCall.png</file>
+        <file>Icons/outgoingCall.png</file>
+        <file>Icons/connectedCall.png</file>
+        <file>Icons/incomingCall.png</file>
     </qresource>
 </RCC>

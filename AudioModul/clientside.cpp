@@ -33,12 +33,12 @@ void ClientSide::setBroadcast()
 
 void ClientSide::turnOffMicrophone()
 {
- voiceIO->startRecording();
+ voiceIO->stopRecording();
 }
 
 void ClientSide::turnOnMicrophone()
 {
- voiceIO->stopRecording();
+ voiceIO->startRecording();
 }
 
 quint16 ClientSide::getPort()

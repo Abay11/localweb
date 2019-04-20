@@ -31,14 +31,24 @@ void ClientSide::setBroadcast()
  connectionHandler->setDestination(QHostAddress("255.255.255.255"), 0);
 }
 
-void ClientSide::turnOffMicrophone()
-{
- voiceIO->stopRecording();
-}
-
 void ClientSide::turnOnMicrophone()
 {
- voiceIO->startRecording();
+ voiceIO->turnOnInput();
+}
+
+void ClientSide::turnOffMicrophone()
+{
+ voiceIO->turnOffInput();
+}
+
+void ClientSide::turnOnSpeakers()
+{
+ voiceIO->turnOnOutput();
+}
+
+void ClientSide::turnOffSpeakers()
+{
+ voiceIO->turnOffOutput();
 }
 
 quint16 ClientSide::getPort()

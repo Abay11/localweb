@@ -19,9 +19,13 @@ public:
 
  void setBroadcast();
 
+ void turnOnMicrophone();
+
  void turnOffMicrophone();
 
- void turnOnMicrophone();
+ void turnOnSpeakers();
+
+ void turnOffSpeakers();
 
  quint16 getPort();
 

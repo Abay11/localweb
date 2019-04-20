@@ -12,3 +12,46 @@ CallingWindow::~CallingWindow()
 {
  delete ui;
 }
+
+void CallingWindow::setImage(CallingWindow::IMAGES image)
+{
+ QPixmap pixmap;
+ bool isPixmapLoaded = false;
+
+ switch (image) {
+	case IMAGES::INCOMING:
+	 {
+		isPixmapLoaded = pixmap.load(":/Res/Icons/incomingCall.png");
+		break;
+	 }
+
+	case IMAGES::OUTGOING:
+	 {
+		isPixmapLoaded = pixmap.load(":/Res/Icons/outgoingCall.png");
+		break;
+	 }
+
+	case IMAGES::CONNECTED:
+	 {
+		isPixmapLoaded = pixmap.load(":/Res/Icons/connectedCall.png");
+		break;
+	 }
+
+	case IMAGES::ACCEPTCALL:
+	 {
+		isPixmapLoaded = pixmap.load(":/Res/Icons/acceptCall.png");
+		break;
+	 }
+
+	case IMAGES::REJECTCALL:
+	 {
+		isPixmapLoaded = pixmap.load(":/Res/Icons/rejectCall.png");
+		break;
+	 }
+	}
+
+ if(isPixmapLoaded)
+	ui->picture->setPixmap(pixmap);
+ else
+	qWarning() << DTAG << "Couldn't load a pixmap";
+}

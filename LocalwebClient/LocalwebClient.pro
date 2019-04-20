@@ -39,7 +39,8 @@ SOURCES += \
     ../MY_FTP/MY_FTP/ftp_client.cpp \
 ../AudioModul/clientside.cpp \
 ../AudioModul/connectionhandler.cpp \
-../AudioModul/iohandler.cpp
+../AudioModul/iohandler.cpp \
+    callingwindow.cpp
 
 HEADERS += \
     ../mylogger.h \
@@ -57,7 +58,8 @@ HEADERS += \
     ../MY_FTP/MY_FTP/ftp_common.h \
 ../AudioModul/clientside.h \
 ../AudioModul/connectionhandler.h \
-../AudioModul/iohandler.h
+../AudioModul/iohandler.h \
+    callingwindow.h
 
 
 
@@ -68,3 +70,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     res.qrc
+
+FORMS += \
+    callingwindow.ui

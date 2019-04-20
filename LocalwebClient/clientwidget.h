@@ -7,6 +7,7 @@
 #include "listdock.h"
 #include "convertionwidget.h"
 #include "clientservice.h"
+#include "callingwindow.h"
 
 #include <QApplication>
 #include <QMainWindow>

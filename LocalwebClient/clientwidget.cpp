@@ -143,6 +143,12 @@ void ClientWidget::slotForwardToDestination(QString msg, QString from, const QTi
 
 void ClientWidget::slotMakeCall(QString nick)
 {
+ static CallingWindow* callingWindow = new CallingWindow;
+
+ callingWindow->setState(nick, CallingWindow::STATES::OUTGOING);
+
+ callingWindow->show();
+
  pservice->makeCall(nick);
 }
 

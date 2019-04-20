@@ -101,6 +101,8 @@ public:
 
  bool isConnected();
 
+ void makeCall(QString nick);
+
 protected slots:
  void slotConnected();
 
@@ -119,7 +121,6 @@ public slots:
 
  void slotSetAddress(QString addr, QString port);
 
- void slotMakeCall(QString nick);
 
 signals:
  void connected();

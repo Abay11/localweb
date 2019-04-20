@@ -144,6 +144,37 @@ bool ClientService::isConnected()
  return psocket->state()==QTcpSocket::ConnectedState;
 }
 
+void ClientService::makeCall(QString nick)
+{
+ qDebug() << "Make a call to" << nick;
+
+ auto iter = clients->find(nick);
+
+ if(iter == clients->end())
+	{
+	 qWarning() << DTAG << "Not found such nick to make a call";
+
+	 return;
+	}
+
+ slotSendToServer(DATATYPE::GETACTUALDATA, nick);
+
+ QEventLoop* loop = new QEventLoop;
+ //block until we get a client's info;
+ connect(this, SIGNAL(clientInfoUpdated()), loop, SLOT(quit()));
+ loop->exec();
+
+ qDebug() << DTAG << "Making a call to a client" << nick << "with address and port" << iter.value()->address()
+					<< iter.value()->audioPort();
+
+ QHostAddress destAddress(iter.value()->address());
+ quint16 destPort = iter.value()->audioPort();
+
+ audioModule->setDestination(destAddress, destPort);
+
+ audioModule->turnOnMicrophone();
+}
+
 void ClientService::slotConnected()
 {
  QTime actionTime=QTime::currentTime();
@@ -434,6 +465,7 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 	 {
 	 qDebug()<<"Sending to server size of base:"<<clients->size();
 	 out << nick << audioModule->getPort() << clients->size();
+
 	 break;
 	 }
 
@@ -462,36 +494,6 @@ void ClientService::slotSetAddress(QString addr, QString port)
  *pserverPort=port;
 }
 
-void ClientService::slotMakeCall(QString nick)
-{
- qDebug() << "Make a call to" << nick;
-
- auto iter = clients->find(nick);
-
- if(iter == clients->end())
-	{
-	 qWarning() << DTAG << "Not found such nick to make a call";
-
-	 return;
-	}
-
- slotSendToServer(DATATYPE::GETACTUALDATA, nick);
-
- QEventLoop* loop = new QEventLoop;
- //block until we get a client's info;
- connect(this, SIGNAL(clientInfoUpdated()), loop, SLOT(quit()));
- loop->exec();
-
- qDebug() << DTAG << "Making a call to a client" << nick << "with address and port" << iter.value()->address()
-					<< iter.value()->audioPort();
-
- QHostAddress destAddress(iter.value()->address());
- quint16 destPort = iter.value()->audioPort();
-
- audioModule->setDestination(destAddress, destPort);
-
- audioModule->turnOnMicrophone();
-}
 
 void ClientService::removeOnlinesFromOfflines(QStringList onlines)
 {

@@ -19,6 +19,15 @@ public:
  explicit CallingWindow(QWidget *parent = nullptr);
  ~CallingWindow();
 
+ enum class STATES
+ {
+	INCOMING,
+	OUTGOING,
+	SPEAKING
+ };
+
+ void setState(STATES state);
+
 private:
  Ui::CallingWindow *ui;
 

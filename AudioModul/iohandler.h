@@ -15,22 +15,22 @@ private:
 
  QAudioOutput* audioOutput;
 
- QIODevice* inputDev;
+ QIODevice* inputDev = nullptr;
 
- QIODevice* outputDev;
+ QIODevice* outputDev = nullptr;
 
  QBuffer* buffer;
 
 public:
  IOHandler();
 
- void startRecording();
-
- void stopRecording();
-
  void turnOnInput();
 
  void turnOffInput();
+
+ void turnOnOutput();
+
+ void turnOffOutput();
 
 signals:
  void readData(QByteArray&);

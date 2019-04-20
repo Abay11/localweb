@@ -31,32 +31,26 @@ IOHandler::IOHandler()
  audioOutput = new QAudioOutput(format, this);
 }
 
-void IOHandler::startRecording()
+void IOHandler::turnOnInput()
 {
- qDebug() << "Start recording...";
-
  inputDev = audioInput->start();
 
  connect(inputDev, SIGNAL(readyRead()), SLOT(slotReadAudioInput()));
-
- outputDev = audioOutput->start();
-}
-
-void IOHandler::stopRecording()
-{
- audioInput->stop();
-
- audioOutput->stop();
-}
-
-void IOHandler::turnOnInput()
-{
- audioInput->stop();
 }
 
 void IOHandler::turnOffInput()
 {
- audioInput->start();
+ audioInput->stop();
+}
+
+void IOHandler::turnOnOutput()
+{
+ outputDev = audioOutput->start();
+}
+
+void IOHandler::turnOffOutput()
+{
+ audioOutput->stop();
 }
 
 void IOHandler::slotReadAudioInput()

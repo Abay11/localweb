@@ -76,7 +76,7 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  connect(plistdock, SIGNAL(openConvertion(QString)),
 				 SLOT(slotSwitchConversions(QString)));
 
- connect(plistdock, SIGNAL(makeCall(QString)), pservice, SLOT(slotMakeCall(QString)));
+ connect(plistdock, SIGNAL(makeCall(QString)), this, SLOT(slotMakeCall(QString)));
 
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 
@@ -139,6 +139,11 @@ void ClientWidget::slotForwardToDestination(QString msg, QString from, const QTi
 	}
 
  (*it)->slotAppendMessageToDisplay(msg, time);
+}
+
+void ClientWidget::slotMakeCall(QString nick)
+{
+ pservice->makeCall(nick);
 }
 
 void ClientWidget::slotConnected()

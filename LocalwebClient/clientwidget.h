@@ -82,6 +82,8 @@ private slots:
  void slotSwitchConversions(QString convertionName);
  void slotForwardToDestination(QString msg, QString from, const QTime &);
 
+ void slotMakeCall(QString nick);
+
 public slots:
  void slotAddressEdited();
  void slotPortEdited();

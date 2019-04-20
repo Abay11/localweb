@@ -113,6 +113,27 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
+  <widget class="QLabel" name="timer">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>320</y>
+     <width>71</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>TIMER</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
   <widget class="QWidget" name="">
    <property name="geometry">
     <rect>

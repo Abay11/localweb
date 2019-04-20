@@ -13,6 +13,70 @@ CallingWindow::~CallingWindow()
  delete ui;
 }
 
+void CallingWindow::setState(const QString& nick, CallingWindow::STATES state)
+{
+ QLabel* nickname = ui->nickname;
+
+ QLabel* status = ui->status;
+
+ QLabel* picture = ui->picture;
+
+ QLabel* timer =ui->timer;
+
+ QWidget* acceptingWidget = ui->acceptingControl;
+
+ QWidget* speakingWidget = ui->speakingControl;
+
+ nickname->setText(nick);
+
+ switch (state)
+	{
+	case STATES::INCOMING:
+	 {
+		status->setText("ВХОДЯЩИЙ ВЫЗОВ");
+
+		setImage(IMAGES::INCOMING);
+
+		timer->setHidden(true);
+
+		acceptingWidget->setVisible(true);
+
+		speakingWidget->setVisible(false);
+
+		break;
+	 }
+
+	case STATES::OUTGOING:
+	 {
+		status->setText("ИСХОДЯЩИЙ ВЫЗОВ");
+
+		setImage(IMAGES::OUTGOING);
+
+		timer->setHidden(true);
+
+		acceptingWidget->setVisible(false);
+
+		speakingWidget->setVisible(true);
+
+		break;
+	 }
+
+	case STATES::SPEAKING:
+	 {
+		status->setText("ИДЕТ БЕСЕДА");
+
+		setImage(IMAGES::CONNECTED);
+
+		timer->setHidden(false);
+
+		acceptingWidget->setVisible(false);
+
+		speakingWidget->setVisible(true);
+	 }
+
+	}
+}
+
 void CallingWindow::setImage(CallingWindow::IMAGES image)
 {
  QPixmap pixmap;

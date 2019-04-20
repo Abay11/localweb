@@ -26,7 +26,7 @@ public:
 	SPEAKING
  };
 
- void setState(STATES state);
+ void setState(const QString& nick, STATES state);
 
 private:
  Ui::CallingWindow *ui;

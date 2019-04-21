@@ -144,7 +144,7 @@ bool ClientService::isConnected()
  return psocket->state()==QTcpSocket::ConnectedState;
 }
 
-void ClientService::makeCall(QString nick)
+int ClientService::makeCall(QString nick)
 {
  qDebug() << "Make a call to" << nick;
 
@@ -154,7 +154,7 @@ void ClientService::makeCall(QString nick)
 	{
 	 qWarning() << DTAG << "Not found such nick to make a call";
 
-	 return;
+	 return -1;
 	}
 
  slotSendToServer(DATATYPE::GETACTUALDATA, nick);
@@ -173,6 +173,8 @@ void ClientService::makeCall(QString nick)
  audioModule->setDestination(destAddress, destPort);
 
  audioModule->turnOnMicrophone();
+
+ return 0;
 }
 
 void ClientService::slotConnected()
@@ -493,6 +495,7 @@ void ClientService::slotSetAddress(QString addr, QString port)
  *pserverAddress=addr;
  *pserverPort=port;
 }
+
 
 
 void ClientService::removeOnlinesFromOfflines(QStringList onlines)

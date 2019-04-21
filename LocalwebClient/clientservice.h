@@ -101,7 +101,7 @@ public:
 
  bool isConnected();
 
- void makeCall(QString nick);
+ int makeCall(QString nick);
 
 protected slots:
  void slotConnected();

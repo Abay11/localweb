@@ -72,6 +72,42 @@ void CallingWindow::setState(const QString& nick, CallingWindow::STATES state)
 		acceptingWidget->setVisible(false);
 
 		speakingWidget->setVisible(true);
+
+		break;
+	 }
+
+	case STATES::REJECTING:
+	 {
+		status->setText("Клиент отклонил вызов");
+
+		setImage(IMAGES::REJECTCALL);
+
+		timer->setHidden(true);
+
+		acceptingWidget->setVisible(false);
+
+		speakingWidget->setVisible(false);
+
+		QTimer::singleShot(3000, this, SLOT(close()));
+
+		break;
+	 }
+
+	case STATES::NOTREACH:
+	 {
+		status->setText("Не удалось дозвониться");
+
+		setImage(IMAGES::REJECTCALL);
+
+		timer->setHidden(true);
+
+		acceptingWidget->setVisible(false);
+
+		speakingWidget->setVisible(false);
+
+		QTimer::singleShot(3000, this, SLOT(close()));
+
+		break;
 	 }
 
 	}

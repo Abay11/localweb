@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QBitmap>
+#include <QTimer>
 #include <QDebug>
 
 namespace Ui {
@@ -23,7 +24,9 @@ public:
  {
 	INCOMING,
 	OUTGOING,
-	SPEAKING
+	SPEAKING,
+	REJECTING,
+	NOTREACH,
  };
 
  void setState(const QString& nick, STATES state);

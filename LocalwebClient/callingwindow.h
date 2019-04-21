@@ -43,6 +43,13 @@ private:
  };
 
  void setImage(IMAGES image);
+
+private slots:
+ void slotTurnMicro();
+
+signals:
+ void turnMicro();
+
 };
 
 #endif // CALLINGWINDOW_H

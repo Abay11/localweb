@@ -6,6 +6,8 @@ CallingWindow::CallingWindow(QWidget *parent) :
 	ui(new Ui::CallingWindow)
 {
  ui->setupUi(this);
+
+ connect(ui->cmdTurnMicro, SIGNAL(clicked()), SLOT(slotTurnMicro()));
 }
 
 CallingWindow::~CallingWindow()
@@ -18,8 +20,6 @@ void CallingWindow::setState(const QString& nick, CallingWindow::STATES state)
  QLabel* nickname = ui->nickname;
 
  QLabel* status = ui->status;
-
- QLabel* picture = ui->picture;
 
  QLabel* timer =ui->timer;
 
@@ -154,4 +154,26 @@ void CallingWindow::setImage(CallingWindow::IMAGES image)
 	ui->picture->setPixmap(pixmap);
  else
 	qWarning() << DTAG << "Couldn't load a pixmap";
+}
+
+void CallingWindow::slotTurnMicro()
+{
+ QPushButton* btn = ui->cmdTurnMicro;
+
+ static bool isTurnOn = true;
+
+ isTurnOn = !isTurnOn;
+
+ if(isTurnOn)
+	{
+	 btn->setText("Выключить микрофон");
+	 btn->setPalette(QPalette(QColor("#8d6c9f")));
+	}
+ else
+	{
+	 btn->setText("Включить микрофон");
+	 btn->setPalette(QPalette(QColor("#81d6bb")));
+	}
+
+ emit turnMicro();
 }

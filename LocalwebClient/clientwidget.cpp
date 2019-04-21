@@ -10,6 +10,9 @@ void ClientWidget::initConvertions()
 
  connect(generalConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
 				 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
+
+ connect(generalConvertion, SIGNAL(makeCallClicked(QString)),
+				 this, SLOT(slotMakeCall(QString)));
 }
 
 ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
@@ -113,6 +116,8 @@ void ClientWidget::slotSwitchConversions(QString convertionName)
 														 insertingConvertion);
 	 connect(insertingConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
 					 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
+
+	 connect(insertingConvertion, SIGNAL(makeCallClicked(QString)), this, SLOT(makeCall(QString)));
 	}
  auto oldWidget = pconvertionLay->itemAt(0)->widget();
  if(oldWidget)

@@ -36,6 +36,8 @@ ConvertionWidget::ConvertionWidget(QString name,
  connect(cmdClr, SIGNAL(clicked()), SLOT(slotClrDisplay()));
 
  connect(pmsgField, SIGNAL(textChanged()), SLOT(slotMsgChanged()));
+
+ connect(cmdMakeCall, SIGNAL(clicked()), SLOT(slotMakeCall()));
 }
 
 void ConvertionWidget::setSocketState(bool isOpen)

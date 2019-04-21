@@ -40,6 +40,7 @@ private slots:
  void slotSendFile();
  void slotClrDisplay();
  void slotMsgChanged();
+
  void slotMakeCall();
 
 public slots:

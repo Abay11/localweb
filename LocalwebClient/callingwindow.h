@@ -49,6 +49,8 @@ private slots:
 
  void slotTurnSpeakers();
 
+ void slotPutDown();
+
 signals:
  void turnMicroClicked();
 

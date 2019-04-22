@@ -11,7 +11,7 @@ CallingWindow::CallingWindow(QWidget *parent) :
 
  connect(ui->cmdTurnSpeakers, SIGNAL(clicked()), SLOT(slotTurnSpeakers()));
 
- connect(ui->cmdPutDown, SIGNAL(clicked()), SIGNAL(putDownClicked()));
+ connect(ui->cmdPutDown, SIGNAL(clicked()), SLOT(slotPutDown()));
 }
 
 CallingWindow::~CallingWindow()
@@ -202,4 +202,11 @@ void CallingWindow::slotTurnSpeakers()
 	}
 
  emit turnSpeakersClicked();
+}
+
+void CallingWindow::slotPutDown()
+{
+ emit putDownClicked();
+
+ close();
 }

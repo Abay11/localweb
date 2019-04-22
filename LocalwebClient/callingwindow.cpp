@@ -8,7 +8,10 @@ CallingWindow::CallingWindow(QWidget *parent) :
  ui->setupUi(this);
 
  connect(ui->cmdTurnMicro, SIGNAL(clicked()), SLOT(slotTurnMicro()));
+
  connect(ui->cmdTurnSpeakers, SIGNAL(clicked()), SLOT(slotTurnSpeakers()));
+
+ connect(ui->cmdPutDown, SIGNAL(clicked()), SIGNAL(putDownClicked()));
 }
 
 CallingWindow::~CallingWindow()
@@ -176,7 +179,7 @@ void CallingWindow::slotTurnMicro()
 	 btn->setPalette(QPalette(QColor("#81d6bb")));
 	}
 
- emit turnMicro();
+ emit turnMicroClicked();
 }
 
 void CallingWindow::slotTurnSpeakers()
@@ -198,5 +201,5 @@ void CallingWindow::slotTurnSpeakers()
 	 btn->setPalette(QPalette(QColor("#81d6bb")));
 	}
 
- emit turnSpeakers();
+ emit turnSpeakersClicked();
 }

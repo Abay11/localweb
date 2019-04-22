@@ -50,9 +50,11 @@ private slots:
  void slotTurnSpeakers();
 
 signals:
- void turnMicro();
+ void turnMicroClicked();
 
- void turnSpeakers();
+ void turnSpeakersClicked();
+
+ void putDownClicked();
 };
 
 #endif // CALLINGWINDOW_H

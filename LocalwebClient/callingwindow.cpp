@@ -8,6 +8,7 @@ CallingWindow::CallingWindow(QWidget *parent) :
  ui->setupUi(this);
 
  connect(ui->cmdTurnMicro, SIGNAL(clicked()), SLOT(slotTurnMicro()));
+ connect(ui->cmdTurnSpeakers, SIGNAL(clicked()), SLOT(slotTurnSpeakers()));
 }
 
 CallingWindow::~CallingWindow()
@@ -176,4 +177,26 @@ void CallingWindow::slotTurnMicro()
 	}
 
  emit turnMicro();
+}
+
+void CallingWindow::slotTurnSpeakers()
+{
+ QPushButton* btn = ui->cmdTurnSpeakers;
+
+ static bool isTurnOn = true;
+
+ isTurnOn = !isTurnOn;
+
+ if(isTurnOn)
+	{
+	 btn->setText("Выключить динамики");
+	 btn->setPalette(QPalette(QColor("#8d6c9f")));
+	}
+ else
+	{
+	 btn->setText("Включить динамики");
+	 btn->setPalette(QPalette(QColor("#81d6bb")));
+	}
+
+ emit turnSpeakers();
 }

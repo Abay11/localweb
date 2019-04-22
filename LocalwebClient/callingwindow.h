@@ -47,9 +47,12 @@ private:
 private slots:
  void slotTurnMicro();
 
+ void slotTurnSpeakers();
+
 signals:
  void turnMicro();
 
+ void turnSpeakers();
 };
 
 #endif // CALLINGWINDOW_H

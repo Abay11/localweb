@@ -175,6 +175,15 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 		break;
 	 }
 
+	case DATATYPE::CALLINGREQUEST:
+	 {
+		qDebug() << DTAG << "Sending the CALLINGREQUEST";
+
+		QString destination = data.toString();
+		out << destination;
+
+		break;
+	 }
 	default:
 	 qWarning()<<"Unknown datatype for sending to client";
 	 break;
@@ -495,6 +504,44 @@ void ServerNetworkService::slotReadClient()
 		 break;
 		}
 
+	 case DATATYPE::CALLINGREQUEST:
+		{
+		 qDebug() << DTAG << "Received the CALLINGREQUEST request";
+		 QString nick;
+
+		 in >> nick;
+
+		 auto fromIter = socketsAndNicksOfOnlines->find(pclient);
+		 if(fromIter == socketsAndNicksOfOnlines->end())
+			{
+			 qWarning() << DTAG << "Couldn't find in the onlines the requesting client";
+
+			 break;
+			}
+		 QString from = fromIter.value();
+
+		 QTcpSocket* to = nullptr;
+		 for(auto i = socketsAndNicksOfOnlines->begin(); i != socketsAndNicksOfOnlines->end(); ++i)
+			{
+			 if(i.value() == nick)
+				{
+				 to = i.key();
+				 break;
+				}
+			}
+
+		 if(to == nullptr)
+			{
+			 qWarning() << DTAG << "Coulnd't find in the base a destination client";
+
+			 break;
+			}
+
+		 //checking if is the client in the base happens in the sending method
+		 sendToClient(to, type, from);
+
+		 break;
+		}
 	 default:
 		qWarning()<<"Unknown datatype";
 		break;

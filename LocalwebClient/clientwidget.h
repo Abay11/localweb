@@ -87,6 +87,8 @@ private slots:
 
  void slotMakeCall(QString nick);
 
+ CallingWindow* initCallingWindow();
+
 public slots:
  void slotAddressEdited();
  void slotPortEdited();

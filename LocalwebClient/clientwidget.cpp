@@ -133,7 +133,7 @@ void ClientWidget::slotForwardToDestination(QString msg, QString from, const QTi
 
 void ClientWidget::slotMakeCall(QString nick)
 {
- static CallingWindow* callingWindow = new CallingWindow;
+ CallingWindow* callingWindow = initCallingWindow();
 
  callingWindow->setState(nick, CallingWindow::STATES::OUTGOING);
 
@@ -145,6 +145,13 @@ void ClientWidget::slotMakeCall(QString nick)
 
 	 callingWindow->setState(nick, CallingWindow::STATES::NOTREACH);
 	}
+}
+
+CallingWindow* ClientWidget::initCallingWindow()
+{
+ static CallingWindow* window = new CallingWindow;
+
+ return window;
 }
 
 void ClientWidget::slotConnected()

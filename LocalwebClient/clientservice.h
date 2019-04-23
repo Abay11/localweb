@@ -72,6 +72,8 @@ private:
 
  void restoreDataAndProperties();
 
+ bool callingResponseStatus = false;
+
 public:
  ClientService(QWidget *parent=nullptr);
 
@@ -138,6 +140,7 @@ signals:
  void newMessageForNotification(QString msg);
 
  void clientInfoUpdated();
+ void privateCallingResponseReceived();
 };
 
 #endif // CLIENTSERVICE_H

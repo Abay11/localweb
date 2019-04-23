@@ -172,9 +172,36 @@ int ClientService::makeCall(QString nick)
 
  audioModule->setDestination(destAddress, destPort);
 
- audioModule->turnOnMicrophone();
+ QEventLoop* loop2 = new QEventLoop;
+ connect(this, SIGNAL(privateCallingResponseReceived()), loop2, SLOT(quit()));
 
- return 0;
+ QTimer::singleShot(4000, loop2, SLOT(quit()));
+
+ // if client won't response, break the loop with a 15ses timer
+ slotSendToServer(DATATYPE::CALLINGREQUEST, nick);
+
+ loop2->exec();
+
+ int res = 0;
+ if(callingResponseStatus == true)
+	{
+	 //the other client accept call
+	 qDebug() << DTAG << "The client accept a call";
+
+	 // audioModule->turnOnMicrophone();
+
+	 res = 0;
+	}
+	else
+	{
+	 qInfo() << DTAG << "Не удалось дозвониться";
+
+	 res = -1;
+	}
+
+ callingResponseStatus = false;
+
+ return res;
 }
 
 void ClientService::slotConnected()
@@ -362,6 +389,15 @@ void ClientService::slotReadyRead()
 		 break;
 	 }
 
+	 case DATATYPE::CALLINGRESPONSE:
+	 {
+		 qDebug() << DTAG << "Received calling response";
+
+		 emit privateCallingResponseReceived();
+
+		 break;
+	 }
+
 	 default:
 		//что-то пошло не так, клиент не может получить иную команду
 		 qCritical()<<"Неизвестная ошибка при получении сообщения.";
@@ -481,6 +517,18 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 
 		break;
 	 }
+
+	case DATATYPE::CALLINGREQUEST:
+	 {
+		qDebug() << DTAG << "Sendting to the server the calling request";
+
+		QString& callingUser = msg;
+
+		out << callingUser;
+
+		break;
+	 }
+
 	default: break;
 	}
 

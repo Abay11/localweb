@@ -1,20 +1,5 @@
 #include "clientwidget.h"
 
-void ClientWidget::initConvertions()
-{
- generalConvertion=new ConvertionWidget("Общий чат");
-
- convertionWidgets->insert("Общий чат", generalConvertion);
-
- currentCunvertion=generalConvertion;
-
- connect(generalConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
-				 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
-
- connect(generalConvertion, SIGNAL(makeCallClicked(QString)),
-				 this, SLOT(slotMakeCall(QString)));
-}
-
 ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
  : QMainWindow (parent)
  ,pserverAddress(new QString)
@@ -275,6 +260,21 @@ void ClientWidget::setUI()
 
  addToolBar(toolbar);
  setMenuBar(pmenuBar);
+}
+
+void ClientWidget::initConvertions()
+{
+ generalConvertion=new ConvertionWidget("Общий чат");
+
+ convertionWidgets->insert("Общий чат", generalConvertion);
+
+ currentCunvertion=generalConvertion;
+
+ connect(generalConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
+				 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
+
+ connect(generalConvertion, SIGNAL(makeCallClicked(QString)),
+				 this, SLOT(slotMakeCall(QString)));
 }
 
 void ClientWidget::slotConnectClicked()

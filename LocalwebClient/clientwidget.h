@@ -65,7 +65,6 @@ private:
  QMap<QString, ConvertionWidget*> *convertionWidgets;
  ConvertionWidget *generalConvertion=nullptr;
  ConvertionWidget *currentCunvertion=nullptr;
- void initConvertions();
 
 public:
  ClientWidget(ClientService *pservice, QWidget *parent = nullptr);
@@ -74,6 +73,9 @@ public:
  void turnStateOff();
 
  void setUI();
+
+private:
+ void initConvertions();
 
 private slots:
  void slotConnectClicked();

@@ -188,7 +188,8 @@ int ClientService::makeCall(QString nick)
 	 //the other client accept call
 	 qDebug() << DTAG << "The client accept a call";
 
-	 // audioModule->turnOnMicrophone();
+		audioModule->turnOnSpeakers();
+		audioModule->turnOnMicrophone();
 
 	 res = 0;
 	}
@@ -605,6 +606,10 @@ void ClientService::slotCallAccepted(QString to)
  bool isCallAccepted = true;
 
  slotSendToServer(DATATYPE::CALLINGRESPONSE, to, isCallAccepted);
+
+ audioModule->turnOnSpeakers();
+
+ audioModule->turnOnMicrophone();
 }
 
 void ClientService::slotCallRejected(QString to)

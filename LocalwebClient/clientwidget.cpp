@@ -143,7 +143,7 @@ void ClientWidget::slotMakeCall(QString nick)
 
  if(pservice->makeCall(nick) != 0) // return nonzero if user not found
 	{
-	 qWarning() << DTAG << "Not found a user to calling. Closing a windows";
+	 qWarning() << DTAG << "Not found a user to calling or the user not respoonse. Closing a windows";
 
 	 callingWindow->setState(nick, CallingWindow::STATES::NOTREACH);
 	}

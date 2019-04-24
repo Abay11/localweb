@@ -34,6 +34,8 @@ public:
 private:
  Ui::CallingWindow *ui;
 
+ QTimer* timer;
+
  enum class IMAGES{
 	ACCEPTCALL,
 	REJECTCALL,

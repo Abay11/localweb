@@ -3,7 +3,8 @@
 
 CallingWindow::CallingWindow(QWidget *parent) :
 	QWidget(parent),
-	ui(new Ui::CallingWindow)
+	ui(new Ui::CallingWindow),
+	timer(new QTimer)
 {
  ui->setupUi(this);
 
@@ -52,7 +53,8 @@ void CallingWindow::setState(const QString& nick, CallingWindow::STATES state)
 		speakingWidget->setVisible(false);
 
 		//close window automatically after 10 sec
-		QTimer::singleShot(10000, this, SLOT(close()));
+		this->timer->setSingleShot(true);
+		QTimer::connect(timer, SIGNAL(timeout()), this, SLOT(close()));
 
 		break;
 	 }
@@ -225,6 +227,8 @@ void CallingWindow::slotCallAccepted()
  emit callAccepted(from);
 
  setState(from, STATES::SPEAKING);
+
+ timer->stop();
 }
 
 void CallingWindow::slotCallRejected()
@@ -232,6 +236,8 @@ void CallingWindow::slotCallRejected()
  QString from = ui->nickname->text();
 
  emit callRejected(from);
+
+ timer->stop();
 
  close();
 }

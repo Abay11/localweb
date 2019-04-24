@@ -77,6 +77,8 @@ public:
 private:
  void initConvertions();
 
+ CallingWindow* initCallingWindow();
+
 private slots:
  void slotConnectClicked();
  void slotQuit();

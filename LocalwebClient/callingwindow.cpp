@@ -235,7 +235,7 @@ void CallingWindow::slotTurnSpeakers()
 
 void CallingWindow::slotPutDown()
 {
- emit putDownClicked();
+ emit putDownClicked(getCurrentNick());
 
  close();
 }

@@ -63,7 +63,7 @@ signals:
 
  void turnSpeakersClicked();
 
- void putDownClicked();
+ void putDownClicked(QString);
 
  void callAccepted(QString);
 

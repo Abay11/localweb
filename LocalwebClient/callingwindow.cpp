@@ -220,14 +220,18 @@ void CallingWindow::slotPutDown()
 
 void CallingWindow::slotCallAccepted()
 {
- emit callAccepted();
+ QString from = ui->nickname->text();
 
- setState(ui->nickname->text(), STATES::SPEAKING);
+ emit callAccepted(from);
+
+ setState(from, STATES::SPEAKING);
 }
 
 void CallingWindow::slotCallRejected()
 {
- emit callRejected();
+ QString from = ui->nickname->text();
+
+ emit callRejected(from);
 
  close();
 }

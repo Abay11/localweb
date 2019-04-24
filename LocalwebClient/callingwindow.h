@@ -62,9 +62,9 @@ signals:
 
  void putDownClicked();
 
- void callAccepted();
+ void callAccepted(QString);
 
- void callRejected();
+ void callRejected(QString);
 };
 
 #endif // CALLINGWINDOW_H

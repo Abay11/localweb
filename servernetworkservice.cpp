@@ -184,8 +184,21 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 
 		break;
 	 }
+	case DATATYPE::CALLINGRESPONSE:
+	 {
+		qDebug() << DTAG << "Sending the CALLING REQUEST";
+
+		QString to = data.toString();
+
+		bool isAccepted = *(static_cast<bool*>(paddition));
+
+		out << to << isAccepted;
+
+		break;
+	 }
+
 	default:
-	 qWarning()<<"Unknown datatype for sending to client";
+	 qWarning()<< DTAG << "Unknown datatype for sending to client";
 	 break;
 	}
 
@@ -542,6 +555,45 @@ void ServerNetworkService::slotReadClient()
 
 		 break;
 		}
+
+	 case DATATYPE::CALLINGRESPONSE:
+		{
+		 qDebug() << DTAG << "Received the CALLINGRESPONSE request";
+
+
+		 bool isAccepted;
+
+		 QString to;
+		 in >> to >> isAccepted;
+
+		 QTcpSocket* destination = nullptr;
+
+		 for(auto it = socketsAndNicksOfOnlines->begin(); it != socketsAndNicksOfOnlines->end(); ++it)
+			{
+			 if(to == it.value())
+				{
+				 destination = it.key();
+				 break;
+				}
+			}
+
+		 auto iterFrom = socketsAndNicksOfOnlines->find(pclient);
+		 if(iterFrom == socketsAndNicksOfOnlines->end())
+			{
+			 qWarning() << DTAG << "Something goes wrong: not found the responder in onlines";
+			 return;
+			}
+
+		 if(destination)
+			sendToClient(destination, type, to, &isAccepted);
+		 else {
+			 qWarning() << "Couldn't found a user to resend the calling response";
+			}
+
+		 break;
+		}
+
+
 	 default:
 		qWarning()<<"Unknown datatype";
 		break;

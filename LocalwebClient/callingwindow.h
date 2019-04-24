@@ -32,6 +32,8 @@ public:
 
  void setState(const QString& nick, STATES state);
 
+ QString getCurrentNick();
+
 private:
  Ui::CallingWindow *ui;
 

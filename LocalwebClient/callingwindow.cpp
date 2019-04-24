@@ -143,7 +143,9 @@ void CallingWindow::setState(const QString& nick, CallingWindow::STATES state)
 	}
 }
 
-	}
+QString CallingWindow::getCurrentNick()
+{
+ return ui->nickname->text();
 }
 
 void CallingWindow::setImage(CallingWindow::IMAGES image)

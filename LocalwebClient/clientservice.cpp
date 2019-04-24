@@ -405,6 +405,14 @@ void ClientService::slotReadyRead()
 	 {
 		 qDebug() << DTAG << "Received calling response";
 
+		 QString from;
+
+		 bool isAccepted;
+
+		 in >> from >> isAccepted;
+
+		 callingResponseStatus = isAccepted;
+
 		 emit privateCallingResponseReceived();
 
 		 break;

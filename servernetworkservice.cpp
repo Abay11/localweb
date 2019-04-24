@@ -197,6 +197,13 @@ void ServerNetworkService::sendToClient(QTcpSocket *to, DATATYPE type, QVariant 
 		break;
 	 }
 
+	case DATATYPE::STOPCALLING:
+	 {
+		qDebug() << DTAG << "Sending the STOPCALLING";
+
+		break;
+	 }
+
 	default:
 	 qWarning()<< DTAG << "Unknown datatype for sending to client";
 	 break;
@@ -593,6 +600,32 @@ void ServerNetworkService::slotReadClient()
 		 break;
 		}
 
+	 case DATATYPE::STOPCALLING:
+		{
+		 qDebug() << DTAG << "Received STOPCALLING";
+
+		 QString to;
+		 in >> to;
+
+		 QTcpSocket* destination = nullptr;
+
+		 for(auto it = socketsAndNicksOfOnlines->begin(); it != socketsAndNicksOfOnlines->end(); ++it)
+			{
+			 if(to == it.value())
+				{
+				 destination = it.key();
+				 break;
+				}
+			}
+
+		 if(destination)
+			sendToClient(destination, type, to);
+		 else {
+			 qWarning() << "Couldn't found a user to forward the stopcalling";
+			}
+
+		 break;
+		}
 
 	 default:
 		qWarning()<<"Unknown datatype";

@@ -66,6 +66,8 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 
  connect(plistdock, SIGNAL(makeCall(QString)), this, SLOT(slotMakeCall(QString)));
 
+ connect(pservice, SIGNAL(callingRequest(QString)), SLOT(slotReceiveCall(QString)));
+
  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 
  if(pservice->isConnected())
@@ -145,6 +147,14 @@ void ClientWidget::slotMakeCall(QString nick)
 
 	 callingWindow->setState(nick, CallingWindow::STATES::NOTREACH);
 	}
+
+void ClientWidget::slotReceiveCall(QString nick)
+{
+ CallingWindow* w = initCallingWindow();
+
+ w->setState(nick, CallingWindow::STATES::INCOMING);
+
+ w->show();
 }
 
 CallingWindow* ClientWidget::initCallingWindow()

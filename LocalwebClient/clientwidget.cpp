@@ -161,6 +161,13 @@ void ClientWidget::slotReceiveCall(QString nick)
  w->show();
 }
 
+void ClientWidget::slotCompanonFinisheCall()
+{
+ CallingWindow* w = initCallingWindow();
+
+ w->setState(w->getCurrentNick(), CallingWindow::STATES::STOPPING);
+}
+
 CallingWindow* ClientWidget::initCallingWindow()
 {
  static CallingWindow* window = new CallingWindow;
@@ -168,6 +175,8 @@ CallingWindow* ClientWidget::initCallingWindow()
  connect(window, SIGNAL(callAccepted(QString)), pservice, SLOT(slotCallAccepted(QString)));
 
  connect(window, SIGNAL(callRejected(QString)), pservice, SLOT(slotCallRejected(QString)));
+
+ connect(pservice, SIGNAL(receivedCallStopped()), this, SLOT(slotCompanonFinisheCall()));
 
  return window;
 }

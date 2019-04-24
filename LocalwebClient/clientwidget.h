@@ -91,7 +91,8 @@ private slots:
 
  void slotReceiveCall(QString nick);
 
- CallingWindow* initCallingWindow();
+ void slotCompanonFinisheCall();
+
 
 public slots:
  void slotAddressEdited();

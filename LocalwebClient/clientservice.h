@@ -123,6 +123,10 @@ public slots:
 
  void slotSetAddress(QString addr, QString port);
 
+ void slotCallAccepted(QString to);
+
+ void slotCallRejected(QString to);
+
 
 signals:
  void connected();

@@ -556,6 +556,20 @@ void ClientService::slotSetAddress(QString addr, QString port)
  *pserverPort=port;
 }
 
+void ClientService::slotCallAccepted(QString to)
+{
+ bool isCallAccepted = true;
+
+ slotSendToServer(DATATYPE::CALLINGRESPONSE, to, isCallAccepted);
+}
+
+void ClientService::slotCallRejected(QString to)
+{
+ bool isCallAccepted = false;
+
+ slotSendToServer(DATATYPE::CALLINGRESPONSE, to, isCallAccepted);
+}
+
 
 
 void ClientService::removeOnlinesFromOfflines(QStringList onlines)

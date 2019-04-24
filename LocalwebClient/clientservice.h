@@ -127,6 +127,7 @@ public slots:
 
  void slotCallRejected(QString to);
 
+ void slotCallPutDowned(QString to);
 
 signals:
  void connected();

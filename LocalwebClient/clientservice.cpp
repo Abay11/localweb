@@ -619,7 +619,14 @@ void ClientService::slotCallRejected(QString to)
  slotSendToServer(DATATYPE::CALLINGRESPONSE, to, isCallAccepted);
 }
 
+void ClientService::slotCallPutDowned(QString to)
+{
+ audioModule->turnOffSpeakers();
 
+ audioModule->turnOffMicrophone();
+
+ slotSendToServer(DATATYPE::STOPCALLING, to);
+}
 
 void ClientService::removeOnlinesFromOfflines(QStringList onlines)
 {

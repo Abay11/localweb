@@ -418,6 +418,18 @@ void ClientService::slotReadyRead()
 		 break;
 	 }
 
+	 case DATATYPE::STOPCALLING:
+		{
+		 qDebug() << DTAG << "Received STOPCALLING";
+
+		 emit receivedCallStopped();
+
+		 audioModule->turnOffSpeakers();
+		 audioModule->turnOffMicrophone();
+
+		 break;
+		}
+
 	 default:
 		//что-то пошло не так, клиент не может получить иную команду
 		 qCritical()<<"Неизвестная ошибка при получении сообщения.";
@@ -558,6 +570,17 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 		bool isCallAccepted = firstAddition.toBool();
 
 		out << callingUser << isCallAccepted;
+
+		break;
+	 }
+
+	case DATATYPE::STOPCALLING:
+	 {
+		qDebug() << DTAG << "Sending STOPCALLING";
+
+		QString to = msg;
+
+		out << to;
 
 		break;
 	 }

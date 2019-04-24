@@ -47,6 +47,9 @@ void CallingWindow::setState(const QString& nick, CallingWindow::STATES state)
 
 		speakingWidget->setVisible(false);
 
+		//close window automatically after 10 sec
+		QTimer::singleShot(10000, this, SLOT(close()));
+
 		break;
 	 }
 

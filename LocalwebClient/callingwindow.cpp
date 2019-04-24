@@ -54,7 +54,8 @@ void CallingWindow::setState(const QString& nick, CallingWindow::STATES state)
 
 		//close window automatically after 10 sec
 		this->timer->setSingleShot(true);
-		QTimer::connect(timer, SIGNAL(timeout()), this, SLOT(close()));
+		QTimer::connect(this->timer, SIGNAL(timeout()), this, SLOT(close()));
+		this->timer->start(3000);
 
 		break;
 	 }

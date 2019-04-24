@@ -124,6 +124,25 @@ void CallingWindow::setState(const QString& nick, CallingWindow::STATES state)
 		break;
 	 }
 
+	case STATES::STOPPING:
+	 {
+		status->setText("Завершение вызова");
+
+		setImage(IMAGES::REJECTCALL);
+
+		timer->setHidden(true);
+
+		acceptingWidget->setVisible(false);
+
+		speakingWidget->setVisible(false);
+
+		QTimer::singleShot(3000, this, SLOT(close()));
+
+		break;
+	 }
+	}
+}
+
 	}
 }
 

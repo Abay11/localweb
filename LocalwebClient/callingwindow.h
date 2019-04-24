@@ -27,6 +27,7 @@ public:
 	SPEAKING,
 	REJECTING,
 	NOTREACH,
+	STOPPING
  };
 
  void setState(const QString& nick, STATES state);

@@ -176,6 +176,8 @@ CallingWindow* ClientWidget::initCallingWindow()
 
  connect(window, SIGNAL(callRejected(QString)), pservice, SLOT(slotCallRejected(QString)));
 
+ connect(window, SIGNAL(putDownClicked(QString)), pservice, SLOT(slotCallPutDowned(QString)));
+
  connect(pservice, SIGNAL(receivedCallStopped()), this, SLOT(slotCompanonFinisheCall()));
 
  return window;

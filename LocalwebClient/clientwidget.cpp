@@ -147,6 +147,10 @@ void ClientWidget::slotMakeCall(QString nick)
 
 	 callingWindow->setState(nick, CallingWindow::STATES::NOTREACH);
 	}
+ else {
+	 callingWindow->setState(nick, CallingWindow::STATES::SPEAKING);
+	}
+}
 
 void ClientWidget::slotReceiveCall(QString nick)
 {

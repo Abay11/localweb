@@ -149,6 +149,8 @@ signals:
  void callingRequest(const QString& from);
 
  void privateCallingResponseReceived();
+
+ void receivedCallStopped();
 };
 
 #endif // CLIENTSERVICE_H

@@ -51,12 +51,20 @@ private slots:
 
  void slotPutDown();
 
+ void slotCallAccepted();
+
+ void slotCallRejected();
+
 signals:
  void turnMicroClicked();
 
  void turnSpeakersClicked();
 
  void putDownClicked();
+
+ void callAccepted();
+
+ void callRejected();
 };
 
 #endif // CALLINGWINDOW_H

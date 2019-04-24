@@ -12,6 +12,10 @@ CallingWindow::CallingWindow(QWidget *parent) :
  connect(ui->cmdTurnSpeakers, SIGNAL(clicked()), SLOT(slotTurnSpeakers()));
 
  connect(ui->cmdPutDown, SIGNAL(clicked()), SLOT(slotPutDown()));
+
+ connect(ui->cmdAccept, SIGNAL(clicked()), SLOT(slotCallAccepted()));
+
+ connect(ui->cmdReject, SIGNAL(clicked()), SLOT(slotCallRejected()));
 }
 
 CallingWindow::~CallingWindow()
@@ -25,7 +29,7 @@ void CallingWindow::setState(const QString& nick, CallingWindow::STATES state)
 
  QLabel* status = ui->status;
 
- QLabel* timer =ui->timer;
+ QLabel* timer = ui->timer;
 
  QWidget* acceptingWidget = ui->acceptingControl;
 
@@ -210,6 +214,20 @@ void CallingWindow::slotTurnSpeakers()
 void CallingWindow::slotPutDown()
 {
  emit putDownClicked();
+
+ close();
+}
+
+void CallingWindow::slotCallAccepted()
+{
+ emit callAccepted();
+
+ setState(ui->nickname->text(), STATES::SPEAKING);
+}
+
+void CallingWindow::slotCallRejected()
+{
+ emit callRejected();
 
  close();
 }

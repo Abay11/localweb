@@ -521,7 +521,7 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 
 	case DATATYPE::GETACTUALDATA:
 	 {
-		qDebug() << DTAG << "Sendting to the server a responce to update client's info";
+		qDebug() << DTAG << "Sendting to the server a request to update client's info";
 
 		QString& updatingClient = msg;
 

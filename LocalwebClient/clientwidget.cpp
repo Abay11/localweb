@@ -165,6 +165,10 @@ CallingWindow* ClientWidget::initCallingWindow()
 {
  static CallingWindow* window = new CallingWindow;
 
+ connect(window, SIGNAL(callAccepted(QString)), pservice, SLOT(slotCallAccepted(QString)));
+
+ connect(window, SIGNAL(callRejected(QString)), pservice, SLOT(slotCallRejected(QString)));
+
  return window;
 }
 

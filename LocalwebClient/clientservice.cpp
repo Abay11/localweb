@@ -541,6 +541,19 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 		break;
 	 }
 
+	case DATATYPE::CALLINGRESPONSE:
+	 {
+		qDebug() << DTAG << "Sendting to the server the calling RESPONSE";
+
+		QString& callingUser = msg;
+
+		bool isCallAccepted = firstAddition.toBool();
+
+		out << callingUser << isCallAccepted;
+
+		break;
+	 }
+
 	default: break;
 	}
 

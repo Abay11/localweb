@@ -140,6 +140,9 @@ signals:
  void newMessageForNotification(QString msg);
 
  void clientInfoUpdated();
+
+ void callingRequest(const QString& from);
+
  void privateCallingResponseReceived();
 };
 

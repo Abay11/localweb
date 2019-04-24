@@ -389,6 +389,18 @@ void ClientService::slotReadyRead()
 		 break;
 	 }
 
+	 case DATATYPE::CALLINGREQUEST:
+		{
+		 qDebug() << DTAG << "Received calling request";
+
+		 QString from;
+		 in >> from;
+
+		 emit callingRequest(from);
+
+		 break;
+		}
+
 	 case DATATYPE::CALLINGRESPONSE:
 	 {
 		 qDebug() << DTAG << "Received calling response";

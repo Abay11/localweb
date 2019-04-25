@@ -32,7 +32,10 @@ public:
 									QWidget *parent=nullptr);
 
  void setSocketState(bool);
+
  void setSentEnabled(bool);
+
+ void appendMsg(const QString& msg);
 
 
 private slots:

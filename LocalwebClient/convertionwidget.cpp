@@ -53,6 +53,15 @@ void ConvertionWidget::setSentEnabled(bool value)
  cmdSend->setEnabled(value);
 }
 
+void ConvertionWidget::appendMsg(const QString &msg)
+{
+ QString str = formatTimeToString(QTime::currentTime());
+
+ str += " " + msg;
+
+ pdisplay->append(str);
+}
+
 void ConvertionWidget::slotSend()
 {
  QString msg=pmsgField->toPlainText();

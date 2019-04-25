@@ -65,5 +65,7 @@ void IOHandler::slotReadAudioInput()
 void IOHandler::slotWriteAudioOutput(QByteArray &data)
 {
  qDebug() << "Size of writing data to output:" << data.size();
- outputDev->write(data);
+
+ if(audioOutput->state() != QAudio::State::StoppedState)
+	outputDev->write(data);
 }

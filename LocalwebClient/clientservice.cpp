@@ -609,6 +609,28 @@ void ClientService::slotCallAccepted(QString to)
 {
  bool isCallAccepted = true;
 
+ slotSendToServer(DATATYPE::GETACTUALDATA, to);
+
+ QEventLoop* loop = new QEventLoop;
+ //block until we get a client's info;
+ connect(this, SIGNAL(clientInfoUpdated()), loop, SLOT(quit()));
+ loop->exec();
+ loop->deleteLater();
+
+ auto iter = clients->find(to);
+
+ if(iter == clients->end())
+	{
+	 qWarning() << DTAG << "Not found such nick to accept a call";
+
+	 return;
+	}
+
+ QHostAddress destAddress(iter.value()->address());
+ quint16 destPort = iter.value()->audioPort();
+
+ audioModule->setDestination(destAddress, destPort);
+
  slotSendToServer(DATATYPE::CALLINGRESPONSE, to, isCallAccepted);
 
  audioModule->turnOnSpeakers();

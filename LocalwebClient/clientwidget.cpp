@@ -135,6 +135,9 @@ void ClientWidget::slotForwardToDestination(QString msg, QString from, const QTi
 
 void ClientWidget::slotMakeCall(QString nick)
 {
+
+ currentCunvertion->appendMsg("Исходящий звонок " + nick);
+
  CallingWindow* callingWindow = initCallingWindow();
 
  callingWindow->setState(nick, CallingWindow::STATES::OUTGOING);
@@ -145,15 +148,21 @@ void ClientWidget::slotMakeCall(QString nick)
 	{
 	 qWarning() << DTAG << "Not found a user to calling or the user not respoonse. Closing a windows";
 
+		currentCunvertion->appendMsg("Не удалось дозвониться до " + nick);
+
 	 callingWindow->setState(nick, CallingWindow::STATES::NOTREACH);
 	}
  else {
 	 callingWindow->setState(nick, CallingWindow::STATES::SPEAKING);
+
+	 currentCunvertion->appendMsg("Исходящий звонок с " + nick + " успешно соединен");
 	}
 }
 
 void ClientWidget::slotReceiveCall(QString nick)
 {
+ currentCunvertion->appendMsg("Входящий звонок от " + nick);
+
  CallingWindow* w = initCallingWindow();
 
  w->setState(nick, CallingWindow::STATES::INCOMING);

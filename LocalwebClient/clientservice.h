@@ -129,6 +129,10 @@ public slots:
 
  void slotCallPutDowned(QString to);
 
+ void slotTurnMicro();
+
+ void slotTurnSpeakers();
+
 signals:
  void connected();
 

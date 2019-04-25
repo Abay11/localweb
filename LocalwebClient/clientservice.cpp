@@ -632,6 +632,34 @@ void ClientService::slotCallPutDowned(QString to)
  slotSendToServer(DATATYPE::STOPCALLING, to);
 }
 
+void ClientService::slotTurnMicro()
+{
+ qDebug() << DTAG << "turn micro";
+
+ static bool isTurn = true;
+
+ if(isTurn)
+	audioModule->turnOffMicrophone();
+	else
+	audioModule->turnOnMicrophone();
+
+ isTurn = !isTurn;
+}
+
+void ClientService::slotTurnSpeakers()
+{
+ qDebug() << DTAG << "turn speakers";
+
+ static bool isTurn = true;
+
+ if(isTurn)
+	audioModule->turnOffSpeakers();
+	else
+	audioModule->turnOnSpeakers();
+
+ isTurn = !isTurn;
+}
+
 void ClientService::removeOnlinesFromOfflines(QStringList onlines)
 {
  QStringList offlines=pofflineModel->stringList();

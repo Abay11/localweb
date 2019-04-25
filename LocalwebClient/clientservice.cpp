@@ -164,6 +164,8 @@ int ClientService::makeCall(QString nick)
  connect(this, SIGNAL(clientInfoUpdated()), loop, SLOT(quit()));
  loop->exec();
 
+ loop->deleteLater();
+
  qDebug() << DTAG << "Making a call to a client" << nick << "with address and port" << iter.value()->address()
 					<< iter.value()->audioPort();
 
@@ -181,6 +183,8 @@ int ClientService::makeCall(QString nick)
  slotSendToServer(DATATYPE::CALLINGREQUEST, nick);
 
  loop2->exec();
+
+ loop2->deleteLater();
 
  int res = 0;
  if(callingResponseStatus == true)

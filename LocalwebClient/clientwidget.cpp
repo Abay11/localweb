@@ -180,6 +180,10 @@ CallingWindow* ClientWidget::initCallingWindow()
 
  connect(pservice, SIGNAL(receivedCallStopped()), this, SLOT(slotCompanonFinisheCall()));
 
+ connect(window, SIGNAL(turnMicroClicked()), pservice, SLOT(slotTurnMicro()));
+
+ connect(window, SIGNAL(turnSpeakersClicked()), pservice, SLOT(slotTurnSpeakers()));
+
  return window;
 }
 

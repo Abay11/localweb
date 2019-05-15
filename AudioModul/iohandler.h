@@ -11,6 +11,8 @@ class IOHandler : public QObject
  Q_OBJECT
 
 private:
+ const QString DTAG = "AudioModule::IOHandler:";
+
  QAudioInput* audioInput;
 
  QAudioOutput* audioOutput;

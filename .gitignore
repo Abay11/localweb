@@ -24,3 +24,5 @@ copy/
 reset_all\.sh
 
 build-AudioModul-Desktop_Qt_5_11_1_GCC_64bit-Debug/
+
+build-VideoModule-Desktop_Qt_5_11_1_GCC_64bit-Debug/

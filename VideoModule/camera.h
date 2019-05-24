@@ -1,41 +1,37 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <QLabel>
-#include <QWidget>
-#include <QCamera>
-#include <QCameraImageCapture>
-#include <QCameraViewfinder>
-#include <QVideoFrame>
-#include <QVideoProbe>
-#include <QTimer>
-#include <QVideoWidget>
+#include <QObject>
 
-#include <QMediaPlayer>
-
-class VideoWidget;
+class QCamera;
+class QVideoFrame;
+class QVideoProbe;
 
 class Camera : public QObject
 {
 	Q_OBJECT
 
 public:
-	Camera(QObject* parent = 0);
+	Camera(QObject* parent = nullptr);
 	~Camera();
-
-private slots:
-	void frameProbed(const QVideoFrame&);
-
-
-private:
 	bool isCameraAvailable();
 
-	VideoWidget* video_widget;
+	void start();
 
+	void stop();
+
+
+signals:
+	void newFrame(const QByteArray&);
+
+private slots:
+	void slotFrameProbed(const QVideoFrame& frame);
+
+private:
 	QCamera* camera;
-	QCameraImageCapture* imageCapture;
-	QCameraViewfinder* viewfinder;
-	QLabel* label;
+	QVideoProbe* video_probe;
+
+	const QString DTAG = "VideoModule::Camera: ";
 };
 
 #endif // CAMERA_H

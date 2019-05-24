@@ -12,7 +12,8 @@ public:
 
 	~VideoWidget();
 
-	void draw(const QVideoFrame& frame);
+public slots:
+	void slotDraw(const QByteArray& data);
 
 private:
 	QSize size;

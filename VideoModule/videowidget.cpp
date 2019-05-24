@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QVideoSurfaceFormat>
 #include <QPaintEvent>
+#include <QDataStream>
 
 #include <private/qvideoframe_p.h>
 
@@ -15,18 +16,21 @@ VideoWidget::~VideoWidget()
 {
 }
 
-void VideoWidget::draw(const QVideoFrame& frame)
+void VideoWidget::slotDraw(const QByteArray& data)
 {
-	if(size != frame.size())
+	//TODO
+	//optimize
+	QDataStream input_stream(data);
+	input_stream.setVersion(QDataStream::Qt_5_11);
+
+	QImage img;
+	input_stream >> img;
+
+	if(size != img.size())
 	{
-		size = frame.size();
+		size = img.size();
 		resize(size);
 	}
 
-	QVideoFrame copy_frame(frame);
-	copy_frame.map(QAbstractVideoBuffer::ReadOnly);
-	QImage temp_img = qt_imageFromVideoFrame(copy_frame);
-	copy_frame.unmap();
-
-	setPixmap(QPixmap::fromImage(temp_img));
+	setPixmap(QPixmap::fromImage(img));
 }

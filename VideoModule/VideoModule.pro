@@ -27,11 +27,15 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         camera.cpp \
-    videowidget.cpp
+    videowidget.cpp \
+    clientside.cpp \
+    connectionhandler.cpp
 
 HEADERS += \
         camera.h \
-    videowidget.h
+    videowidget.h \
+    clientside.h \
+    connectionhandler.h
 
 LIBS += -lpulse
 

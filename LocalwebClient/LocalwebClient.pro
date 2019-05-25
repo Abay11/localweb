@@ -40,7 +40,11 @@ SOURCES += \
 ../AudioModul/clientside.cpp \
 ../AudioModul/connectionhandler.cpp \
 ../AudioModul/iohandler.cpp \
-    callingwindow.cpp
+    callingwindow.cpp \
+    ../VideoModule/videowidget.cpp \
+    ../VideoModule/clientside.cpp \
+    ../VideoModule/camera.cpp \
+    ../VideoModule/connectionhandler.cpp
 
 HEADERS += \
     ../mylogger.h \
@@ -59,7 +63,11 @@ HEADERS += \
 ../AudioModul/clientside.h \
 ../AudioModul/connectionhandler.h \
 ../AudioModul/iohandler.h \
-    callingwindow.h
+    callingwindow.h \
+    ../VideoModule/videowidget.h \
+    ../VideoModule/camera.h \
+    ../VideoModule/clientside.h \
+    ../VideoModule/connectionhandler.h
 
 
 

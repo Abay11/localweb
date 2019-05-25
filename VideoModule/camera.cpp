@@ -61,8 +61,6 @@ void Camera::slotFrameProbed(const QVideoFrame& frame)
 	//TODO:
 	//optimize
 	QByteArray bytes;
-	QDataStream stream_data(&bytes, QIODevice::WriteOnly);
-	stream_data.setVersion(QDataStream::Qt_5_11);
 
 	QByteArray format;
 	QBuffer buffer(&bytes);
@@ -70,8 +68,7 @@ void Camera::slotFrameProbed(const QVideoFrame& frame)
 	QImageWriter writer; // use to compress img's size
 	writer.setDevice(&buffer);
 	writer.setFormat("jpg");
-	writer.setQuality(0);
-	writer.setCompression(1);
+	writer.setQuality(50);
 
 
 	if(!writer.write(img))

@@ -2,7 +2,6 @@
 #define VIDEOWIDGET_H
 
 #include <QLabel>
-#include <QVideoFrame>
 
 namespace VideoModule
 {

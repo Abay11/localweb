@@ -1,739 +1,764 @@
 #include "clientservice.h"
 
+#include "../MY_FTP/MY_FTP/ftp_common.h"
+
+#include <QEventLoop>
+#include <QTimer>
+
 void ClientService::saveDataAndProperties()
 {
- QFile file(defaultSavingFile);
- if(file.open(QFile::WriteOnly))
+	QFile file(defaultSavingFile);
+
+	if(file.open(QFile::WriteOnly))
 	{
-	 QDataStream out(&file);
-	 out<<nick<<name<<*pserverAddress<<*pserverPort<<*clients;
-	 file.close();
+		QDataStream out(&file);
+		out << nick << name << *pserverAddress << *pserverPort << *clients;
+		file.close();
 	}
- else
-	qCritical()<<"Error saving clients base";
+	else
+		qCritical() << "Error saving clients base";
 }
 
 void ClientService::restoreDataAndProperties()
 {
- QFile file(defaultSavingFile);
- if(file.open(QFile::ReadOnly))
+	QFile file(defaultSavingFile);
+
+	if(file.open(QFile::ReadOnly))
 	{
-	 QDataStream in(&file);
-	 in>>nick>>name>>*pserverAddress>>*pserverPort>>*clients;
-	 file.close();
+		QDataStream in(&file);
+		in >> nick >> name >> *pserverAddress >> *pserverPort >> *clients;
+		file.close();
 
-	 addAllUsersToOfflineModel();
-	 return;
+		addAllUsersToOfflineModel();
+		return;
 	}
- else if(QFile::exists(file.fileName()))
-	qWarning()<<"Error restoring clients base";
+	else if(QFile::exists(file.fileName()))
+		qWarning() << "Error restoring clients base";
 
- *pserverAddress=defaultServerAddress;
- *pserverPort=defaultServerPort;
+	*pserverAddress = defaultServerAddress;
+	*pserverPort = defaultServerPort;
 }
 
 void ClientService::addAllUsersToOfflineModel()
 {
- QStringList offlines;
- QStringList nicksInBase=clients->keys();
- if(!nick.isEmpty())
+	QStringList offlines;
+	QStringList nicksInBase = clients->keys();
+
+	if(!nick.isEmpty())
 	{
-	 QString usernick="Вы: "+nick;
-	 offlines.prepend(usernick);
-	 nicksInBase.removeOne(nick);
+		QString usernick = "Вы: " + nick;
+		offlines.prepend(usernick);
+		nicksInBase.removeOne(nick);
 	}
 
- offlines.append(nicksInBase);
+	offlines.append(nicksInBase);
 
- ponlineModel->setStringList(QStringList());
- pofflineModel->setStringList(offlines);
+	ponlineModel->setStringList(QStringList());
+	pofflineModel->setStringList(offlines);
 }
 
 void ClientService::addNewOnlineToModel(QString nick)
 {
- int nIndex=ponlineModel->rowCount();
- ponlineModel->insertRow(nIndex);
- ponlineModel->setData(ponlineModel->index(nIndex), nick);
+	int nIndex = ponlineModel->rowCount();
+	ponlineModel->insertRow(nIndex);
+	ponlineModel->setData(ponlineModel->index(nIndex), nick);
 }
 
-ClientService::ClientService(QWidget *prnt)
- :QObject (prnt)
- ,psocket(new QTcpSocket)
- ,clients(new CLIENTBASE)
- ,ponlineModel(new QStringListModel)
- ,pofflineModel(new QStringListModel)
- ,pserverAddress(new QString)
- ,pserverPort(new QString)
+ClientService::ClientService(QWidget* prnt)
+	: QObject(prnt)
+	, psocket(new QTcpSocket)
+	, clients(new CLIENTBASE)
+	, ponlineModel(new QStringListModel)
+	, pofflineModel(new QStringListModel)
+	, pserverAddress(new QString)
+	, pserverPort(new QString)
 {
- restoreDataAndProperties();
+	restoreDataAndProperties();
 
- ftp = new FtpClient(*pserverAddress, MY_FTP::PORT);
+	ftp = new FtpClient(*pserverAddress, MY_FTP::PORT);
 
- audioModule = new ClientSide(AUDIOMODULE_IP, QHostAddress(*pserverAddress));
+	audioModule = new ClientSide(AUDIOMODULE_IP, QHostAddress(*pserverAddress));
 
- connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
- connect(psocket, SIGNAL(connected()), SIGNAL(connected()));
- connect(psocket, SIGNAL(disconnected()), SLOT(slotDisconnected()));
- connect(psocket, SIGNAL(disconnected()), SIGNAL(disconnected()));
- connect(psocket, SIGNAL(readyRead()), SLOT(slotReadyRead()));
- connect(psocket, SIGNAL(error(QAbstractSocket::SocketError)),
-				 this, SLOT(slotError(QAbstractSocket::SocketError)));
+	connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
+	connect(psocket, SIGNAL(connected()), SIGNAL(connected()));
+	connect(psocket, SIGNAL(disconnected()), SLOT(slotDisconnected()));
+	connect(psocket, SIGNAL(disconnected()), SIGNAL(disconnected()));
+	connect(psocket, SIGNAL(readyRead()), SLOT(slotReadyRead()));
+	connect(psocket, SIGNAL(error(QAbstractSocket::SocketError)),
+		this, SLOT(slotError(QAbstractSocket::SocketError)));
 }
 
 ClientService::~ClientService()
 {
- saveDataAndProperties();
+	saveDataAndProperties();
 }
 
 void ClientService::appendOwnerUserToOnlines()
 {
- //this method may be usefull only on registration
- ponlineModel->insertRow(0);
- auto firstIndex=ponlineModel->index(0);
- ponlineModel->setData(firstIndex, "Вы: " + nick);
+	//this method may be usefull only on registration
+	ponlineModel->insertRow(0);
+	auto firstIndex = ponlineModel->index(0);
+	ponlineModel->setData(firstIndex, "Вы: " + nick);
 }
 
 bool ClientService::socketIsOpen()
 {
- return psocket->isOpen();
+	return psocket->isOpen();
 }
 
 QStringListModel* ClientService::onlineModel()
 {
- return ponlineModel;
+	return ponlineModel;
 }
 
-QStringListModel *ClientService::offlineModel()
+QStringListModel* ClientService::offlineModel()
 {
- return pofflineModel;
+	return pofflineModel;
 }
 
 QString ClientService::serverAddress()
 {
- return *pserverAddress;
+	return *pserverAddress;
 }
 
 QString ClientService::serverPort()
 {
- return *pserverPort;
+	return *pserverPort;
 }
 
 quint16 ClientService::clientPort()
 {
- return psocket->localPort();
+	return psocket->localPort();
 }
 
 void ClientService::setAddress(QString addr)
 {
- *pserverAddress=addr;
+	*pserverAddress = addr;
 }
 
 void ClientService::setPort(QString port)
 {
- *pserverPort=port;
+	*pserverPort = port;
 }
 
 void ClientService::setNickAndName(QString nick, QString name)
 {
- this->nick=nick;
- this->name=name;
+	this->nick = nick;
+	this->name = name;
 }
 
 bool ClientService::isConnected()
 {
- return psocket->state()==QTcpSocket::ConnectedState;
+	return psocket->state() == QTcpSocket::ConnectedState;
 }
 
 int ClientService::makeCall(QString nick)
 {
- qDebug() << "Make a call to" << nick;
+	qDebug() << "Make a call to" << nick;
 
- auto iter = clients->find(nick);
+	auto iter = clients->find(nick);
 
- if(iter == clients->end())
+	if(iter == clients->end())
 	{
-	 qWarning() << DTAG << "Not found such nick to make a call";
+		qWarning() << DTAG << "Not found such nick to make a call";
 
-	 return -1;
+		return -1;
 	}
 
- slotSendToServer(DATATYPE::GETACTUALDATA, nick);
+	slotSendToServer(DATATYPE::GETACTUALDATA, nick);
 
- QEventLoop* loop = new QEventLoop;
- //block until we get a client's info;
- connect(this, SIGNAL(clientInfoUpdated()), loop, SLOT(quit()));
- loop->exec();
+	QEventLoop* loop = new QEventLoop;
+	//block until we get a client's info;
+	connect(this, SIGNAL(clientInfoUpdated()), loop, SLOT(quit()));
+	loop->exec();
 
- loop->deleteLater();
+	loop->deleteLater();
 
- qDebug() << DTAG << "Making a call to a client" << nick << "with address and port" << iter.value()->address()
-					<< iter.value()->audioPort();
+	qDebug() << DTAG << "Making a call to a client" << nick << "with address and port" << iter.value()->address()
+		<< iter.value()->audioPort();
 
- QHostAddress destAddress(iter.value()->address());
- quint16 destPort = iter.value()->audioPort();
+	QHostAddress destAddress(iter.value()->address());
+	quint16 destPort = iter.value()->audioPort();
 
- audioModule->setDestination(destAddress, destPort);
+	audioModule->setDestination(destAddress, destPort);
 
- QEventLoop* loop2 = new QEventLoop;
- connect(this, SIGNAL(privateCallingResponseReceived()), loop2, SLOT(quit()));
+	QEventLoop* loop2 = new QEventLoop;
+	connect(this, SIGNAL(privateCallingResponseReceived()), loop2, SLOT(quit()));
 
- QTimer::singleShot(4000, loop2, SLOT(quit()));
+	QTimer::singleShot(4000, loop2, SLOT(quit()));
 
- // if client won't response, break the loop with a 15ses timer
- slotSendToServer(DATATYPE::CALLINGREQUEST, nick);
+	// if client won't response, break the loop with a 15ses timer
+	slotSendToServer(DATATYPE::CALLINGREQUEST, nick);
 
- loop2->exec();
+	loop2->exec();
 
- loop2->deleteLater();
+	loop2->deleteLater();
 
- int res = 0;
- if(callingResponseStatus == true)
+	int res = 0;
+
+	if(callingResponseStatus == true)
 	{
-	 //the other client accept call
-	 qDebug() << DTAG << "The client accept a call";
+		//the other client accept call
+		qDebug() << DTAG << "The client accept a call";
 
 		audioModule->turnOnSpeakers();
 		audioModule->turnOnMicrophone();
 
-	 res = 0;
+		res = 0;
 	}
 	else
 	{
-	 qInfo() << DTAG << "Не удалось дозвониться";
+		qInfo() << DTAG << "Не удалось дозвониться";
 
-	 res = -1;
+		res = -1;
 	}
 
- callingResponseStatus = false;
+	callingResponseStatus = false;
 
- return res;
+	return res;
 }
 
 void ClientService::slotConnected()
 {
- QTime actionTime=QTime::currentTime();
- qInfo()<<formatTimeToString(actionTime)<<" Соединение с сервером установлено.";
+	QTime actionTime = QTime::currentTime();
+	qInfo() << formatTimeToString(actionTime) << " Соединение с сервером установлено.";
 
- //говорим серверу что мы только что подключились и нам нужно сверить базу
- slotSendToServer(DATATYPE::CONNECT);
- emit newMessageForNotification("Соединение с сервером установлено!");
- emit newMessageForDisplay("Соединение с сервером установлено!", actionTime);
+	//говорим серверу что мы только что подключились и нам нужно сверить базу
+	slotSendToServer(DATATYPE::CONNECT);
+	emit newMessageForNotification("Соединение с сервером установлено!");
+	emit newMessageForDisplay("Соединение с сервером установлено!", actionTime);
 
- qInfo()<<actionTime<<"Отправлен запрос на получение списка";
+	qInfo() << actionTime << "Отправлен запрос на получение списка";
 }
 
 void ClientService::slotDisconnected()
 {
- QTime actionTime=QTime::currentTime();
-	qInfo()<<formatTimeToString(actionTime)<<" Соединение с сервером разорвано.";
+	QTime actionTime = QTime::currentTime();
+	qInfo() << formatTimeToString(actionTime) << " Соединение с сервером разорвано.";
 	emit newMessageForNotification("Соединение с сервером разорвано!");
 	emit newMessageForDisplay("Соединение с сервером разорвано!", actionTime);
 }
 
 void ClientService::slotReadyRead()
 {
- qDebug()<<"read server event";
+	qDebug() << "read server event";
 
- QDataStream in(psocket) ;
- in.setVersion(QDataStream::Qt_5_11);
+	QDataStream in(psocket) ;
+	in.setVersion(QDataStream::Qt_5_11);
 
- forever
- {
-	if(!mnNextBlockSize)
-	 {
-		if(static_cast<size_t>(psocket->bytesAvailable())<sizeof(quint16))
-		 break;
-
-		in>>mnNextBlockSize;
-	 }
-
-	if(psocket->bytesAvailable()<mnNextBlockSize)
-	 break;
-
-	QTime time;
-	QString msg;
-
-	DATATYPE type;
-	in>>type;
-
-	switch (type) {
-	 case DATATYPE::REGISTRATION:
+	forever
+	{
+		if(!mnNextBlockSize)
 		{
-		in>>time>>registrationResult;
+			if(static_cast<size_t>(psocket->bytesAvailable()) < sizeof(quint16))
+				break;
 
-		emit returnRegistrationResult(registrationResult);
-
-		qInfo()<<time.toString("[hh:mm:ss] ")
-					<<"Registration attempt. Result: "<<registrationResult;
-		break;
+			in >> mnNextBlockSize;
 		}
 
-	 case DATATYPE::CONNECT:
-		{
-		 qDebug()<<"Receiving list of clients";
+		if(psocket->bytesAvailable() < mnNextBlockSize)
+			break;
 
-		 //если база сервера не совпадает с нашим,
-		 //ждем актуальную базу
-		 int serverBaseSize;
-		 in>>serverBaseSize;
-		 bool hasClientActualBase=serverBaseSize==clients->size();
-		 if(!hasClientActualBase)
+		QTime time;
+		QString msg;
+
+		DATATYPE type;
+		in >> type;
+
+		switch(type)
+		{
+			case DATATYPE::REGISTRATION:
 			{
-			 //receive and update base
-			 in>>*clients;
-			 qDebug()<<"база не сошлась, получена новая с размером:"<<clients->size();
-			 addAllUsersToOfflineModel();
+				in >> time >> registrationResult;
+
+				emit returnRegistrationResult(registrationResult);
+
+				qInfo() << time.toString("[hh:mm:ss] ")
+					<< "Registration attempt. Result: " << registrationResult;
+				break;
 			}
-		 else
-			qDebug()<<"база сошлась, синхрон не нужен";
 
-		 QList<QString> onlines;
-		 in>>onlines;
-		 removeOnlinesFromOfflines(onlines);
-		 break;
-	 }
-
-	 case DATATYPE::DISCONNECTION:
-		{
-		 qDebug()<<"кто-то отсоединился";
-		 QString disconnected;
-		 in>>disconnected;
-		 throwDisconnectedToOfflines(disconnected);
-
-		 QString msg=disconnected;
-		 msg+=" вышел";
-
-		 emit(newMessageForNotification(msg));
-		 emit(newMessageForDisplay(msg));
-		 break;
-		}
-
-	 case DATATYPE::NOTIFYING:
-		{
-		 QString connectedUserNick;
-		 in>>connectedUserNick;
-		 qDebug()<<"есть новый подсоединившийся:"<<connectedUserNick;
-		 addNewOnlineToModel(connectedUserNick);
-		 removeConnectedFromOfflines(connectedUserNick);
-
-		 QString msg=connectedUserNick + " стал доступен";
-		 emit(newMessageForNotification(msg));
-		 emit(newMessageForDisplay(msg));
-		 break;
-		}
-
-	 case DATATYPE::MESSAGE:
-	 {
-		 qDebug()<<"новое сообщение";
-		 QString from;
-		 QString to;
-
-		 in>>time>>msg>>from>>to;
-
-		 receivedMessage=msg;
-		 emit(newMessageForNotification("***Новое сообщение***"));
-
-		 if(to=="Общий чат")
-			emit(newMessageForDisplay(msg, time, from));
-		 else {
-			 emit newMessageToForwarding(msg, from, time);
-			}
-		 break;
-	 }
-
-	 case DATATYPE::FILE:
-		{
-		 qDebug()<<"ClientService: receiving a file";
-		 QString from;
-		 QString filename;
-		 QString to;
-
-		 in>>time>>from>>filename>>to;
-
-		 emit(newMessageForNotification("***Прием файла***"));
-
-		 ftp->download(MY_NETWORK::DOWNLOAD_PATH, filename);
-
-		 msg = "Прием файла " + filename;
-
-		 if(to=="Общий чат")
-			emit(newMessageForDisplay(msg, time, from));
-		 else {
-			 emit newMessageToForwarding(msg, from, time);
-
-			 qDebug()<<"from:"<<from<<"filename:"<<filename;
-			}
-		 break;
-		}
-
-	 case DATATYPE::GETACTUALDATA:
-	 {
-		 qDebug() << DTAG << "Receving updated client info";
-
-		 QString nick;
-		 quint16 audioPort;
-		 in >> nick >> audioPort;
-
-		 auto it = clients->find(nick);
-
-		 if(it == clients->end())
+			case DATATYPE::CONNECT:
 			{
-			 qWarning() << DTAG << "A client not found such nick to update data";
+				qDebug() << "Receiving list of clients";
+
+				//если база сервера не совпадает с нашим,
+				//ждем актуальную базу
+				int serverBaseSize;
+				in >> serverBaseSize;
+				bool hasClientActualBase = serverBaseSize == clients->size();
+
+				if(!hasClientActualBase)
+				{
+					//receive and update base
+					in >> *clients;
+					qDebug() << "база не сошлась, получена новая с размером:" << clients->size();
+					addAllUsersToOfflineModel();
+				}
+				else
+					qDebug() << "база сошлась, синхрон не нужен";
+
+				QList<QString> onlines;
+				in >> onlines;
+				removeOnlinesFromOfflines(onlines);
+				break;
 			}
-		 else if(audioPort == 0)
+
+			case DATATYPE::DISCONNECTION:
 			{
-			 qWarning() << DTAG << "The server not found such nick to update data";
+				qDebug() << "кто-то отсоединился";
+				QString disconnected;
+				in >> disconnected;
+				throwDisconnectedToOfflines(disconnected);
+
+				QString msg = disconnected;
+				msg += " вышел";
+
+				emit(newMessageForNotification(msg));
+				emit(newMessageForDisplay(msg));
+				break;
 			}
-		 else {
-			 it.value()->audioPort() = audioPort;
+
+			case DATATYPE::NOTIFYING:
+			{
+				QString connectedUserNick;
+				in >> connectedUserNick;
+				qDebug() << "есть новый подсоединившийся:" << connectedUserNick;
+				addNewOnlineToModel(connectedUserNick);
+				removeConnectedFromOfflines(connectedUserNick);
+
+				QString msg = connectedUserNick + " стал доступен";
+				emit(newMessageForNotification(msg));
+				emit(newMessageForDisplay(msg));
+				break;
 			}
 
-		 //need emit even a client was not found to interupt a waiting event loop
-		 emit clientInfoUpdated();
+			case DATATYPE::MESSAGE:
+			{
+				qDebug() << "новое сообщение";
+				QString from;
+				QString to;
 
-		 break;
-	 }
+				in >> time >> msg >> from >> to;
 
-	 case DATATYPE::CALLINGREQUEST:
-		{
-		 qDebug() << DTAG << "Received calling request";
+				receivedMessage = msg;
+				emit(newMessageForNotification("***Новое сообщение***"));
 
-		 QString from;
-		 in >> from;
+				if(to == "Общий чат")
+					emit(newMessageForDisplay(msg, time, from));
+				else
+				{
+					emit newMessageToForwarding(msg, from, time);
+				}
 
-		 emit callingRequest(from);
+				break;
+			}
 
-		 break;
+			case DATATYPE::FILE:
+			{
+				qDebug() << "ClientService: receiving a file";
+				QString from;
+				QString filename;
+				QString to;
+
+				in >> time >> from >> filename >> to;
+
+				emit(newMessageForNotification("***Прием файла***"));
+
+				ftp->download(MY_NETWORK::DOWNLOAD_PATH, filename);
+
+				msg = "Прием файла " + filename;
+
+				if(to == "Общий чат")
+					emit(newMessageForDisplay(msg, time, from));
+				else
+				{
+					emit newMessageToForwarding(msg, from, time);
+
+					qDebug() << "from:" << from << "filename:" << filename;
+				}
+
+				break;
+			}
+
+			case DATATYPE::GETACTUALDATA:
+			{
+				qDebug() << DTAG << "Receving updated client info";
+
+				QString nick;
+				quint16 audioPort;
+				in >> nick >> audioPort;
+
+				auto it = clients->find(nick);
+
+				if(it == clients->end())
+				{
+					qWarning() << DTAG << "A client not found such nick to update data";
+				}
+				else if(audioPort == 0)
+				{
+					qWarning() << DTAG << "The server not found such nick to update data";
+				}
+				else
+				{
+					it.value()->audioPort() = audioPort;
+				}
+
+				//need emit even a client was not found to interupt a waiting event loop
+				emit clientInfoUpdated();
+
+				break;
+			}
+
+			case DATATYPE::CALLINGREQUEST:
+			{
+				qDebug() << DTAG << "Received calling request";
+
+				QString from;
+				in >> from;
+
+				emit callingRequest(from);
+
+				break;
+			}
+
+			case DATATYPE::CALLINGRESPONSE:
+			{
+				qDebug() << DTAG << "Received calling response";
+
+				QString from;
+
+				bool isAccepted;
+
+				in >> from >> isAccepted;
+
+				callingResponseStatus = isAccepted;
+
+				emit privateCallingResponseReceived();
+
+				break;
+			}
+
+			case DATATYPE::STOPCALLING:
+			{
+				qDebug() << DTAG << "Received STOPCALLING";
+
+				emit receivedCallStopped();
+
+				audioModule->turnOffSpeakers();
+				audioModule->turnOffMicrophone();
+
+				break;
+			}
+
+			default:
+				//что-то пошло не так, клиент не может получить иную команду
+				qCritical() << "Неизвестная ошибка при получении сообщения.";
 		}
 
-	 case DATATYPE::CALLINGRESPONSE:
-	 {
-		 qDebug() << DTAG << "Received calling response";
-
-		 QString from;
-
-		 bool isAccepted;
-
-		 in >> from >> isAccepted;
-
-		 callingResponseStatus = isAccepted;
-
-		 emit privateCallingResponseReceived();
-
-		 break;
-	 }
-
-	 case DATATYPE::STOPCALLING:
-		{
-		 qDebug() << DTAG << "Received STOPCALLING";
-
-		 emit receivedCallStopped();
-
-		 audioModule->turnOffSpeakers();
-		 audioModule->turnOffMicrophone();
-
-		 break;
-		}
-
-	 default:
-		//что-то пошло не так, клиент не может получить иную команду
-		 qCritical()<<"Неизвестная ошибка при получении сообщения.";
-	 }
-
-	mnNextBlockSize=0;
- }
+		mnNextBlockSize = 0;
+	}
 }
 
 void ClientService::slotError(QAbstractSocket::SocketError nerr)
 {
- QString info;
- switch(nerr)
+	QString info;
+
+	switch(nerr)
 	{
-	case QAbstractSocket::HostNotFoundError:
-	 info.append("Удаленный сервер не найден. "
-							 "Удостоверьте, что введен правильный адрес и порт сервера.");
-	 break;
-	case QAbstractSocket::RemoteHostClosedError:
-	 info.append("Удаленный сервер закрыл соединение. "
-							 "Обратитесь к администратору сети.");
-	 break;
-	case QAbstractSocket::ConnectionRefusedError:
-	 info.append("Удаленный сервер отказал в доступе. "
-							 "Обратитесь к администратору сети.");
-	 break;
-	default:
-	 info.append("Произошла критическая ошибка. "
-							 "Обратитесь к администратору сети.");
+		case QAbstractSocket::HostNotFoundError:
+			info.append("Удаленный сервер не найден. "
+				"Удостоверьте, что введен правильный адрес и порт сервера.");
+			break;
+
+		case QAbstractSocket::RemoteHostClosedError:
+			info.append("Удаленный сервер закрыл соединение. "
+				"Обратитесь к администратору сети.");
+			break;
+
+		case QAbstractSocket::ConnectionRefusedError:
+			info.append("Удаленный сервер отказал в доступе. "
+				"Обратитесь к администратору сети.");
+			break;
+
+		default:
+			info.append("Произошла критическая ошибка. "
+				"Обратитесь к администратору сети.");
 	}
 
- emit socketError("Ошибка соединения", info);
- qCritical()<<"Ошибка соединения с сервером: "<<psocket->errorString();
- throwOnlinesToOfflines();
- psocket->close();
+	emit socketError("Ошибка соединения", info);
+	qCritical() << "Ошибка соединения с сервером: " << psocket->errorString();
+	throwOnlinesToOfflines();
+	psocket->close();
 }
 
 void ClientService::slotConnectToServer()
 {
- psocket->connectToHost(*pserverAddress,
-												static_cast<quint16>(pserverPort->toInt()));
+	psocket->connectToHost(*pserverAddress,
+		static_cast<quint16>(pserverPort->toInt()));
 }
 
 void ClientService::slotDisconnectFromServer()
 {
- qDebug()<<"Disconnected from server";
- throwOnlinesToOfflines();
- psocket->close();
+	qDebug() << "Disconnected from server";
+	throwOnlinesToOfflines();
+	psocket->close();
 }
 
 void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstAddition)
 {
- QByteArray arrBlock;
- QDataStream out(&arrBlock, QIODevice::WriteOnly);
+	QByteArray arrBlock;
+	QDataStream out(&arrBlock, QIODevice::WriteOnly);
 
- out.setVersion(QDataStream::Qt_5_11);
+	out.setVersion(QDataStream::Qt_5_11);
 
- QTime curTime=QTime::currentTime();
- out<<quint16(0)<<type<<curTime;
+	QTime curTime = QTime::currentTime();
+	out << quint16(0) << type << curTime;
 
- switch(type)
+	switch(type)
 	{
-	case DATATYPE::MESSAGE:
-	 {
-	 qDebug()<<"Client send message";
-	 QString to=firstAddition.toString();
-	 out<<msg<<to;
-	 break;
-	 }
+		case DATATYPE::MESSAGE:
+		{
+			qDebug() << "Client send message";
+			QString to = firstAddition.toString();
+			out << msg << to;
+			break;
+		}
 
-	case DATATYPE::FILE:
-	 {
-		qDebug()<<"ClientService: Sending a file";
+		case DATATYPE::FILE:
+		{
+			qDebug() << "ClientService: Sending a file";
 
-		QString fullFileName=msg;
-		QFile file(fullFileName);
-		if(file.open(QFile::ReadOnly))
-		 {
-			QString to=firstAddition.toString();
+			QString fullFileName = msg;
+			QFile file(fullFileName);
 
-			QFileInfo fileInfo(file);
+			if(file.open(QFile::ReadOnly))
+			{
+				QString to = firstAddition.toString();
 
-			out<<to<<fileInfo.fileName();
-			ftp->upload(fileInfo.path() + "/", fileInfo.fileName());
-		 }
-		else
-		 {
-			qWarning()<<"ClientService: Couldn't open a file to read";
-		 }
-		break;
-	 }
+				QFileInfo fileInfo(file);
 
-	case DATATYPE::REGISTRATION:
-	 {
-		qDebug()<<"Sending to server registration request";
-		QString *nick=&msg;
-		QString name=firstAddition.toString();
-		out << *nick << name << audioModule->getPort();
-		break;
-	 }
+				out << to << fileInfo.fileName();
+				ftp->upload(fileInfo.path() + "/", fileInfo.fileName());
+			}
+			else
+			{
+				qWarning() << "ClientService: Couldn't open a file to read";
+			}
 
-	case DATATYPE::CONNECT:
-	 {
-	 qDebug()<<"Sending to server size of base:"<<clients->size();
-	 out << nick << audioModule->getPort() << clients->size();
+			break;
+		}
 
-	 break;
-	 }
+		case DATATYPE::REGISTRATION:
+		{
+			qDebug() << "Sending to server registration request";
+			QString* nick = &msg;
+			QString name = firstAddition.toString();
+			out << *nick << name << audioModule->getPort();
+			break;
+		}
 
-	case DATATYPE::GETACTUALDATA:
-	 {
-		qDebug() << DTAG << "Sendting to the server a request to update client's info";
+		case DATATYPE::CONNECT:
+		{
+			qDebug() << "Sending to server size of base:" << clients->size();
+			out << nick << audioModule->getPort() << clients->size();
 
-		QString& updatingClient = msg;
+			break;
+		}
 
-		out << updatingClient;
+		case DATATYPE::GETACTUALDATA:
+		{
+			qDebug() << DTAG << "Sendting to the server a request to update client's info";
 
-		break;
-	 }
+			QString& updatingClient = msg;
 
-	case DATATYPE::CALLINGREQUEST:
-	 {
-		qDebug() << DTAG << "Sendting to the server the calling request";
+			out << updatingClient;
 
-		QString& callingUser = msg;
+			break;
+		}
 
-		out << callingUser;
+		case DATATYPE::CALLINGREQUEST:
+		{
+			qDebug() << DTAG << "Sendting to the server the calling request";
 
-		break;
-	 }
+			QString& callingUser = msg;
 
-	case DATATYPE::CALLINGRESPONSE:
-	 {
-		qDebug() << DTAG << "Sendting to the server the calling RESPONSE";
+			out << callingUser;
 
-		QString& callingUser = msg;
+			break;
+		}
 
-		bool isCallAccepted = firstAddition.toBool();
+		case DATATYPE::CALLINGRESPONSE:
+		{
+			qDebug() << DTAG << "Sendting to the server the calling RESPONSE";
 
-		out << callingUser << isCallAccepted;
+			QString& callingUser = msg;
 
-		break;
-	 }
+			bool isCallAccepted = firstAddition.toBool();
 
-	case DATATYPE::STOPCALLING:
-	 {
-		qDebug() << DTAG << "Sending STOPCALLING";
+			out << callingUser << isCallAccepted;
 
-		QString to = msg;
+			break;
+		}
 
-		out << to;
+		case DATATYPE::STOPCALLING:
+		{
+			qDebug() << DTAG << "Sending STOPCALLING";
 
-		break;
-	 }
+			QString to = msg;
 
-	default: break;
+			out << to;
+
+			break;
+		}
+
+		default:
+			break;
 	}
 
- out.device()->seek(0);
- out<<quint16(static_cast<size_t>(arrBlock.size())-sizeof(quint16));
+	out.device()->seek(0);
+	out << quint16(static_cast<size_t>(arrBlock.size()) - sizeof(quint16));
 
- psocket->write(arrBlock);
+	psocket->write(arrBlock);
 }
 
 void ClientService::slotSetAddress(QString addr, QString port)
 {
- *pserverAddress=addr;
- *pserverPort=port;
+	*pserverAddress = addr;
+	*pserverPort = port;
 }
 
 void ClientService::slotCallAccepted(QString to)
 {
- bool isCallAccepted = true;
+	bool isCallAccepted = true;
 
- slotSendToServer(DATATYPE::GETACTUALDATA, to);
+	slotSendToServer(DATATYPE::GETACTUALDATA, to);
 
- QEventLoop* loop = new QEventLoop;
- //block until we get a client's info;
- connect(this, SIGNAL(clientInfoUpdated()), loop, SLOT(quit()));
- loop->exec();
- loop->deleteLater();
+	QEventLoop* loop = new QEventLoop;
+	//block until we get a client's info;
+	connect(this, SIGNAL(clientInfoUpdated()), loop, SLOT(quit()));
+	loop->exec();
+	loop->deleteLater();
 
- auto iter = clients->find(to);
+	auto iter = clients->find(to);
 
- if(iter == clients->end())
+	if(iter == clients->end())
 	{
-	 qWarning() << DTAG << "Not found such nick to accept a call";
+		qWarning() << DTAG << "Not found such nick to accept a call";
 
-	 return;
+		return;
 	}
 
- QHostAddress destAddress(iter.value()->address());
- quint16 destPort = iter.value()->audioPort();
+	QHostAddress destAddress(iter.value()->address());
+	quint16 destPort = iter.value()->audioPort();
 
- audioModule->setDestination(destAddress, destPort);
+	audioModule->setDestination(destAddress, destPort);
 
- slotSendToServer(DATATYPE::CALLINGRESPONSE, to, isCallAccepted);
+	slotSendToServer(DATATYPE::CALLINGRESPONSE, to, isCallAccepted);
 
- audioModule->turnOnSpeakers();
+	audioModule->turnOnSpeakers();
 
- audioModule->turnOnMicrophone();
+	audioModule->turnOnMicrophone();
 }
 
 void ClientService::slotCallRejected(QString to)
 {
- bool isCallAccepted = false;
+	bool isCallAccepted = false;
 
- slotSendToServer(DATATYPE::CALLINGRESPONSE, to, isCallAccepted);
+	slotSendToServer(DATATYPE::CALLINGRESPONSE, to, isCallAccepted);
 }
 
 void ClientService::slotCallPutDowned(QString to)
 {
- audioModule->turnOffSpeakers();
+	audioModule->turnOffSpeakers();
 
- audioModule->turnOffMicrophone();
+	audioModule->turnOffMicrophone();
 
- slotSendToServer(DATATYPE::STOPCALLING, to);
+	slotSendToServer(DATATYPE::STOPCALLING, to);
 }
 
 void ClientService::slotTurnMicro()
 {
- qDebug() << DTAG << "turn micro";
+	qDebug() << DTAG << "turn micro";
 
- static bool isTurn = true;
+	static bool isTurn = true;
 
- if(isTurn)
-	audioModule->turnOffMicrophone();
+	if(isTurn)
+		audioModule->turnOffMicrophone();
 	else
-	audioModule->turnOnMicrophone();
+		audioModule->turnOnMicrophone();
 
- isTurn = !isTurn;
+	isTurn = !isTurn;
 }
 
 void ClientService::slotTurnSpeakers()
 {
- qDebug() << DTAG << "turn speakers";
+	qDebug() << DTAG << "turn speakers";
 
- static bool isTurn = true;
+	static bool isTurn = true;
 
- if(isTurn)
-	audioModule->turnOffSpeakers();
+	if(isTurn)
+		audioModule->turnOffSpeakers();
 	else
-	audioModule->turnOnSpeakers();
+		audioModule->turnOnSpeakers();
 
- isTurn = !isTurn;
+	isTurn = !isTurn;
 }
 
 void ClientService::removeOnlinesFromOfflines(QStringList onlines)
 {
- QStringList offlines=pofflineModel->stringList();
+	QStringList offlines = pofflineModel->stringList();
 
- if(!nick.isEmpty())
+	if(!nick.isEmpty())
 	{
-	 if(!offlines.empty())
-		offlines.pop_front();
+		if(!offlines.empty())
+			offlines.pop_front();
 
-	 if(onlines.removeOne(nick))
-		onlines.prepend("Вы: "+nick);
+		if(onlines.removeOne(nick))
+			onlines.prepend("Вы: " + nick);
 	}
 
- for(auto o:onlines)
-	if(offlines.contains(o))
-	 offlines.removeOne(o);
+	for(auto o : onlines)
+		if(offlines.contains(o))
+			offlines.removeOne(o);
 
- ponlineModel->setStringList(onlines);
- pofflineModel->setStringList(offlines);
+	ponlineModel->setStringList(onlines);
+	pofflineModel->setStringList(offlines);
 }
 
 void ClientService::removeConnectedFromOfflines(QString connected)
 {
- int nrow = pofflineModel->stringList().indexOf(connected);
- if(nrow!=-1)
-	 pofflineModel->removeRow(nrow);
+	int nrow = pofflineModel->stringList().indexOf(connected);
+
+	if(nrow != -1)
+		pofflineModel->removeRow(nrow);
 }
 
 void ClientService::throwOnlinesToOfflines()
 {
- QStringList onlines=ponlineModel->stringList();
- QStringList offlines=pofflineModel->stringList();
+	QStringList onlines = ponlineModel->stringList();
+	QStringList offlines = pofflineModel->stringList();
 
- if(!onlines.empty())
+	if(!onlines.empty())
 	{
-	 onlines.pop_front();
-	 offlines.append(onlines);
-	 offlines.prepend("Вы: "+nick);
+		onlines.pop_front();
+		offlines.append(onlines);
+		offlines.prepend("Вы: " + nick);
 	}
 
- ponlineModel->setStringList(QStringList());
- pofflineModel->setStringList(offlines);
+	ponlineModel->setStringList(QStringList());
+	pofflineModel->setStringList(offlines);
 }
 
 void ClientService::throwDisconnectedToOfflines(QString disconnected)
 {
- int nrow = ponlineModel->stringList().indexOf(disconnected);
- if(nrow!=-1)
+	int nrow = ponlineModel->stringList().indexOf(disconnected);
+
+	if(nrow != -1)
 	{
-	 ponlineModel->removeRow(nrow);
-	 int i=pofflineModel->rowCount();
-	 pofflineModel->insertRow(pofflineModel->rowCount());
-	 pofflineModel->setData(pofflineModel->index(i), disconnected);
+		ponlineModel->removeRow(nrow);
+		int i = pofflineModel->rowCount();
+		pofflineModel->insertRow(pofflineModel->rowCount());
+		pofflineModel->setData(pofflineModel->index(i), disconnected);
 	}
 }

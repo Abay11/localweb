@@ -1,53 +1,48 @@
 #ifndef FTP_CLIENT_H
 #define FTP_CLIENT_H
 
-#include "ftp_server.h"
-#include "ftp_common.h"
-
 #include <QObject>
-#include <QTcpSocket>
-#include <QFile>
-#include <QFileInfo>
-#include <QDir>
-#include <QThread>
+#include <QAbstractSocket>
+
+class QTcpSocket;
 
 class FtpClient : public QObject
 {
- Q_OBJECT
+	Q_OBJECT
 
 private:
- QString serverAddress;
+	QString serverAddress;
 
- quint16 port;
+	quint16 port;
 
- qint64 expectedSize=0;
+	qint64 expectedSize = 0;
 
- QTcpSocket *socket;
+	QTcpSocket* socket;
 
 public:
- FtpClient(const QString &serverAddress, quint16 port);
+	FtpClient(const QString& serverAddress, quint16 port);
 
- virtual ~FtpClient();
+	virtual ~FtpClient();
 
- void connectToServer();
+	void connectToServer();
 
- void disconnect();
+	void disconnect();
 
- void upload(const QString &path, const QString &filename);
+	void upload(const QString& path, const QString& filename);
 
- qint8 download(const QString &path, const QString &filename);
+	qint8 download(const QString& path, const QString& filename);
 
- bool isFinished=false;
+	bool isFinished = false;
 
- bool sendRequest(qint8 request, const QString &filename);
+	bool sendRequest(qint8 request, const QString& filename);
 
 signals:
- void uploadingIsFinished();
+	void uploadingIsFinished();
 
 public slots:
- void slotConnected();
+	void slotConnected();
 
- void slotError(QAbstractSocket::SocketError);
+	void slotError(QAbstractSocket::SocketError);
 };
 
 #endif // FTP_CLIENT_H

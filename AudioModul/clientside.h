@@ -1,48 +1,50 @@
 #ifndef CLIENTSIDE_H
 #define CLIENTSIDE_H
 
+#include "iohandler.h"
+
 #include <QObject>
 #include <QHostAddress>
 
-#include "iohandler.h"
-#include "connectionhandler.h"
+class IOHandler;
+class ConnectionHandler;
 
 class ClientSide : public QObject
 {
- Q_OBJECT
+	Q_OBJECT
 public:
- explicit ClientSide(quint16 serverPort, const QHostAddress& serverAddress=QHostAddress("localhost"), QObject *parent = nullptr);
+	explicit ClientSide(quint16 serverPort, const QHostAddress& serverAddress = QHostAddress("localhost"), QObject* parent = nullptr);
 
- ~ClientSide();
+	~ClientSide();
 
- void setDestination(const QHostAddress& addr, quint16 port);
+	void setDestination(const QHostAddress& addr, quint16 port);
 
- void setBroadcast();
+	void setBroadcast();
 
- void turnOnMicrophone();
+	void turnOnMicrophone();
 
- void turnOffMicrophone();
+	void turnOffMicrophone();
 
- void turnOnSpeakers();
+	void turnOnSpeakers();
 
- void turnOffSpeakers();
+	void turnOffSpeakers();
 
- quint16 getPort();
+	quint16 getPort();
 
 signals:
 
 public slots:
 
 private:
- quint16 serverPort;
+	quint16 serverPort;
 
- QHostAddress serverAddress;
+	QHostAddress serverAddress;
 
- IOHandler* voiceIO;
+	IOHandler* voiceIO;
 
- ConnectionHandler* connectionHandler;
+	ConnectionHandler* connectionHandler;
 
- const QString DTAG = "AudioModule::ClientSide:";
+	const QString DTAG = "AudioModule::ClientSide:";
 };
 
 #endif // CLIENTSIDE_H

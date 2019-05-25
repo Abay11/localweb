@@ -1,47 +1,49 @@
 #ifndef IOHANDLER_H
 #define IOHANDLER_H
 
-#include <QAudioInput>
-#include <QAudioOutput>
-#include <QDebug>
-#include <QBuffer>
+#include <QObject>
+
+class QAudioInput;
+class QAudioOutput;
+class QIODevice;
+class QBuffer;
 
 class IOHandler : public QObject
 {
- Q_OBJECT
+	Q_OBJECT
 
 private:
- const QString DTAG = "AudioModule::IOHandler:";
+	const QString DTAG = "AudioModule::IOHandler:";
 
- QAudioInput* audioInput;
+	QAudioInput* audioInput;
 
- QAudioOutput* audioOutput;
+	QAudioOutput* audioOutput;
 
- QIODevice* inputDev = nullptr;
+	QIODevice* inputDev = nullptr;
 
- QIODevice* outputDev = nullptr;
+	QIODevice* outputDev = nullptr;
 
- QBuffer* buffer;
+	QBuffer* buffer;
 
 public:
- IOHandler();
+	IOHandler();
 
- void turnOnInput();
+	void turnOnInput();
 
- void turnOffInput();
+	void turnOffInput();
 
- void turnOnOutput();
+	void turnOnOutput();
 
- void turnOffOutput();
+	void turnOffOutput();
 
 signals:
- void readData(QByteArray&);
+	void readData(QByteArray&);
 
- private slots:
- void slotReadAudioInput();
+private slots:
+	void slotReadAudioInput();
 
- public slots:
- void slotWriteAudioOutput(QByteArray& data);
+public slots:
+	void slotWriteAudioOutput(QByteArray& data);
 };
 
 #endif // IOHANDLER_H

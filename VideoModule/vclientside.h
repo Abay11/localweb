@@ -4,12 +4,12 @@
 #include <QObject>
 #include <QHostAddress>
 
-#include "camera.h"
-#include "videowidget.h"
-#include "vconnectionhandler.h"
-
-//class VideoWidget;
-//class ConnectionHandler;
+namespace VideoModule
+{
+	class Camera;
+	class VideoWidget;
+	class ConnectionHandler;
+}
 
 class QVideoFrame;
 class QLabel;
@@ -39,7 +39,7 @@ namespace VideoModule
 
 		quint16 serverPort;
 		QHostAddress serverAddress;
-		VideoModule::Camera* camera;
+		Camera* camera;
 		VideoWidget* video_widget;
 		ConnectionHandler* connHandler;
 	};

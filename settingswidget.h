@@ -2,40 +2,36 @@
 #define SETTINGSWIDGET_H
 
 #include <QDialog>
-#include <QLineEdit>
-#include <QLabel>
-#include <QFormLayout>
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QDebug>
-#include <QIntValidator>
+
+class QLineEdit;
+class QFormLayout;
+
 
 class SettingsWidget : public QDialog
 {
- Q_OBJECT
+	Q_OBJECT
 private:
- QLineEdit *pleAddress;
- QLineEdit *plePort;
- QPushButton *pcmdOk;
- QPushButton *pcmdCancel;
+	QLineEdit* pleAddress;
+	QLineEdit* plePort;
+	QPushButton* pcmdOk;
+	QPushButton* pcmdCancel;
 
- QFormLayout *pflay;
+	QFormLayout* pflay;
 
- QString mcurrentAddress;
- QString mcurrentPort;
+	QString mcurrentAddress;
+	QString mcurrentPort;
 
 public:
- SettingsWidget(QWidget *parent=nullptr);
- ~SettingsWidget();
+	SettingsWidget(QWidget* parent = nullptr);
+	~SettingsWidget();
 
- void setCurrentAddress(QString address, QString port);
+	void setCurrentAddress(QString address, QString port);
 
 public slots:
- void slotOK();
- void slotCancel();
+	void slotOK();
+	void slotCancel();
 
 signals:
- void addressChanged(QString, QString);
+	void addressChanged(QString, QString);
 };
 #endif // SETTINGSWIDGET_H

@@ -2,71 +2,72 @@
 #define CLIENTINFO_H
 
 #include <QString>
-#include <QDataStream>
-#include <QTcpSocket>
 
-enum class DATATYPE:char{
- REGISTRATION=0,
- DELETION,
- DISCONNECTION,
- NOTIFYING,
- CONNECT,
- MESSAGE,
- FILE,
- GETACTUALDATA,
- CALLINGREQUEST,
- CALLINGRESPONSE,
- STOPCALLING
+class QDataStream;
+
+enum class DATATYPE : char
+{
+	REGISTRATION = 0,
+	DELETION,
+	DISCONNECTION,
+	NOTIFYING,
+	CONNECT,
+	MESSAGE,
+	FILE,
+	GETACTUALDATA,
+	CALLINGREQUEST,
+	CALLINGRESPONSE,
+	STOPCALLING
 };
 
 class ClientInfo
 {
 private:
- QString mfullName;
+	QString mfullName;
 
- QString maddress;
+	QString maddress;
 
- QString mport;
+	QString mport;
 
- quint16 audioPort_;
+	quint16 audioPort_;
 
- bool mstatus=false;
+	bool mstatus = false;
 
 public:
- ClientInfo(QString fullname=QString(),
-            QString addr=QString(),
-            QString mport=QString(),
-            bool status=false);
+	ClientInfo(QString fullname = QString(),
+		QString addr = QString(),
+		QString mport = QString(),
+		bool status = false);
 
- virtual ~ClientInfo();
+	virtual ~ClientInfo();
 
- const QString& fullName()const;
+	const QString& fullName()const;
 
- QString& fullName();
+	QString& fullName();
 
- const QString& address()const;
+	const QString& address()const;
 
- QString& address();
+	QString& address();
 
- const QString& port() const;
+	const QString& port() const;
 
- QString& port();
+	QString& port();
 
- const bool& status() const;
+	const bool& status() const;
 
- bool& status();
+	bool& status();
 
- quint16 audioPort() const;
+	quint16 audioPort() const;
 
- quint16& audioPort();
+	quint16& audioPort();
 };
 
-QDataStream& operator>>(QDataStream& out, ClientInfo *&cinfo);
+QDataStream& operator>>(QDataStream& out, ClientInfo*& cinfo);
 
-QDataStream& operator<<(QDataStream& out, const ClientInfo *const&cinfo);
+QDataStream& operator<<(QDataStream& out, const ClientInfo* const& cinfo);
 
-QDataStream& operator<<(QDataStream &out, DATATYPE &type);
+QDataStream& operator<<(QDataStream& out, DATATYPE& type);
 
-QDataStream& operator>>(QDataStream &out, DATATYPE &type);
+QDataStream& operator>>(QDataStream& out, DATATYPE& type);
 
 #endif // CLIENTINFO_H

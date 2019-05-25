@@ -1,5 +1,7 @@
 #include "convertionwidget.h"
 
+#include <QDebug>
+
 ConvertionWidget::ConvertionWidget(QString name,
 	QWidget* parent)
 	: QWidget(parent)

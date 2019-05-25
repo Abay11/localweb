@@ -1,5 +1,22 @@
 #include "clientwidget.h"
 
+#include "../popup.h"
+#include "listdock.h"
+#include "clientservice.h"
+#include "convertionwidget.h"
+#include "callingwindow.h"
+
+#include <QApplication>
+#include <QSystemTrayIcon>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QToolBar>
+#include <QMenuBar>
+
+
 ClientWidget::ClientWidget(ClientService* service, QWidget* parent)
 	: QMainWindow(parent)
 	, pserverAddress(new QString)

@@ -12,47 +12,48 @@
 #include "../clientinfo.h"
 #include "../common.h"
 
-class ConvertionWidget:public QWidget
+class ConvertionWidget: public QWidget
 {
- Q_OBJECT
+	Q_OBJECT
 private:
- QPushButton *cmdSend;
- QPushButton *cmdSendFile;
- QPushButton *cmdClr;
+	QPushButton* cmdSend;
+	QPushButton* cmdSendFile;
+	QPushButton* cmdClr;
 
- QPushButton* cmdMakeCall;
+	QPushButton* cmdAudioCall;
+	QPushButton* cmdVideoCall;
 
- QTextEdit *pdisplay,*pmsgField;
+	QTextEdit* pdisplay, *pmsgField;
 
- bool socketIsOpen=false;
- QString convertionName;
+	bool socketIsOpen = false;
+	QString convertionName;
 
 public:
- ConvertionWidget(QString name,
-									QWidget *parent=nullptr);
+	ConvertionWidget(QString name,
+		QWidget* parent = nullptr);
 
- void setSocketState(bool);
+	void setSocketState(bool);
 
- void setSentEnabled(bool);
+	void setSentEnabled(bool);
 
- void appendMsg(const QString& msg);
+	void appendMsg(const QString& msg);
 
 
 private slots:
- void slotSend();
- void slotSendFile();
- void slotClrDisplay();
- void slotMsgChanged();
+	void slotSend();
+	void slotSendFile();
+	void slotClrDisplay();
+	void slotMsgChanged();
 
- void slotMakeCall();
+	void slotMakeCall();
 
 public slots:
- void slotAppendMessageToDisplay(QString msg, const QTime &actionTime, QString from=nullptr);
+	void slotAppendMessageToDisplay(QString msg, const QTime& actionTime, QString from = nullptr);
 
 signals:
- void sentClicked(DATATYPE type, QString stringData, QVariant variantData=0);
+	void sentClicked(DATATYPE type, QString stringData, QVariant variantData = 0);
 
- void makeCallClicked(QString nick);
+	void makeCallClicked(QString nick);
 };
 
 #endif // CONVERTIONWIDGET_H

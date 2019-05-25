@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets network multimedia
+QT       += core gui widgets network multimedia multimedia-private
 
 TARGET = LocalwebClient
 TEMPLATE = app
@@ -42,9 +42,9 @@ SOURCES += \
 ../AudioModul/iohandler.cpp \
     callingwindow.cpp \
     ../VideoModule/videowidget.cpp \
-    ../VideoModule/clientside.cpp \
     ../VideoModule/camera.cpp \
-    ../VideoModule/connectionhandler.cpp
+    ../VideoModule/vconnectionhandler.cpp \
+    ../VideoModule/vclientside.cpp
 
 HEADERS += \
     ../mylogger.h \
@@ -66,8 +66,8 @@ HEADERS += \
     callingwindow.h \
     ../VideoModule/videowidget.h \
     ../VideoModule/camera.h \
-    ../VideoModule/clientside.h \
-    ../VideoModule/connectionhandler.h
+    ../VideoModule/vconnectionhandler.h \
+    ../VideoModule/vclientside.h
 
 
 

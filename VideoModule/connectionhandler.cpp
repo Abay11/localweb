@@ -63,6 +63,7 @@ quint16 ConnectionHandler::getPort()
 
 void ConnectionHandler::slotReadDataFrom()
 {
+	qDebug() << DTAG << "Received data";
 	auto datagramSize = socket->pendingDatagramSize();
 
 	QByteArray compressed;
@@ -72,18 +73,17 @@ void ConnectionHandler::slotReadDataFrom()
 
 	auto data = qUncompress(compressed);
 
+	qDebug() << DTAG << "Received data size" << data.size();
+
 	emit dataArrived(data);
 }
 
 void ConnectionHandler::slotWriteData(const QByteArray& data)
 {
-	qDebug() << DTAG << "Writing data";
+	qDebug() << DTAG << "Writing data with size" << data.size();
 
 	auto compressed = qCompress(data, 10);
-	qDebug() << DTAG << "size of writing data:" << data.size();
-	qDebug() << DTAG << "size of writing coperssed:" << compressed.size();
-
-
+	qDebug() << DTAG << "Writing compressed data size" << compressed.size();
 
 	QString address = dest_host.toString();
 
@@ -107,6 +107,4 @@ void ConnectionHandler::slotWriteData(const QByteArray& data)
 	{
 		qWarning() << DTAG << "error writing bytes";
 	}
-
-	qDebug() << DTAG << serverhost << server_port << "wrote bytes:" << wrote;
 }

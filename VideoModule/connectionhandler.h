@@ -25,7 +25,7 @@ public:
 	quint16 getPort();
 
 signals:
-	void dataArrived(const QByteArray&);
+	void dataArrived(QByteArray&);
 
 private slots:
 	void slotReadDataFrom();

@@ -13,10 +13,12 @@ public:
 	~VideoWidget();
 
 public slots:
-	void slotDraw(const QByteArray& data);
+	void slotDraw(QByteArray& data);
 
 private:
 	QSize size;
+
+	const QString DTAG = "VideoModule::VideoWidget:";
 
 };
 

@@ -1,30 +1,37 @@
 #include "videowidget.h"
 
-#include <QPainter>
-#include <QVideoSurfaceFormat>
-#include <QPaintEvent>
-#include <QDataStream>
+#include <QBuffer>
+#include <QImageReader>
+#include <QDebug>
 
 #include <private/qvideoframe_p.h>
 
 VideoWidget::VideoWidget(QWidget* parent)
 	: QLabel(parent)
 {
+	resize(400, 400);
 }
 
 VideoWidget::~VideoWidget()
 {
 }
 
-void VideoWidget::slotDraw(const QByteArray& data)
+void VideoWidget::slotDraw(QByteArray& data)
 {
+	qDebug() << DTAG << "RECEIVED DATA TO DRAW";
 	//TODO
 	//optimize
-	QDataStream input_stream(data);
-	input_stream.setVersion(QDataStream::Qt_5_11);
 
+	QBuffer buff(&data);
+	buff.open(QIODevice::ReadOnly);
 	QImage img;
-	input_stream >> img;
+
+	QImageReader reader;
+	reader.setDevice(&buff);
+	reader.setFormat("jpg");
+	reader.read(&img);
+
+	qDebug() << DTAG << "received img size" << img.sizeInBytes();
 
 	if(size != img.size())
 	{

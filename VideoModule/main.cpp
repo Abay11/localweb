@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
 {
 	QApplication a(argc, argv);
 
-	ClientSide* client = new ClientSide(16000);
+	VideoModule::ClientSide* client = new VideoModule::ClientSide(16000);
 
 	client->setDestination(QHostAddress("127.0.0.1"),
 		6001);

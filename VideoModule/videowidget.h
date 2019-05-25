@@ -4,22 +4,25 @@
 #include <QLabel>
 #include <QVideoFrame>
 
-class VideoWidget : public QLabel
+namespace VideoModule
 {
-	Q_OBJECT
-public:
-	VideoWidget(QWidget* parent = nullptr);
+	class VideoWidget : public QLabel
+	{
+		Q_OBJECT
+	public:
+		VideoWidget(QWidget* parent = nullptr);
 
-	~VideoWidget();
+		~VideoWidget();
 
-public slots:
-	void slotDraw(QByteArray& data);
+	public slots:
+		void slotDraw(QByteArray& data);
 
-private:
-	QSize size;
+	private:
+		QSize size;
 
-	const QString DTAG = "VideoModule::VideoWidget:";
+		const QString DTAG = "VideoModule::VideoWidget:";
 
-};
+	};
+}
 
 #endif // VIDEOWIDGET_H

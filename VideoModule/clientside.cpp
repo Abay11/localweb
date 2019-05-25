@@ -4,44 +4,48 @@
 #include "videowidget.h"
 #include "connectionhandler.h"
 
-ClientSide::ClientSide(quint16 serverPort,
-	const QHostAddress& serverAddress,
-	QObject* parent)
-	: QObject(parent)
-	, serverPort(serverPort)
-	, serverAddress(serverAddress)
-	, camera(new Camera(this))
-	, video_widget(new VideoWidget)
-	, connHandler(new ConnectionHandler(serverPort, serverAddress, this))
+namespace VideoModule
 {
-	//writing frames
-	connect(camera, SIGNAL(newFrame(const QByteArray&)),
-		connHandler, SLOT(slotWriteData(const QByteArray&)));
 
-	//reading frames
-	connect(connHandler, SIGNAL(dataArrived(QByteArray&)),
-		video_widget, SLOT(slotDraw(QByteArray&)));
+	ClientSide::ClientSide(quint16 serverPort,
+		const QHostAddress& serverAddress,
+		QObject* parent)
+		: QObject(parent)
+		, serverPort(serverPort)
+		, serverAddress(serverAddress)
+		, camera(new Camera(this))
+		, video_widget(new VideoWidget)
+		, connHandler(new ConnectionHandler(serverPort, serverAddress, this))
+	{
+		//writing frames
+		connect(camera, SIGNAL(newFrame(const QByteArray&)),
+			connHandler, SLOT(slotWriteData(const QByteArray&)));
 
-	connHandler->startListen();
-}
+		//reading frames
+		connect(connHandler, SIGNAL(dataArrived(QByteArray&)),
+			video_widget, SLOT(slotDraw(QByteArray&)));
 
-void ClientSide::startCamera()
-{
-	if(camera->isCameraAvailable())
-		camera->start();
-}
+		connHandler->startListen();
+	}
 
-void ClientSide::stopCamera()
-{
-	camera->stop();
-}
+	void ClientSide::startCamera()
+	{
+		if(camera->isCameraAvailable())
+			camera->start();
+	}
 
-QWidget* ClientSide::getVideoWidget()
-{
-	return video_widget;
-}
+	void ClientSide::stopCamera()
+	{
+		camera->stop();
+	}
 
-void ClientSide::setDestination(const QHostAddress& host, quint16 port)
-{
-	connHandler->setDestination(host, port);
+	QWidget* ClientSide::getVideoWidget()
+	{
+		return video_widget;
+	}
+
+	void ClientSide::setDestination(const QHostAddress& host, quint16 port)
+	{
+		connHandler->setDestination(host, port);
+	}
 }

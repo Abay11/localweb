@@ -7,31 +7,35 @@ class QCamera;
 class QVideoFrame;
 class QVideoProbe;
 
-class Camera : public QObject
+namespace VideoModule
 {
-	Q_OBJECT
 
-public:
-	Camera(QObject* parent = nullptr);
-	~Camera();
-	bool isCameraAvailable();
+	class Camera : public QObject
+	{
+		Q_OBJECT
 
-	void start();
+	public:
+		Camera(QObject* parent = nullptr);
+		~Camera();
+		bool isCameraAvailable();
 
-	void stop();
+		void start();
+
+		void stop();
 
 
-signals:
-	void newFrame(const QByteArray&);
+	signals:
+		void newFrame(const QByteArray&);
 
-private slots:
-	void slotFrameProbed(const QVideoFrame& frame);
+	private slots:
+		void slotFrameProbed(const QVideoFrame& frame);
 
-private:
-	QCamera* camera;
-	QVideoProbe* video_probe;
+	private:
+		QCamera* camera;
+		QVideoProbe* video_probe;
 
-	const QString DTAG = "VideoModule::Camera: ";
-};
+		const QString DTAG = "VideoModule::Camera: ";
+	};
+}
 
 #endif // CAMERA_H

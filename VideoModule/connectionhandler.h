@@ -6,47 +6,50 @@
 
 class QUdpSocket;
 
-class ConnectionHandler : public QObject
+namespace VideoModule
 {
-	Q_OBJECT
-public:
-	explicit ConnectionHandler(quint16 server_port,
-		const QHostAddress& host = QHostAddress("127.0.0.1"),
-		QObject* parent = nullptr);
+	class ConnectionHandler : public QObject
+	{
+		Q_OBJECT
+	public:
+		explicit ConnectionHandler(quint16 server_port,
+			const QHostAddress& host = QHostAddress("127.0.0.1"),
+			QObject* parent = nullptr);
 
-	~ConnectionHandler();
+		~ConnectionHandler();
 
-	void startListen();
+		void startListen();
 
-	void stopListen();
+		void stopListen();
 
-	void setDestination(const QHostAddress& host, quint16 port);
+		void setDestination(const QHostAddress& host, quint16 port);
 
-	quint16 getPort();
+		quint16 getPort();
 
-signals:
-	void dataArrived(QByteArray&);
+	signals:
+		void dataArrived(QByteArray&);
 
-private slots:
-	void slotReadDataFrom();
+	private slots:
+		void slotReadDataFrom();
 
-public slots:
-	void slotWriteData(const QByteArray&);
+	public slots:
+		void slotWriteData(const QByteArray&);
 
-private:
-	QUdpSocket* socket;
+	private:
+		QUdpSocket* socket;
 
-	QHostAddress serverhost;
+		QHostAddress serverhost;
 
-	QHostAddress dest_host;
+		QHostAddress dest_host;
 
-	quint16 server_port;
+		quint16 server_port;
 
-	quint16 dest_port;
+		quint16 dest_port;
 
-	quint16 binding_port = 6000;
+		quint16 binding_port = 6000;
 
-	const QString DTAG = "VideoModule::ConnectionHandler:";
-};
+		const QString DTAG = "VideoModule::ConnectionHandler:";
+	};
+}
 
 #endif // CONNECTIONHANDLER_H

@@ -1,85 +1,85 @@
 #include "clientwidget.h"
 
-ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
- : QMainWindow (parent)
- ,pserverAddress(new QString)
- ,pserverPort(new QString)
- ,plblAddress(new QLabel("IP адрес сервера"))
- ,pleAddress(new QLineEdit)
- ,plblPort(new QLabel("Номер порта сервера"))
- ,plePort(new QLineEdit)
- ,pcmdConnect(new QPushButton("Подключиться"))
- ,pcmdDisconnect(new QPushButton("Отсоединиться"))
- ,phlay(new QHBoxLayout)
- ,pconvertionLay(new QHBoxLayout)
- ,pvlay(new QVBoxLayout)
- ,popup(new PopUp(this))
- ,plistdock(new ListDock(this))
- ,pservice(service)
- ,convertionWidgets(new QMap<QString, ConvertionWidget *>)
+ClientWidget::ClientWidget(ClientService* service, QWidget* parent)
+	: QMainWindow(parent)
+	, pserverAddress(new QString)
+	, pserverPort(new QString)
+	, plblAddress(new QLabel("IP адрес сервера"))
+	, pleAddress(new QLineEdit)
+	, plblPort(new QLabel("Номер порта сервера"))
+	, plePort(new QLineEdit)
+	, pcmdConnect(new QPushButton("Подключиться"))
+	, pcmdDisconnect(new QPushButton("Отсоединиться"))
+	, phlay(new QHBoxLayout)
+	, pconvertionLay(new QHBoxLayout)
+	, pvlay(new QVBoxLayout)
+	, popup(new PopUp(this))
+	, plistdock(new ListDock(this))
+	, pservice(service)
+	, convertionWidgets(new QMap<QString, ConvertionWidget *>)
 {
- plistdock->setOnlineModel(pservice->onlineModel());
- plistdock->setOfflineModel(pservice->offlineModel());
+	plistdock->setOnlineModel(pservice->onlineModel());
+	plistdock->setOfflineModel(pservice->offlineModel());
 
- pleAddress->setInputMask("000.000.000.000");
- pleAddress->setText(pservice->serverAddress());
- plePort->setInputMask("00000");
- plePort->setText(pservice->serverPort());
+	pleAddress->setInputMask("000.000.000.000");
+	pleAddress->setText(pservice->serverAddress());
+	plePort->setInputMask("00000");
+	plePort->setText(pservice->serverPort());
 
- phlay->addWidget(plblAddress);
- phlay->addWidget(pleAddress);
- phlay->addWidget(plblPort);
- phlay->addWidget(plePort);
- phlay->addWidget(pcmdConnect);
- phlay->addWidget(pcmdDisconnect);
- pvlay->addLayout(phlay);
- initConvertions();
- pconvertionLay->addWidget(generalConvertion);
- pvlay->addLayout(pconvertionLay);
+	phlay->addWidget(plblAddress);
+	phlay->addWidget(pleAddress);
+	phlay->addWidget(plblPort);
+	phlay->addWidget(plePort);
+	phlay->addWidget(pcmdConnect);
+	phlay->addWidget(pcmdDisconnect);
+	pvlay->addLayout(phlay);
+	initConvertions();
+	pconvertionLay->addWidget(generalConvertion);
+	pvlay->addLayout(pconvertionLay);
 
- connect(pcmdConnect, SIGNAL(clicked()),
-				SLOT(slotConnectClicked()));
+	connect(pcmdConnect, SIGNAL(clicked()),
+		SLOT(slotConnectClicked()));
 
- connect(pcmdDisconnect, SIGNAL(clicked()),
-				 pservice, SLOT(slotDisconnectFromServer()));
+	connect(pcmdDisconnect, SIGNAL(clicked()),
+		pservice, SLOT(slotDisconnectFromServer()));
 
- connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
+	connect(pservice, SIGNAL(connected()), SLOT(slotConnected()));
 
- connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
+	connect(pservice, SIGNAL(disconnected()), SLOT(slotDisconnected()));
 
- connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));
+	connect(pservice, SIGNAL(socketError(QString, QString)), this, SLOT(slotSocketError()));
 
- connect(pservice, SIGNAL(newMessageToForwarding(QString, QString, const QTime &)),
-				 SLOT(slotForwardToDestination(QString, QString, const QTime &)));
+	connect(pservice, SIGNAL(newMessageToForwarding(QString, QString, const QTime&)),
+		SLOT(slotForwardToDestination(QString, QString, const QTime&)));
 
- connect(pservice, SIGNAL(newMessageForDisplay(QString, const QTime &, QString)),
-				 generalConvertion, SLOT(slotAppendMessageToDisplay(QString, const QTime &, QString)));
+	connect(pservice, SIGNAL(newMessageForDisplay(QString, const QTime&, QString)),
+		generalConvertion, SLOT(slotAppendMessageToDisplay(QString, const QTime&, QString)));
 
- connect(pservice, SIGNAL(newMessageForNotification(QString)), this, SLOT(slotShowNotification(QString)));
+	connect(pservice, SIGNAL(newMessageForNotification(QString)), this, SLOT(slotShowNotification(QString)));
 
- connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
+	connect(pleAddress, SIGNAL(editingFinished()), SLOT(slotAddressEdited()));
 
- connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
+	connect(plePort, SIGNAL(editingFinished()), SLOT(slotPortEdited()));
 
- connect(plistdock, SIGNAL(openConvertion(QString)),
-				 SLOT(slotSwitchConversions(QString)));
+	connect(plistdock, SIGNAL(openConvertion(QString)),
+		SLOT(slotSwitchConversions(QString)));
 
- connect(plistdock, SIGNAL(makeCall(QString)), this, SLOT(slotMakeCall(QString)));
+	connect(plistdock, SIGNAL(makeCall(QString)), this, SLOT(slotMakeCall(QString)));
 
- connect(pservice, SIGNAL(callingRequest(QString)), SLOT(slotReceiveCall(QString)));
+	connect(pservice, SIGNAL(callingRequest(QString)), SLOT(slotReceiveCall(QString)));
 
- addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
+	addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 
- if(pservice->isConnected())
+	if(pservice->isConnected())
 	{
-	 turnStateOn();
+		turnStateOn();
 	}
- else
+	else
 	{
-	 turnStateOff();
+		turnStateOff();
 	}
 
-	QWidget *pcentral=new QWidget(this);
+	QWidget* pcentral = new QWidget(this);
 	pcentral->setLayout(pvlay);
 	setCentralWidget(pcentral);
 	setUI();
@@ -88,133 +88,138 @@ ClientWidget::ClientWidget(ClientService *service, QWidget *parent)
 
 void ClientWidget::slotSetAddress(QString addr, QString port)
 {
- pleAddress->setText(addr);
- plePort->setText(port);
- qDebug()<<"receive address info: "<<*pserverAddress<<" "<<*pserverPort;
+	pleAddress->setText(addr);
+	plePort->setText(port);
+	qDebug() << "receive address info: " << *pserverAddress << " " << *pserverPort;
 }
 
 void ClientWidget::slotSwitchConversions(QString convertionName)
 {
- auto it=convertionWidgets->find(convertionName);
- if(it==convertionWidgets->end())
-	{
-	 auto insertingConvertion=new ConvertionWidget(convertionName, this);
-	 it=convertionWidgets->insert(convertionName,
-														 insertingConvertion);
-	 connect(insertingConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
-					 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
+	auto it = convertionWidgets->find(convertionName);
 
-	 connect(insertingConvertion, SIGNAL(makeCallClicked(QString)), this, SLOT(makeCall(QString)));
-	}
- auto oldWidget = pconvertionLay->itemAt(0)->widget();
- if(oldWidget)
+	if(it == convertionWidgets->end())
 	{
-	 pconvertionLay->removeWidget(oldWidget);
-	 oldWidget->hide();
+		auto insertingConvertion = new ConvertionWidget(convertionName, this);
+		it = convertionWidgets->insert(convertionName,
+				insertingConvertion);
+		connect(insertingConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
+			pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
+
+		connect(insertingConvertion, SIGNAL(makeCallClicked(QString)), this, SLOT(makeCall(QString)));
 	}
- currentCunvertion=*it;
- currentCunvertion->setSocketState(pservice->isConnected());
- currentCunvertion->show();
- pconvertionLay->addWidget(currentCunvertion);
+
+	auto oldWidget = pconvertionLay->itemAt(0)->widget();
+
+	if(oldWidget)
+	{
+		pconvertionLay->removeWidget(oldWidget);
+		oldWidget->hide();
+	}
+
+	currentCunvertion = *it;
+	currentCunvertion->setSocketState(pservice->isConnected());
+	currentCunvertion->show();
+	pconvertionLay->addWidget(currentCunvertion);
 }
 
-void ClientWidget::slotForwardToDestination(QString msg, QString from, const QTime &time)
+void ClientWidget::slotForwardToDestination(QString msg, QString from, const QTime& time)
 {
- auto it=convertionWidgets->find(from);
+	auto it = convertionWidgets->find(from);
 
- if(it==convertionWidgets->end())
+	if(it == convertionWidgets->end())
 	{
-	 it=convertionWidgets->insert(from, new ConvertionWidget(from, this));
+		it = convertionWidgets->insert(from, new ConvertionWidget(from, this));
 
-	 connect(*it, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
-					 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
+		connect(*it, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
+			pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
 	}
 
- (*it)->slotAppendMessageToDisplay(msg, time);
+	(*it)->slotAppendMessageToDisplay(msg, time);
 }
 
 void ClientWidget::slotMakeCall(QString nick)
 {
 
- currentCunvertion->appendMsg("Исходящий звонок " + nick);
+	currentCunvertion->appendMsg("Исходящий звонок " + nick);
 
- CallingWindow* callingWindow = initCallingWindow();
+	CallingWindow* callingWindow = initCallingWindow();
 
- callingWindow->setState(nick, CallingWindow::STATES::OUTGOING);
+	callingWindow->setState(nick, CallingWindow::STATES::OUTGOING);
 
- callingWindow->show();
+	callingWindow->show();
 
- if(pservice->makeCall(nick) != 0) // return nonzero if user not found
+	if(pservice->makeCall(nick) != 0) // return nonzero if user not found
 	{
-	 qWarning() << DTAG << "Not found a user to calling or the user not respoonse. Closing a windows";
+		qWarning() << DTAG << "Not found a user to calling or the user not respoonse. Closing a windows";
 
 		currentCunvertion->appendMsg("Не удалось дозвониться до " + nick);
 
-	 callingWindow->setState(nick, CallingWindow::STATES::NOTREACH);
+		callingWindow->setState(nick, CallingWindow::STATES::NOTREACH);
 	}
- else {
-	 callingWindow->setState(nick, CallingWindow::STATES::SPEAKING);
+	else
+	{
+		callingWindow->setState(nick, CallingWindow::STATES::SPEAKING);
 
-	 currentCunvertion->appendMsg("Исходящий звонок с " + nick + " успешно соединен");
+		currentCunvertion->appendMsg("Исходящий звонок с " + nick + " успешно соединен");
 	}
 }
 
 void ClientWidget::slotReceiveCall(QString nick)
 {
- currentCunvertion->appendMsg("Входящий звонок от " + nick);
+	currentCunvertion->appendMsg("Входящий звонок от " + nick);
 
- CallingWindow* w = initCallingWindow();
+	CallingWindow* w = initCallingWindow();
 
- w->setState(nick, CallingWindow::STATES::INCOMING);
+	w->setState(nick, CallingWindow::STATES::INCOMING);
 
- w->show();
+	w->show();
 }
 
 void ClientWidget::slotCompanonFinisheCall()
 {
- CallingWindow* w = initCallingWindow();
+	CallingWindow* w = initCallingWindow();
 
- w->setState(w->getCurrentNick(), CallingWindow::STATES::STOPPING);
+	w->setState(w->getCurrentNick(), CallingWindow::STATES::STOPPING);
 }
 
 CallingWindow* ClientWidget::initCallingWindow()
 {
- static CallingWindow* window = new CallingWindow;
+	static CallingWindow* window = new CallingWindow;
 
- connect(window, SIGNAL(callAccepted(QString)), pservice, SLOT(slotCallAccepted(QString)));
+	connect(window, SIGNAL(callAccepted(QString)), pservice, SLOT(slotCallAccepted(QString)));
 
- connect(window, SIGNAL(callRejected(QString)), pservice, SLOT(slotCallRejected(QString)));
+	connect(window, SIGNAL(callRejected(QString)), pservice, SLOT(slotCallRejected(QString)));
 
- connect(window, SIGNAL(putDownClicked(QString)), pservice, SLOT(slotCallPutDowned(QString)));
+	connect(window, SIGNAL(putDownClicked(QString)), pservice, SLOT(slotCallPutDowned(QString)));
 
- connect(pservice, SIGNAL(receivedCallStopped()), this, SLOT(slotCompanonFinisheCall()));
+	connect(pservice, SIGNAL(receivedCallStopped()), this, SLOT(slotCompanonFinisheCall()));
 
- connect(window, SIGNAL(turnMicroClicked()), pservice, SLOT(slotTurnMicro()));
+	connect(window, SIGNAL(turnMicroClicked()), pservice, SLOT(slotTurnMicro()));
 
- connect(window, SIGNAL(turnSpeakersClicked()), pservice, SLOT(slotTurnSpeakers()));
+	connect(window, SIGNAL(turnSpeakersClicked()), pservice, SLOT(slotTurnSpeakers()));
 
- return window;
+	return window;
 }
 
 void ClientWidget::slotConnected()
 {
- turnStateOn();
+	turnStateOn();
 }
 
 void ClientWidget::slotDisconnected()
 {
- turnStateOff();
+	turnStateOff();
 }
 
 void ClientWidget::slotSocketError()
 {
- turnStateOff();
+	turnStateOff();
 }
 
 void ClientWidget::slotShowNotification(QString msg)
 {
- ptray->showMessage("Localweb", msg,
-										QSystemTrayIcon::Information, 3000);
+	ptray->showMessage("Localweb", msg,
+		QSystemTrayIcon::Information, 3000);
 }
 
 ClientWidget::~ClientWidget()
@@ -223,132 +228,132 @@ ClientWidget::~ClientWidget()
 
 void ClientWidget::turnStateOn()
 {
- pleAddress->setEnabled(false);
- plePort->setEnabled(false);
- pcmdConnect->setEnabled(false);
- pcmdDisconnect->setEnabled(true);
+	pleAddress->setEnabled(false);
+	plePort->setEnabled(false);
+	pcmdConnect->setEnabled(false);
+	pcmdDisconnect->setEnabled(true);
 
- bool isConnected=true;
- currentCunvertion->setSocketState(isConnected);
+	bool isConnected = true;
+	currentCunvertion->setSocketState(isConnected);
 }
 
 void ClientWidget::turnStateOff()
 {
- pleAddress->setEnabled(true);
- plePort->setEnabled(true);
- pcmdConnect->setEnabled(true);
- pcmdDisconnect->setEnabled(false);
+	pleAddress->setEnabled(true);
+	plePort->setEnabled(true);
+	pcmdConnect->setEnabled(true);
+	pcmdDisconnect->setEnabled(false);
 
- bool isConnected=false;
- currentCunvertion->setSocketState(isConnected);
- currentCunvertion->setSentEnabled(false);
+	bool isConnected = false;
+	currentCunvertion->setSocketState(isConnected);
+	currentCunvertion->setSentEnabled(false);
 }
 
 
 void ClientWidget::setUI()
 {
- QApplication::setQuitOnLastWindowClosed(false);
- QApplication::setWindowIcon(QIcon(":/Res/Icons/client.png"));
+	QApplication::setQuitOnLastWindowClosed(false);
+	QApplication::setWindowIcon(QIcon(":/Res/Icons/client.png"));
 
- QAction *paconnect=new QAction("Подключиться", this);
- paconnect->setIcon(QIcon(":/Res/Icons/connect.png"));
- connect(paconnect, SIGNAL(triggered()),
-				 pservice, SLOT(slotConnectToServer()));
+	QAction* paconnect = new QAction("Подключиться", this);
+	paconnect->setIcon(QIcon(":/Res/Icons/connect.png"));
+	connect(paconnect, SIGNAL(triggered()),
+		pservice, SLOT(slotConnectToServer()));
 
- QAction *padisconnect=new QAction("Отключиться", this);
- padisconnect->setIcon(QIcon(":/Res/Icons/disconnect.png"));
- connect(padisconnect, SIGNAL(triggered()),
-				 pservice, SLOT(slotDisconnectFromServer()));
+	QAction* padisconnect = new QAction("Отключиться", this);
+	padisconnect->setIcon(QIcon(":/Res/Icons/disconnect.png"));
+	connect(padisconnect, SIGNAL(triggered()),
+		pservice, SLOT(slotDisconnectFromServer()));
 
- QAction *pashow=new QAction("Показать", this);
- pashow->setIcon(QIcon(":/Res/Icons/show.png"));
- auto parentWidget_=parentWidget();
-	 connect(pashow, SIGNAL(triggered()),
-					 parentWidget_, SLOT(show()));
-	 connect(pashow, SIGNAL(triggered()),
-					 parentWidget_, SLOT(slotRestoreWindow()));
+	QAction* pashow = new QAction("Показать", this);
+	pashow->setIcon(QIcon(":/Res/Icons/show.png"));
+	auto parentWidget_ = parentWidget();
+	connect(pashow, SIGNAL(triggered()),
+		parentWidget_, SLOT(show()));
+	connect(pashow, SIGNAL(triggered()),
+		parentWidget_, SLOT(slotRestoreWindow()));
 
- QAction *pahide=new QAction("Скрыть", this);
- pahide->setIcon(QIcon(":/Res/Icons/hide.png"));
+	QAction* pahide = new QAction("Скрыть", this);
+	pahide->setIcon(QIcon(":/Res/Icons/hide.png"));
 	connect(pahide, SIGNAL(triggered()),
-				parentWidget(), SLOT(hide()));
+		parentWidget(), SLOT(hide()));
 
- QAction *paexit=new QAction("Выход", this);
- paexit->setIcon(QIcon(":/Res/Icons/exit.png"));
- connect(paexit, SIGNAL(triggered()), SLOT(slotQuit()));
+	QAction* paexit = new QAction("Выход", this);
+	paexit->setIcon(QIcon(":/Res/Icons/exit.png"));
+	connect(paexit, SIGNAL(triggered()), SLOT(slotQuit()));
 
- QToolBar *toolbar=new QToolBar(this);
- toolbar->addAction(paconnect);
- toolbar->addAction(padisconnect);
- toolbar->addAction(pashow);
- toolbar->addAction(pahide);
- toolbar->addAction(paexit);
+	QToolBar* toolbar = new QToolBar(this);
+	toolbar->addAction(paconnect);
+	toolbar->addAction(padisconnect);
+	toolbar->addAction(pashow);
+	toolbar->addAction(pahide);
+	toolbar->addAction(paexit);
 
 
- QMenu *pfileMenu=new QMenu("Меню", this);
- pfileMenu->addAction(paconnect);
- pfileMenu->addAction(padisconnect);
- pfileMenu->addAction(pashow);
- pfileMenu->addAction(pahide);
- pfileMenu->addAction(paexit);
+	QMenu* pfileMenu = new QMenu("Меню", this);
+	pfileMenu->addAction(paconnect);
+	pfileMenu->addAction(padisconnect);
+	pfileMenu->addAction(pashow);
+	pfileMenu->addAction(pahide);
+	pfileMenu->addAction(paexit);
 
- QMenu *psettingMenu=new QMenu("Настройки", this);
- psettingMenu->addAction("Настроить адреса");
- psettingMenu->addAction("Изменить информацию");
+	QMenu* psettingMenu = new QMenu("Настройки", this);
+	psettingMenu->addAction("Настроить адреса");
+	psettingMenu->addAction("Изменить информацию");
 
- QMenuBar *pmenuBar=new QMenuBar(this);
- pmenuBar->addMenu(pfileMenu);
- pmenuBar->addMenu(psettingMenu);
- pmenuBar->addMenu(new QMenu("Помощь", this));
- pmenuBar->addMenu(new QMenu("О приложении", this));
+	QMenuBar* pmenuBar = new QMenuBar(this);
+	pmenuBar->addMenu(pfileMenu);
+	pmenuBar->addMenu(psettingMenu);
+	pmenuBar->addMenu(new QMenu("Помощь", this));
+	pmenuBar->addMenu(new QMenu("О приложении", this));
 
- ptray=new QSystemTrayIcon(this);
- ptray->setIcon(QIcon(":/Res/Icons/client.png"));
- ptray->setContextMenu(pfileMenu);
- ptray->show();
+	ptray = new QSystemTrayIcon(this);
+	ptray->setIcon(QIcon(":/Res/Icons/client.png"));
+	ptray->setContextMenu(pfileMenu);
+	ptray->show();
 
- addToolBar(toolbar);
- setMenuBar(pmenuBar);
+	addToolBar(toolbar);
+	setMenuBar(pmenuBar);
 }
 
 void ClientWidget::initConvertions()
 {
- generalConvertion=new ConvertionWidget("Общий чат");
+	generalConvertion = new ConvertionWidget("Общий чат");
 
- convertionWidgets->insert("Общий чат", generalConvertion);
+	convertionWidgets->insert("Общий чат", generalConvertion);
 
- currentCunvertion=generalConvertion;
+	currentCunvertion = generalConvertion;
 
- connect(generalConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
-				 pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
+	connect(generalConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
+		pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
 
- connect(generalConvertion, SIGNAL(makeCallClicked(QString)),
-				 this, SLOT(slotMakeCall(QString)));
+	connect(generalConvertion, SIGNAL(audioCallClicked(QString)),
+		this, SLOT(slotMakeCall(QString)));
 }
 
 void ClientWidget::slotConnectClicked()
 {
- if(pleAddress->text()=="" || plePort->text()=="")
+	if(pleAddress->text() == "" || plePort->text() == "")
 	{
-	 qWarning()<<"Поле адреса или порта не могут быть пустыми!";
-	 return;
+		qWarning() << "Поле адреса или порта не могут быть пустыми!";
+		return;
 	}
 
- pservice->slotSetAddress(pleAddress->text(), plePort->text());
- pservice->slotConnectToServer();
+	pservice->slotSetAddress(pleAddress->text(), plePort->text());
+	pservice->slotConnectToServer();
 }
 
 void ClientWidget::slotQuit()
 {
- QApplication::quit();
+	QApplication::quit();
 }
 
 void ClientWidget::slotAddressEdited()
 {
- pservice->setAddress(pleAddress->text());
+	pservice->setAddress(pleAddress->text());
 }
 
 void ClientWidget::slotPortEdited()
 {
- pservice->setPort((plePort->text()));
+	pservice->setPort((plePort->text()));
 }

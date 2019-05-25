@@ -19,18 +19,29 @@ ClientSide::ClientSide(quint16 serverPort,
 		connHandler, SLOT(slotWriteData(const QByteArray&)));
 
 	//reading frames
-	connect(connHandler, SIGNAL(dataArrived(const QByteArray&)),
-		video_widget, SLOT(slotDraw(const QByteArray&)));
+	connect(connHandler, SIGNAL(dataArrived(QByteArray&)),
+		video_widget, SLOT(slotDraw(QByteArray&)));
 
 	connHandler->startListen();
 }
 
 void ClientSide::startCamera()
 {
-	camera->start();
+	if(camera->isCameraAvailable())
+		camera->start();
 }
 
 void ClientSide::stopCamera()
 {
 	camera->stop();
+}
+
+QWidget* ClientSide::getVideoWidget()
+{
+	return video_widget;
+}
+
+void ClientSide::setDestination(const QHostAddress& host, quint16 port)
+{
+	connHandler->setDestination(host, port);
 }

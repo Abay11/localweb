@@ -8,6 +8,7 @@ class Camera;
 class VideoWidget;
 class ConnectionHandler;
 class QVideoFrame;
+class QLabel;
 
 class ClientSide : public QObject
 {
@@ -21,6 +22,10 @@ public:
 	void startCamera();
 
 	void stopCamera();
+
+	QWidget* getVideoWidget();
+
+	void setDestination(const QHostAddress& host, quint16 port);
 
 private slots:
 

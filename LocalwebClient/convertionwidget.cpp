@@ -40,6 +40,7 @@ ConvertionWidget::ConvertionWidget(QString name,
 	connect(pmsgField, SIGNAL(textChanged()), SLOT(slotMsgChanged()));
 
 	connect(cmdAudioCall, SIGNAL(clicked()), SLOT(slotAudioCall()));
+	connect(cmdVideoCall, SIGNAL(clicked()), SLOT(slotAudioCall()));
 }
 
 void ConvertionWidget::setSocketState(bool isOpen)
@@ -121,6 +122,11 @@ void ConvertionWidget::slotMsgChanged()
 void ConvertionWidget::slotAudioCall()
 {
 	emit audioCallClicked(convertionName);
+}
+
+void ConvertionWidget::slotVideoCall()
+{
+	emit videoCallClicked(convertionName);
 }
 
 void ConvertionWidget::slotAppendMessageToDisplay(QString msg, const QTime& actionTime, QString from)

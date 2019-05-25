@@ -1,4 +1,4 @@
-#ifndef CONVERTIONWIDGET_H
+﻿#ifndef CONVERTIONWIDGET_H
 #define CONVERTIONWIDGET_H
 
 #include <QWidget>
@@ -47,6 +47,8 @@ private slots:
 
 	void slotAudioCall();
 
+	void slotVideoCall();
+
 public slots:
 	void slotAppendMessageToDisplay(QString msg, const QTime& actionTime, QString from = nullptr);
 
@@ -54,6 +56,8 @@ signals:
 	void sentClicked(DATATYPE type, QString stringData, QVariant variantData = 0);
 
 	void audioCallClicked(QString nick);
+
+	void videoCallClicked(QString nick);
 };
 
 #endif // CONVERTIONWIDGET_H

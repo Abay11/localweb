@@ -1,5 +1,5 @@
-#ifndef CLIENTSIDE_H
-#define CLIENTSIDE_H
+#ifndef VCLIENTSIDE_H
+#define VCLIENTSIDE_H
 
 #include <QObject>
 #include <QHostAddress>
@@ -22,8 +22,8 @@ namespace VideoModule
 
 	public:
 		explicit ClientSide(quint16 serverPort,
-			const QHostAddress& serverAddress = QHostAddress("127.0.0.1"),
-			QObject* parent = nullptr);
+    const QHostAddress& serverAddress = QHostAddress("127.0.0.1"),
+    QObject* parent = nullptr);
 
 		void startCamera();
 
@@ -45,4 +45,4 @@ namespace VideoModule
 	};
 }
 
-#endif // CLIENTSIDE_H
+#endif // VCLIENTSIDE_H

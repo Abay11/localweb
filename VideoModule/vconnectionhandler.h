@@ -1,5 +1,5 @@
-#ifndef CONNECTIONHANDLER_H
-#define CONNECTIONHANDLER_H
+#ifndef VCONNECTIONHANDLER_H
+#define VCONNECTIONHANDLER_H
 
 #include <QObject>
 #include <QHostAddress>
@@ -52,4 +52,4 @@ namespace VideoModule
 	};
 }
 
-#endif // CONNECTIONHANDLER_H
+#endif // VCONNECTIONHANDLER_H

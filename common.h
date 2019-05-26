@@ -7,7 +7,7 @@ class QTime;
 
 const qint64 BUFFER_SIZE = 1024;
 
-const quint16 AUDIOMODULE_IP = 16016;
+const quint16 AUDIO_VIDEO_SERVER_IP = 16016;
 
 namespace MY_NETWORK
 {

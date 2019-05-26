@@ -2,74 +2,75 @@
 #define CALLINGWINDOW_H
 
 #include <QWidget>
-#include <QBitmap>
-#include <QTimer>
-#include <QDebug>
 
-namespace Ui {
- class CallingWindow;
+class QTimer;
+
+namespace Ui
+{
+	class CallingWindow;
 }
 
 class CallingWindow : public QWidget
 {
- Q_OBJECT
+	Q_OBJECT
 
- const QString DTAG = "CallingWindow:";
+	const QString DTAG = "CallingWindow:";
 
 public:
- explicit CallingWindow(QWidget *parent = nullptr);
- ~CallingWindow();
+	explicit CallingWindow(QWidget* parent = nullptr);
+	~CallingWindow();
 
- enum class STATES
- {
-	INCOMING,
-	OUTGOING,
-	SPEAKING,
-	REJECTING,
-	NOTREACH,
-	STOPPING
- };
+	enum class STATES
+	{
+		INCOMING,
+		OUTGOING,
+		SPEAKING,
+		REJECTING,
+		NOTREACH,
+		STOPPING
+	};
 
- void setState(const QString& nick, STATES state);
+	void setState(const QString& nick, STATES state);
 
- QString getCurrentNick();
+	QString getCurrentNick();
 
 private:
- Ui::CallingWindow *ui;
+	Ui::CallingWindow* ui;
 
- QTimer* timer;
+	QTimer* timer;
 
- enum class IMAGES{
-	ACCEPTCALL,
-	REJECTCALL,
-	CONNECTED,
-	INCOMING,
-	OUTGOING
- };
+	enum class IMAGES
+	{
+		ACCEPTCALL,
+		REJECTCALL,
+		CONNECTED,
+		INCOMING,
+		OUTGOING
+	};
 
- void setImage(IMAGES image);
+	void setImage(IMAGES image);
 
 private slots:
- void slotTurnMicro();
+	void slotTurnMicro();
 
- void slotTurnSpeakers();
+	void slotTurnSpeakers();
 
- void slotPutDown();
+	void slotPutDown();
 
- void slotCallAccepted();
+	void slotCallAccepted();
 
- void slotCallRejected();
+	void slotCallRejected();
 
 signals:
- void turnMicroClicked();
+	void turnMicroClicked();
 
- void turnSpeakersClicked();
+	void turnSpeakersClicked();
 
- void putDownClicked(QString);
+	void putDownClicked(QString);
 
- void callAccepted(QString);
+	void callAccepted(QString);
 
- void callRejected(QString);
+	void callRejected(QString);
 };
 
 #endif // CALLINGWINDOW_H

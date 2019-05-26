@@ -2,54 +2,44 @@
 #define REGISTRATION_H
 
 #include <QWidget>
-#include <QFile>
-#include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QFormLayout>
-#include <QGridLayout>
-#include <QMessageBox>
-#include <QLayoutItem>
-#include <QApplication>
 
-#include <QTcpSocket>
-#include <QTime>
-
-#include "../clientinfo.h"
-#include "../settingswidget.h"
-#include "clientservice.h"
+class QLineEdit;
+class QPushButton;
+class QHBoxLayout;
+class QVBoxLayout;
+class QGridLayout;
+class QFormLayout;
 
 class MyLogger;
+class ClientService;
 
-class Registration:public QWidget
+class Registration: public QWidget
 {
- Q_OBJECT
+	Q_OBJECT
 private:
- QLineEdit *pleNick, *pleName;
- QPushButton *pcmdRegister, *pcmdExit, *pcmdSettings, *pcmdHelp;
- QHBoxLayout *phlay;
- QVBoxLayout *pvlay;
- QGridLayout *pglay;
- QFormLayout *pflay;
+	QLineEdit* pleNick, *pleName;
+	QPushButton* pcmdRegister, *pcmdExit, *pcmdSettings, *pcmdHelp;
+	QHBoxLayout* phlay;
+	QVBoxLayout* pvlay;
+	QGridLayout* pglay;
+	QFormLayout* pflay;
 
- ClientService *pservice;
+	ClientService* pservice;
 
 public:
- Registration(ClientService *pservice, QWidget *parent=nullptr);
+	Registration(ClientService* pservice, QWidget* parent = nullptr);
 
 private slots:
- void slotSentRequest();
- void slotProcessResult(bool registrationResult);
- void slotExit();
- void slotSettings();
- void slotAddressChanged(QString, QString);
+	void slotSentRequest();
+	void slotProcessResult(bool registrationResult);
+	void slotExit();
+	void slotSettings();
+	void slotAddressChanged(QString, QString);
 
 public slots:
 
 signals:
- void registrationFinished();
+	void registrationFinished();
 };
 
 #endif // REGISTRATION_H

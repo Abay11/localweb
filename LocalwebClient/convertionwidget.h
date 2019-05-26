@@ -2,15 +2,18 @@
 #define CONVERTIONWIDGET_H
 
 #include <QWidget>
-#include <QFileDialog>
-#include <QPushButton>
-#include <QTextEdit>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QTime>
+#include <QVariant>
+//#include <QPushButton>
+//#include <QTextEdit>
+//#include <QHBoxLayout>
+//#include <QLabel>
+//#include <QTime>
 
 #include "../clientinfo.h"
 #include "../common.h"
+
+class QPushButton;
+class QTextEdit;
 
 class ConvertionWidget: public QWidget
 {

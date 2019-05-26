@@ -2,159 +2,157 @@
 #define CLIENTSERVICE_H
 
 #include "../clientinfo.h"
-#include "../common.h"
-#include "../MY_FTP/MY_FTP/ftp_client.h"
-#include "../AudioModul/clientside.h"
 
-#include <QTime>
-#include <QMap>
-#include <QTcpSocket>
-#include <QNetworkInterface>
+#include <QString>
 #include <QStringListModel>
-#include <QListWidget>
-#include <QFile>
-#include <QFileInfo>
-#include <QLabel>
+#include <QTime>
+#include <QAbstractSocket>
+
+class ClientInfo;
+class FtpClient;
+class ClientSide;
+
+class QTcpSocket;
 
 #define CLIENTBASE QMap<QString, ClientInfo*>
 
-static QString defaultServerAddress="127.0.0.1";
+static QString defaultServerAddress = "127.0.0.1";
 
-static QString defaultServerPort="9999";
+static QString defaultServerPort = "9999";
 
-static QString defaultSavingFile="data.bin";
+static QString defaultSavingFile = "data.bin";
 
 static const QString DTAG = "ClientService:";
 
 class ClientService : public QObject
 {
- Q_OBJECT
+	Q_OBJECT
 
 protected:
- QTcpSocket *psocket;
+	QTcpSocket* psocket;
 
- bool registrationResult=false;
+	bool registrationResult = false;
 
- CLIENTBASE *clients;
+	CLIENTBASE* clients;
 
- QStringListModel *ponlineModel;
+	QStringListModel* ponlineModel;
 
- QStringListModel *pofflineModel;
+	QStringListModel* pofflineModel;
 
- FtpClient *ftp;
+	FtpClient* ftp;
 
- ClientSide* audioModule;
+	ClientSide* audioModule;
 
- void addAllUsersToOfflineModel();
+	void addAllUsersToOfflineModel();
 
- void addNewOnlineToModel(QString nick);
+	void addNewOnlineToModel(QString nick);
 
- void removeOnlinesFromOfflines(QStringList onlines);
+	void removeOnlinesFromOfflines(QStringList onlines);
 
- void removeConnectedFromOfflines(QString connected);
+	void removeConnectedFromOfflines(QString connected);
 
- void throwOnlinesToOfflines();
+	void throwOnlinesToOfflines();
 
- void throwDisconnectedToOfflines(QString disconnected);
+	void throwDisconnectedToOfflines(QString disconnected);
 
 private:
- QString nick;
+	QString nick;
 
- QString name;
+	QString name;
 
- QString *pserverAddress;
+	QString* pserverAddress;
 
- QString *pserverPort;
+	QString* pserverPort;
 
- quint16 mnNextBlockSize=0;
+	quint16 mnNextBlockSize = 0;
 
- void saveDataAndProperties();
+	void saveDataAndProperties();
 
- void restoreDataAndProperties();
+	void restoreDataAndProperties();
 
- bool callingResponseStatus = false;
+	bool callingResponseStatus = false;
 
 public:
- ClientService(QWidget *parent=nullptr);
+	ClientService(QWidget* parent = nullptr);
 
- ~ClientService();
+	~ClientService();
 
- void appendOwnerUserToOnlines();
+	void appendOwnerUserToOnlines();
 
- bool socketIsOpen();
+	bool socketIsOpen();
 
- QStringListModel *onlineModel();
+	QStringListModel* onlineModel();
 
- QStringListModel *offlineModel();
+	QStringListModel* offlineModel();
 
- QString serverAddress();
+	QString serverAddress();
 
- QString serverPort();
+	QString serverPort();
 
- quint16 clientPort();
+	quint16 clientPort();
 
- void setAddress(QString addr);
+	void setAddress(QString addr);
 
- void setPort(QString port);
+	void setPort(QString port);
 
- QString receivedMessage=nullptr;
+	QString receivedMessage = nullptr;
 
- void setNickAndName(QString nick, QString name);
+	void setNickAndName(QString nick, QString name);
 
- bool isConnected();
+	bool isConnected();
 
- int makeCall(QString nick);
+	int makeCall(QString nick);
 
 protected slots:
- void slotConnected();
+	void slotConnected();
 
- void slotDisconnected();
+	void slotDisconnected();
 
- void slotReadyRead();
+	void slotReadyRead();
 
- void slotError(QAbstractSocket::SocketError);
+	void slotError(QAbstractSocket::SocketError);
 
 public slots:
- void slotConnectToServer();
+	void slotConnectToServer();
 
- void slotDisconnectFromServer();
+	void slotDisconnectFromServer();
 
- void slotSendToServer(DATATYPE, QString=nullptr, QVariant=0);
+	void slotSendToServer(DATATYPE, QString = nullptr, QVariant = 0);
 
- void slotSetAddress(QString addr, QString port);
+	void slotSetAddress(QString addr, QString port);
 
- void slotCallAccepted(QString to);
+	void slotCallAccepted(QString to);
 
- void slotCallRejected(QString to);
+	void slotCallRejected(QString to);
 
- void slotCallPutDowned(QString to);
+	void slotCallPutDowned(QString to);
 
- void slotTurnMicro();
+	void slotTurnMicro();
 
- void slotTurnSpeakers();
+	void slotTurnSpeakers();
 
 signals:
- void connected();
+	void connected();
 
- void disconnected();
+	void disconnected();
 
- void returnRegistrationResult(bool);
+	void returnRegistrationResult(bool);
 
- void socketError(QString title, QString info);
+	void socketError(QString title, QString info);
 
- void newMessageForDisplay(QString msg, const QTime &time=QTime::currentTime(), QString from=nullptr);
+	void newMessageForDisplay(QString msg, const QTime& time = QTime::currentTime(), QString from = nullptr);
 
- void newMessageToForwarding(QString msg, QString from, const QTime &time=QTime::currentTime());
+	void newMessageToForwarding(QString msg, QString from, const QTime& time = QTime::currentTime());
 
- void newMessageForNotification(QString msg);
+	void newMessageForNotification(QString msg);
 
- void clientInfoUpdated();
+	void clientInfoUpdated();
 
- void callingRequest(const QString& from);
+	void callingRequest(const QString& from);
 
- void privateCallingResponseReceived();
+	void privateCallingResponseReceived();
 
- void receivedCallStopped();
+	void receivedCallStopped();
 };
 
 #endif // CLIENTSERVICE_H

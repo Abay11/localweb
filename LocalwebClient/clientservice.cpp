@@ -1,9 +1,18 @@
 #include "clientservice.h"
 
 #include "../MY_FTP/MY_FTP/ftp_common.h"
+#include "../MY_FTP/MY_FTP/ftp_client.h"
+#include "../AudioModul/clientside.h"
+#include "../common.h"
 
 #include <QEventLoop>
 #include <QTimer>
+#include <QFile>
+#include <QFileInfo>
+#include <QDataStream>
+#include <QWidget>
+#include <QTcpSocket>
+#include <QHostAddress>
 
 void ClientService::saveDataAndProperties()
 {

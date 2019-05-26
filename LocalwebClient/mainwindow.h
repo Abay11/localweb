@@ -2,37 +2,29 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QStackedWidget>
-#include <QFile>
-#include <QObject>
-#include <QMenuBar>
-#include <QToolBar>
-#include <QAction>
-#include <QIcon>
-#include <QStyle>
-#include <QDockWidget>
-#include <QEvent>
 
-#include "clientwidget.h"
-#include "registrationwidget.h"
-#include "../mylogger.h"
-#include "clientservice.h"
+class QStackedWidget;
+
+class MyLogger;
+class ClientWidget;
+class Registration;
+class ClientService;
 
 class MainWindow : public QMainWindow
 {
- Q_OBJECT
+	Q_OBJECT
 private:
- QStackedWidget *pstackedWidgets;
- MyLogger *plogger;
- ClientWidget *pclientWidget;
- Registration *preg;
- ClientService *pservice;
+	QStackedWidget* pstackedWidgets;
+	MyLogger* plogger;
+	ClientWidget* pclientWidget;
+	Registration* preg;
+	ClientService* pservice;
 
- void setupAndShowRegistrationWidget();
+	void setupAndShowRegistrationWidget();
 
 public:
- explicit MainWindow(QWidget *parent = nullptr);
- void changeEvent(QEvent *e) override;
+	explicit MainWindow(QWidget* parent = nullptr);
+	void changeEvent(QEvent* e) override;
 
 public slots:
 	void slotShowClientWidget();

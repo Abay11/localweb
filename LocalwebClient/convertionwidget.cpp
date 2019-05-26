@@ -1,6 +1,13 @@
 #include "convertionwidget.h"
 
 #include <QDebug>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QTime>
+#include <QFile>
+#include <QFileDialog>
 
 ConvertionWidget::ConvertionWidget(QString name,
 	QWidget* parent)

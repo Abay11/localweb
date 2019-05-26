@@ -1,6 +1,13 @@
 #include "mainwindow.h"
 
+#include "clientwidget.h"
+#include "registrationwidget.h"
+//#include "../mylogger.h"
+#include "clientservice.h"
+
 #include <QWindowStateChangeEvent>
+#include <QStackedWidget>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	//,plogger(new MyLogger)

@@ -86,7 +86,7 @@ ClientService::ClientService(QWidget* prnt)
 
 	ftp = new FtpClient(*pserverAddress, MY_FTP::PORT);
 
-	audioModule = new ClientSide(AUDIOMODULE_IP, QHostAddress(*pserverAddress));
+	audioModule = new AudioModule::ClientSide(AUDIOMODULE_IP, QHostAddress(*pserverAddress));
 
 	connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
 	connect(psocket, SIGNAL(connected()), SIGNAL(connected()));

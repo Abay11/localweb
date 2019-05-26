@@ -5,6 +5,8 @@
 #include <QBuffer>
 #include <QDebug>
 
+using namespace AudioModule;
+
 IOHandler::IOHandler()
 {
 	QAudioFormat format;

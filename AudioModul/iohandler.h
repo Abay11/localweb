@@ -8,42 +8,46 @@ class QAudioOutput;
 class QIODevice;
 class QBuffer;
 
-class IOHandler : public QObject
+namespace AudioModule
 {
-	Q_OBJECT
 
-private:
-	const QString DTAG = "AudioModule::IOHandler:";
+	class IOHandler : public QObject
+	{
+		Q_OBJECT
 
-	QAudioInput* audioInput;
+	private:
+		const QString DTAG = "AudioModule::IOHandler:";
 
-	QAudioOutput* audioOutput;
+		QAudioInput* audioInput;
 
-	QIODevice* inputDev = nullptr;
+		QAudioOutput* audioOutput;
 
-	QIODevice* outputDev = nullptr;
+		QIODevice* inputDev = nullptr;
 
-	QBuffer* buffer;
+		QIODevice* outputDev = nullptr;
 
-public:
-	IOHandler();
+		QBuffer* buffer;
 
-	void turnOnInput();
+	public:
+		IOHandler();
 
-	void turnOffInput();
+		void turnOnInput();
 
-	void turnOnOutput();
+		void turnOffInput();
 
-	void turnOffOutput();
+		void turnOnOutput();
 
-signals:
-	void readData(QByteArray&);
+		void turnOffOutput();
 
-private slots:
-	void slotReadAudioInput();
+	signals:
+		void readData(QByteArray&);
 
-public slots:
-	void slotWriteAudioOutput(QByteArray& data);
-};
+	private slots:
+		void slotReadAudioInput();
+
+	public slots:
+		void slotWriteAudioOutput(QByteArray& data);
+	};
+}
 
 #endif // IOHANDLER_H

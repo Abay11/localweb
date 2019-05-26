@@ -6,44 +6,48 @@
 
 class QUdpSocket;
 
-class ConnectionHandler : public QObject
+namespace AudioModule
 {
-	Q_OBJECT
 
-private:
-	QUdpSocket* socket;
+	class ConnectionHandler : public QObject
+	{
+		Q_OBJECT
 
-	QHostAddress serverhost;
+	private:
+		QUdpSocket* socket;
 
-	QHostAddress dest_host;
+		QHostAddress serverhost;
 
-	quint16 server_port;
+		QHostAddress dest_host;
 
-	quint16 dest_port;
+		quint16 server_port;
 
-	quint16 binding_port = 5000;
+		quint16 dest_port;
 
-	const QString DTAG = "AudioModule::ConnectionHandler:";
+		quint16 binding_port = 5000;
 
-public:
-	explicit ConnectionHandler(quint16 server_port, const QHostAddress& serverhost = QHostAddress("127.0.0.1"), QObject* parent = nullptr);
+		const QString DTAG = "AudioModule::ConnectionHandler:";
 
-	void startListen();
+	public:
+		explicit ConnectionHandler(quint16 server_port, const QHostAddress& serverhost = QHostAddress("127.0.0.1"), QObject* parent = nullptr);
 
-	void stopListen();
+		void startListen();
 
-	void setDestination(const QHostAddress& host, quint16 port);
+		void stopListen();
 
-	quint16 getPort();
+		void setDestination(const QHostAddress& host, quint16 port);
 
-signals:
-	void dataArrived(QByteArray&);
+		quint16 getPort();
 
-private slots:
-	void slotReadDataFrom();
+	signals:
+		void dataArrived(QByteArray&);
 
-public slots:
-	void slotWriteDataTo(QByteArray&);
-};
+	private slots:
+		void slotReadDataFrom();
+
+	public slots:
+		void slotWriteDataTo(QByteArray&);
+	};
+}
 
 #endif // CONNECTIONHANDLER_H

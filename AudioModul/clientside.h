@@ -6,45 +6,53 @@
 #include <QObject>
 #include <QHostAddress>
 
-class IOHandler;
-class ConnectionHandler;
-
-class ClientSide : public QObject
+namespace AudioModule
 {
-	Q_OBJECT
-public:
-	explicit ClientSide(quint16 serverPort, const QHostAddress& serverAddress = QHostAddress("localhost"), QObject* parent = nullptr);
 
-	~ClientSide();
+	class IOHandler;
+	class ConnectionHandler;
+}
 
-	void setDestination(const QHostAddress& addr, quint16 port);
+namespace AudioModule
+{
 
-	void setBroadcast();
+	class ClientSide : public QObject
+	{
+		Q_OBJECT
+	public:
+		explicit ClientSide(quint16 serverPort, const QHostAddress& serverAddress = QHostAddress("localhost"), QObject* parent = nullptr);
 
-	void turnOnMicrophone();
+		~ClientSide();
 
-	void turnOffMicrophone();
+		void setDestination(const QHostAddress& addr, quint16 port);
 
-	void turnOnSpeakers();
+		void setBroadcast();
 
-	void turnOffSpeakers();
+		void turnOnMicrophone();
 
-	quint16 getPort();
+		void turnOffMicrophone();
 
-signals:
+		void turnOnSpeakers();
 
-public slots:
+		void turnOffSpeakers();
 
-private:
-	quint16 serverPort;
+		quint16 getPort();
 
-	QHostAddress serverAddress;
+	signals:
 
-	IOHandler* voiceIO;
+	public slots:
 
-	ConnectionHandler* connectionHandler;
+	private:
+		quint16 serverPort;
 
-	const QString DTAG = "AudioModule::ClientSide:";
-};
+		QHostAddress serverAddress;
+
+		IOHandler* voiceIO;
+
+		ConnectionHandler* connectionHandler;
+
+		const QString DTAG = "AudioModule::ClientSide:";
+	};
+}
 
 #endif // CLIENTSIDE_H

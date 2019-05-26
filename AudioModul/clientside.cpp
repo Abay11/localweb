@@ -3,6 +3,8 @@
 #include "connectionhandler.h"
 #include "iohandler.h"
 
+using namespace AudioModule;
+
 ClientSide::ClientSide(quint16 serverPort, const QHostAddress& serverAddress, QObject* parent)
 	: QObject(parent)
 	, serverPort(serverPort)

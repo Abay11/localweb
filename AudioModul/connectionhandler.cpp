@@ -3,6 +3,8 @@
 #include <QUdpSocket>
 #include <QTimer>
 
+using namespace AudioModule;
+
 ConnectionHandler::ConnectionHandler(quint16 port, const QHostAddress& host, QObject* parent)
 	: QObject(parent)
 	, socket(new QUdpSocket)

@@ -170,6 +170,7 @@ void ServerNetworkService::sendToClient(QTcpSocket* to, DATATYPE type, QVariant 
 			auto clientinfo = clientbase->find(nick);
 
 			quint16 audioPort = 0;
+			quint16 videoPort = 0;
 
 			if(clientinfo == clientbase->end())
 			{
@@ -179,9 +180,10 @@ void ServerNetworkService::sendToClient(QTcpSocket* to, DATATYPE type, QVariant 
 			else
 			{
 				audioPort = clientinfo.value()->audioPort();
+				videoPort = clientinfo.value()->videoPort();
 			}
 
-			out << nick << audioPort;
+			out << nick << audioPort << videoPort;
 
 			break;
 		}
@@ -269,7 +271,7 @@ void ServerNetworkService::addToOnlines(QTcpSocket* client, const QString& nick)
 
 void ServerNetworkService::updateClientInfo(CLIENTBASE::iterator* item, quint16 audio_port, quint16 video_port)
 {
-	qDebug() << DTAG << "updating clientinfo audioport: " << audio_port;
+	qDebug() << DTAG << "updating clientinfo audioport & videoport: " << audio_port << video_port;
 	item->value()->audioPort() = audio_port;
 	item->value()->videoPort() = video_port;
 }

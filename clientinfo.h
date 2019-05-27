@@ -7,17 +7,18 @@ class QDataStream;
 
 enum class DATATYPE : char
 {
-	REGISTRATION = 0,
-	DELETION,
-	DISCONNECTION,
-	NOTIFYING,
-	CONNECT,
-	MESSAGE,
-	FILE,
-	GETACTUALDATA,
-	CALLINGREQUEST,
-	CALLINGRESPONSE,
-	STOPCALLING
+ REGISTRATION = 0,
+ DELETION,
+ DISCONNECTION,
+ NOTIFYING,
+ CONNECT,
+ MESSAGE,
+ FILE,
+ GETACTUALDATA,
+ CALLINGREQUEST,
+ CALLINGRESPONSE,
+ STOPCALLING,
+ VIDEOCALL
 };
 
 class ClientInfo
@@ -37,9 +38,9 @@ private:
 
 public:
 	ClientInfo(QString fullname = QString(),
-		QString addr = QString(),
-		QString mport = QString(),
-		bool status = false);
+   QString addr = QString(),
+   QString mport = QString(),
+   bool status = false);
 
 	virtual ~ClientInfo();
 

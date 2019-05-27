@@ -22,8 +22,8 @@ namespace VideoModule
 
 	public:
 		explicit ClientSide(quint16 serverPort,
-    const QHostAddress& serverAddress = QHostAddress("127.0.0.1"),
-    QObject* parent = nullptr);
+			const QHostAddress& serverAddress = QHostAddress("127.0.0.1"),
+			QObject* parent = nullptr);
 
 		void startCamera();
 
@@ -32,6 +32,8 @@ namespace VideoModule
 		QWidget* getVideoWidget();
 
 		void setDestination(const QHostAddress& host, quint16 port);
+
+		quint16 getPort();
 
 	private slots:
 

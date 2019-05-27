@@ -47,3 +47,8 @@ void ClientSide::setDestination(const QHostAddress& host, quint16 port)
 {
 	connHandler->setDestination(host, port);
 }
+
+quint16 ClientSide::getPort()
+{
+	return connHandler->getPort();
+}

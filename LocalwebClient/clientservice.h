@@ -2,7 +2,6 @@
 #define CLIENTSERVICE_H
 
 #include "../clientinfo.h"
-#include "../AudioModul/clientside.h"
 
 #include <QString>
 #include <QStringListModel>
@@ -13,6 +12,11 @@ class ClientInfo;
 class FtpClient;
 
 namespace AudioModule
+{
+	class ClientSide;
+}
+
+namespace VideoModule
 {
 	class ClientSide;
 }
@@ -47,6 +51,8 @@ protected:
 	FtpClient* ftp;
 
 	AudioModule::ClientSide* audioModule;
+
+	VideoModule::ClientSide* videoModule;
 
 	void addAllUsersToOfflineModel();
 

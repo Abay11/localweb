@@ -3,6 +3,7 @@
 #include "../MY_FTP/MY_FTP/ftp_common.h"
 #include "../MY_FTP/MY_FTP/ftp_client.h"
 #include "../AudioModul/clientside.h"
+#include "../VideoModule/vclientside.h"
 #include "../common.h"
 
 #include <QEventLoop>
@@ -86,7 +87,9 @@ ClientService::ClientService(QWidget* prnt)
 
 	ftp = new FtpClient(*pserverAddress, MY_FTP::PORT);
 
-	audioModule = new AudioModule::ClientSide(AUDIOMODULE_IP, QHostAddress(*pserverAddress));
+	audioModule = new AudioModule::ClientSide(AUDIO_VIDEO_SERVER_IP, QHostAddress(*pserverAddress));
+
+	videoModule = new VideoModule::ClientSide(AUDIO_VIDEO_SERVER_IP, QHostAddress(*pserverAddress));
 
 	connect(psocket, SIGNAL(connected()), SLOT(slotConnected()));
 	connect(psocket, SIGNAL(connected()), SIGNAL(connected()));

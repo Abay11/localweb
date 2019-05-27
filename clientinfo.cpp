@@ -61,6 +61,16 @@ quint16& ClientInfo::audioPort()
 	return audioPort_;
 }
 
+quint16 ClientInfo::videoPort() const
+{
+	return video_port;
+}
+
+quint16& ClientInfo::videoPort()
+{
+	return video_port;
+}
+
 QDataStream& operator>>(QDataStream& out, ClientInfo*& cinfo)
 {
 	cinfo = new ClientInfo;

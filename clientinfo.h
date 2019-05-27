@@ -31,6 +31,8 @@ private:
 
 	quint16 audioPort_;
 
+	quint16 video_port;
+
 	bool mstatus = false;
 
 public:
@@ -60,6 +62,10 @@ public:
 	quint16 audioPort() const;
 
 	quint16& audioPort();
+
+	quint16 videoPort() const;
+
+	quint16& videoPort();
 };
 
 QDataStream& operator>>(QDataStream& out, ClientInfo*& cinfo);

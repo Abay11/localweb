@@ -267,10 +267,11 @@ void ServerNetworkService::addToOnlines(QTcpSocket* client, const QString& nick)
 	socketsAndNicksOfOnlines->insert(client, nick);
 }
 
-void ServerNetworkService::updateClientInfo(CLIENTBASE::iterator* item, quint16 audioPort)
+void ServerNetworkService::updateClientInfo(CLIENTBASE::iterator* item, quint16 audio_port, quint16 video_port)
 {
-	qDebug() << DTAG << "updating clientinfo audioport: " << audioPort;
-	item->value()->audioPort() = audioPort;
+	qDebug() << DTAG << "updating clientinfo audioport: " << audio_port;
+	item->value()->audioPort() = audio_port;
+	item->value()->videoPort() = video_port;
 }
 
 void ServerNetworkService::notifyOthersNewConnection(const QString& nick)
@@ -411,10 +412,9 @@ void ServerNetworkService::slotReadClient()
 			{
 				QString nick;
 				int clientBaseSize;
-				quint16 audioPort;
-				in >> nick >> audioPort >> clientBaseSize;
-
-				qDebug() << DTAG << "connected client's audio port" << audioPort;
+				quint16 audio_port;
+				quint16 video_port;
+				in >> nick >> audio_port >> video_port >> clientBaseSize;
 
 				auto iter = clientbase->find(nick);
 
@@ -424,7 +424,7 @@ void ServerNetworkService::slotReadClient()
 					{
 						notifyOthersNewConnection(nick);
 
-						updateClientInfo(&iter, audioPort);
+						updateClientInfo(&iter, audio_port, video_port);
 
 						addToOnlines(pclient, nick);
 					}

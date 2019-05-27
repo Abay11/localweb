@@ -18,96 +18,96 @@
 #include <QNetworkInterface>
 
 #ifndef CLIENTBASE
-#define CLIENTBASE QMap<QString, ClientInfo *>
+	#define CLIENTBASE QMap<QString, ClientInfo *>
 #endif
 
 class ServerNetworkService : public QObject
 {
- Q_OBJECT
+	Q_OBJECT
 
 public:
 
- explicit ServerNetworkService(QObject *parent = nullptr);
+	explicit ServerNetworkService(QObject* parent = nullptr);
 
- ~ServerNetworkService();
+	~ServerNetworkService();
 
- void initAudioServerModule(quint16 listeningPort);
+	void initAudioServerModule(quint16 listeningPort);
 
- quint16 listeningPort();
+	quint16 listeningPort();
 
- void setPort(quint16 nport);
+	void setPort(quint16 nport);
 
- quint16 getPort();
+	quint16 getPort();
 
- QString getAddress();
+	QString getAddress();
 
- bool saveData(QString filename="serverdata.bin");
+	bool saveData(QString filename = "serverdata.bin");
 
- bool restoreData(QString filename="serverdata.bin");
+	bool restoreData(QString filename = "serverdata.bin");
 
- void sendToClient(QTcpSocket *to, DATATYPE type, QVariant data, void *paddition=nullptr, QString from=nullptr, QVariant addition2=0);
+	void sendToClient(QTcpSocket* to, DATATYPE type, QVariant data, void* paddition = nullptr, QString from = nullptr, QVariant addition2 = 0);
 
- bool addUserIfNickNotBusy(const QString &nick, const QString &name, QTcpSocket *client);
+	bool addUserIfNickNotBusy(const QString& nick, const QString& name, QTcpSocket* client);
 
- void addToBase(const QString &nick, const QString &name,
-								const QString &address, const QString &nport);
+	void addToBase(const QString& nick, const QString& name,
+		const QString& address, const QString& nport);
 
- void addToModel(const QString &nick);
+	void addToModel(const QString& nick);
 
- void addToOnlines(QTcpSocket *client, const QString &nick);
+	void addToOnlines(QTcpSocket* client, const QString& nick);
 
- void updateClientInfo(CLIENTBASE::iterator* item, quint16 audioPort);
+	void updateClientInfo(CLIENTBASE::iterator* item, quint16 audio_port, quint16 video_port);
 
- void notifyOthersNewConnection(const QString& nick);
+	void notifyOthersNewConnection(const QString& nick);
 
- void notifyOthersAboutDisconnection(const QString& nick);
+	void notifyOthersAboutDisconnection(const QString& nick);
 
- void removeFromOnlines(QTcpSocket *client);
+	void removeFromOnlines(QTcpSocket* client);
 
- void setDataFromBaseToModel();
+	void setDataFromBaseToModel();
 
- CLIENTBASE *getClientBase() const;
+	CLIENTBASE* getClientBase() const;
 
- QStringListModel *getModel();
+	QStringListModel* getModel();
 
- QStringList getClientsList();
+	QStringList getClientsList();
 
 private:
- quint16 nextBlockSize=0;
+	quint16 nextBlockSize = 0;
 
- quint16 nport;
+	quint16 nport;
 
- QString address;
+	QString address;
 
- QTcpServer *ptcpServer;
+	QTcpServer* ptcpServer;
 
- QStringListModel *pmodel;
+	QStringListModel* pmodel;
 
- FtpServer *ftp;
+	FtpServer* ftp;
 
- CLIENTBASE *clientbase;
+	CLIENTBASE* clientbase;
 
- QMap<QTcpSocket *, QString> *socketsAndNicksOfOnlines;
+	QMap<QTcpSocket*, QString>* socketsAndNicksOfOnlines;
 
- ServerSide* audioServerModule;
+	ServerSide* audioServerModule;
 
- const QString DTAG = "ServerNetworkService:";
+	const QString DTAG = "ServerNetworkService:";
 
 signals:
 
 public slots:
 
- bool slotStartServer();
+	bool slotStartServer();
 
- void slotStopServer();
+	void slotStopServer();
 
- void slotNewConnection();
+	void slotNewConnection();
 
- void slotDisconnection();
+	void slotDisconnection();
 
- void slotReadClient();
+	void slotReadClient();
 
- void slotAcceptError(QAbstractSocket::SocketError socketError);
+	void slotAcceptError(QAbstractSocket::SocketError socketError);
 };
 
 #endif // SERVERNETWORKSERVICE_H

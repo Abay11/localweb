@@ -75,6 +75,7 @@ private slots:
 
 	void slotCompanonFinisheCall();
 
+	void slotMakeVideoCall(QString to);
 
 public slots:
 	void slotAddressEdited();

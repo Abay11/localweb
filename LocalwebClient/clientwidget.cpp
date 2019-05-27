@@ -122,7 +122,8 @@ void ClientWidget::slotSwitchConversions(QString convertionName)
 		connect(insertingConvertion, SIGNAL(sentClicked(DATATYPE, QString, QVariant)),
 			pservice, SLOT(slotSendToServer(DATATYPE, QString, QVariant)));
 
-		connect(insertingConvertion, SIGNAL(makeCallClicked(QString)), this, SLOT(makeCall(QString)));
+		connect(insertingConvertion, SIGNAL(audioCallClicked(QString)), this, SLOT(slotMakeCall(QString)));
+		connect(insertingConvertion, SIGNAL(videoCallClicked(QString)), this, SLOT(slotMakeVideoCall(QString)));
 	}
 
 	auto oldWidget = pconvertionLay->itemAt(0)->widget();
@@ -197,6 +198,11 @@ void ClientWidget::slotCompanonFinisheCall()
 	CallingWindow* w = initCallingWindow();
 
 	w->setState(w->getCurrentNick(), CallingWindow::STATES::STOPPING);
+}
+
+void ClientWidget::slotMakeVideoCall(QString to)
+{
+	pservice->slotVideoCall(to);
 }
 
 CallingWindow* ClientWidget::initCallingWindow()

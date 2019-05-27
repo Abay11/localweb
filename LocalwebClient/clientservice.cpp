@@ -398,8 +398,9 @@ void ClientService::slotReadyRead()
 				qDebug() << DTAG << "Receving updated client info";
 
 				QString nick;
-				quint16 audioPort;
-				in >> nick >> audioPort;
+				quint16 audio_port;
+				quint16 video_port;
+				in >> nick >> audio_port >> video_port;
 
 				auto it = clients->find(nick);
 
@@ -407,13 +408,14 @@ void ClientService::slotReadyRead()
 				{
 					qWarning() << DTAG << "A client not found such nick to update data";
 				}
-				else if(audioPort == 0)
+				else if(audio_port == 0 || video_port == 0)
 				{
 					qWarning() << DTAG << "The server not found such nick to update data";
 				}
 				else
 				{
-					it.value()->audioPort() = audioPort;
+					it.value()->audioPort() = audio_port;
+					it.value()->videoPort() = video_port;
 				}
 
 				//need emit even a client was not found to interupt a waiting event loop

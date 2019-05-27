@@ -691,6 +691,40 @@ void ClientService::slotCallPutDowned(QString to)
 	slotSendToServer(DATATYPE::STOPCALLING, to);
 }
 
+void ClientService::slotVideoCall(QString to)
+{
+	qDebug() << DTAG << "Making a videocall to" << to;
+
+	auto iter = clients->find(nick);
+
+	if(iter == clients->end())
+	{
+		qWarning() << DTAG << "Not found such nick to make a call";
+
+		return;
+	}
+
+	slotSendToServer(DATATYPE::GETACTUALDATA, nick);
+
+	QEventLoop* loop = new QEventLoop;
+	//block until we get a client's info;
+	connect(this, SIGNAL(clientInfoUpdated()), loop, SLOT(quit()));
+	loop->exec();
+
+	loop->deleteLater();
+
+	qDebug() << DTAG << "Making a VIDEO call to a client" << nick << "with address and port" << iter.value()->address()
+		<< iter.value()->videoPort();
+
+	QHostAddress destAddress(iter.value()->address());
+	quint16 destPort = iter.value()->videoPort();
+
+	videoModule->setDestination(destAddress, destPort);
+
+	videoModule->startCamera();
+	//	videoModule->startCamera();
+}
+
 void ClientService::slotTurnMicro()
 {
 	qDebug() << DTAG << "turn micro";

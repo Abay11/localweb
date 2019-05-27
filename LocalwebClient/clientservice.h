@@ -138,6 +138,8 @@ public slots:
 
 	void slotCallPutDowned(QString to);
 
+	void slotVideoCall(QString to);
+
 	void slotTurnMicro();
 
 	void slotTurnSpeakers();

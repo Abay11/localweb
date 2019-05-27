@@ -3,11 +3,6 @@
 
 #include <QWidget>
 #include <QVariant>
-//#include <QPushButton>
-//#include <QTextEdit>
-//#include <QHBoxLayout>
-//#include <QLabel>
-//#include <QTime>
 
 #include "../clientinfo.h"
 #include "../common.h"

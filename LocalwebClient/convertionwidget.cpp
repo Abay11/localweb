@@ -49,7 +49,7 @@ ConvertionWidget::ConvertionWidget(QString name,
 	connect(pmsgField, SIGNAL(textChanged()), SLOT(slotMsgChanged()));
 
 	connect(cmdAudioCall, SIGNAL(clicked()), SLOT(slotAudioCall()));
-	connect(cmdVideoCall, SIGNAL(clicked()), SLOT(slotAudioCall()));
+	connect(cmdVideoCall, SIGNAL(clicked()), SLOT(slotVideoCall()));
 }
 
 void ConvertionWidget::setSocketState(bool isOpen)

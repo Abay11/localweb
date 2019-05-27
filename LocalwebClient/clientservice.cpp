@@ -573,7 +573,7 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 		case DATATYPE::CONNECT:
 		{
 			qDebug() << "Sending to server size of base:" << clients->size();
-			out << nick << audioModule->getPort() << clients->size();
+			out << nick << audioModule->getPort() << videoModule->getPort() << clients->size();
 
 			break;
 		}

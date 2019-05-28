@@ -16,6 +16,8 @@ ClientSide::ClientSide(quint16 serverPort,
 	, video_widget(new VideoWidget)
 	, connHandler(new ConnectionHandler(serverPort, serverAddress, this))
 {
+	video_widget->setCameraInstance(camera);
+
 	//writing frames
 	connect(camera, SIGNAL(newFrame(const QByteArray&)),
 		connHandler, SLOT(slotWriteData(const QByteArray&)));

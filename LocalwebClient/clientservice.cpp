@@ -741,6 +741,8 @@ void ClientService::slotVideoCall(QString to)
 	slotSendToServer(DATATYPE::VIDEOCALL, to);
 
 	videoModule->startCamera();
+
+	videoModule->getVideoWidget()->show();
 }
 
 void ClientService::slotTurnMicro()

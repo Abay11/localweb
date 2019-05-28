@@ -465,6 +465,16 @@ void ClientService::slotReadyRead()
 				break;
 			}
 
+			case DATATYPE::VIDEOCALL:
+			{
+				qDebug() << DTAG << "Received VIDEOCALL datatype";
+
+				QString from;
+				in >> from;
+
+				break;
+			}
+
 			default:
 				//что-то пошло не так, клиент не может получить иную команду
 				qCritical() << "Неизвестная ошибка при получении сообщения.";

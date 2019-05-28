@@ -638,6 +638,8 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 			break;
 		}
 
+
+
 		default:
 			break;
 	}
@@ -733,8 +735,10 @@ void ClientService::slotVideoCall(QString to)
 
 	videoModule->setDestination(destAddress, destPort);
 
+	//say to the server to notify a called about a calling
+	slotSendToServer(DATATYPE::VIDEOCALL, to);
+
 	videoModule->startCamera();
-	//	videoModule->startCamera();
 }
 
 void ClientService::slotTurnMicro()

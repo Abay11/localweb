@@ -472,6 +472,8 @@ void ClientService::slotReadyRead()
 				QString from;
 				in >> from;
 
+				videoModule->getVideoWidget()->show();
+
 				break;
 			}
 

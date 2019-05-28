@@ -188,6 +188,7 @@ void ServerNetworkService::sendToClient(QTcpSocket* to, DATATYPE type, QVariant 
 			break;
 		}
 
+		case DATATYPE::VIDEOCALL:
 		case DATATYPE::CALLINGREQUEST:
 		{
 			qDebug() << DTAG << "Sending the CALLINGREQUEST";
@@ -545,9 +546,10 @@ void ServerNetworkService::slotReadClient()
 				break;
 			}
 
+			case DATATYPE::VIDEOCALL:
 			case DATATYPE::CALLINGREQUEST:
 			{
-				qDebug() << DTAG << "Received the CALLINGREQUEST request";
+				qDebug() << DTAG << "Received the CALLING-type request to forward a client";
 				QString nick;
 
 				in >> nick;

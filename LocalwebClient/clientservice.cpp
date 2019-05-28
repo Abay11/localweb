@@ -695,7 +695,7 @@ void ClientService::slotVideoCall(QString to)
 {
 	qDebug() << DTAG << "Making a videocall to" << to;
 
-	auto iter = clients->find(nick);
+	auto iter = clients->find(to);
 
 	if(iter == clients->end())
 	{
@@ -704,7 +704,7 @@ void ClientService::slotVideoCall(QString to)
 		return;
 	}
 
-	slotSendToServer(DATATYPE::GETACTUALDATA, nick);
+	slotSendToServer(DATATYPE::GETACTUALDATA, to);
 
 	QEventLoop* loop = new QEventLoop;
 	//block until we get a client's info;
@@ -713,7 +713,7 @@ void ClientService::slotVideoCall(QString to)
 
 	loop->deleteLater();
 
-	qDebug() << DTAG << "Making a VIDEO call to a client" << nick << "with address and port" << iter.value()->address()
+	qDebug() << DTAG << "Making a VIDEO call to a client" << to << "with address and port" << iter.value()->address()
 		<< iter.value()->videoPort();
 
 	QHostAddress destAddress(iter.value()->address());

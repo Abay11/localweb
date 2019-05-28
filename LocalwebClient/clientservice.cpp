@@ -591,9 +591,10 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 			break;
 		}
 
+		case DATATYPE::VIDEOCALL:
 		case DATATYPE::CALLINGREQUEST:
 		{
-			qDebug() << DTAG << "Sendting to the server the calling request";
+			qDebug() << DTAG << "Sending to the server the calling request";
 
 			QString& callingUser = msg;
 
@@ -614,6 +615,7 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 
 			break;
 		}
+
 
 		case DATATYPE::STOPCALLING:
 		{

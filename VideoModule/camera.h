@@ -21,7 +21,7 @@ namespace VideoModule
 
 		bool isAvailable();
 
-		void start();
+		bool start();
 
 		void stop();
 

@@ -47,9 +47,15 @@ bool Camera::isAvailable()
 	return camera->isAvailable();
 }
 
-void Camera::start()
+bool Camera::start()
 {
+	if(!isCameraAvailable()) return false;
+
+	initCamera();
+
 	camera->start();
+
+	return true;
 }
 
 void Camera::stop()

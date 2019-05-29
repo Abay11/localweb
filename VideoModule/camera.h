@@ -36,7 +36,7 @@ namespace VideoModule
 		void slotFrameProbed(const QVideoFrame& frame);
 
 	private:
-		QCamera* camera;
+		QCamera* camera = nullptr;
 		QVideoProbe* video_probe;
 
 		const QString DTAG = "VideoModule::Camera: ";

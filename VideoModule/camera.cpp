@@ -36,7 +36,8 @@ bool Camera::start()
 {
 	if(!isCameraAvailable()) return false;
 
-	initCamera();
+	if(!camera)
+		initCamera();
 
 	camera->start();
 
@@ -45,10 +46,15 @@ bool Camera::start()
 
 void Camera::stop()
 {
-	camera->stop();
+	if(camera)
+	{
+		camera->stop();
 
-	delete video_probe;
-	delete camera;
+		delete video_probe;
+		delete camera;
+
+		camera = nullptr;
+	}
 }
 
 void Camera::initCamera()

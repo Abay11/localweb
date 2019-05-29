@@ -31,8 +31,10 @@ ClientSide::ClientSide(quint16 serverPort,
 
 void ClientSide::startCamera()
 {
-	if(camera->isAvailable())
-		camera->start();
+	if(!camera->start())
+	{
+		qWarning() << "A camera is not available";
+	}
 }
 
 void ClientSide::stopCamera()

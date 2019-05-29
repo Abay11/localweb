@@ -34,10 +34,14 @@ private slots:
 
 	void slotMakeCall();
 
+	void slotMakeVideocall();
+
 signals:
 	void openConvertion(QString nick);
 
 	void makeCall(QString nick);
+
+	void makeVideocall(QString nick);
 };
 
 #endif // CLIENTSLISTCONTAINER_H

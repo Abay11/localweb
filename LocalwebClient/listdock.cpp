@@ -74,7 +74,7 @@ void ListDock::slotShowContextMenu(const QPoint& pos)
 		menu = new QMenu(this);
 		menu->addAction("Открыть беседу", this, SLOT(slotOpenConvertion()));
 		menu->addAction("Аудиозвонок", this, SLOT(slotMakeCall()));
-		menu->addAction("Видеозвонок");
+		menu->addAction("Видеозвонок", this, SLOT(slotMakeVideocall()));
 		menu->addAction("Показать информацию");
 	}
 
@@ -120,5 +120,19 @@ void ListDock::slotMakeCall()
 
 		qDebug() << "Emit make a call to" << nick;
 		emit makeCall(nick);
+	}
+}
+
+void ListDock::slotMakeVideocall()
+{
+	bool isOnlineView = focusWidget() == ponline;
+
+	if(isOnlineView)
+	{
+		auto curIndex = ponline->currentIndex();
+		QString nick = ponline->model()->data(curIndex).toString();
+
+		qDebug() << "Emit make a videocall to" << nick;
+		emit makeVideocall(nick);
 	}
 }

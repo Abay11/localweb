@@ -25,6 +25,9 @@ namespace VideoModule
 
 		void stop();
 
+	private:
+		void initCamera();
+
 
 	signals:
 		void newFrame(const QByteArray&);

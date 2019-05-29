@@ -62,6 +62,10 @@ void Camera::stop()
 {
 	camera->stop();
 
+	delete video_probe;
+	delete camera;
+}
+
 void Camera::initCamera()
 {
 	camera = new QCamera;

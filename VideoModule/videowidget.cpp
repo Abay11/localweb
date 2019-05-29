@@ -62,9 +62,7 @@ void VideoWidget::showEvent(QShowEvent* event)
 {
 	QWidget::showEvent(event);
 
-	if(cam && cam->isCameraAvailable())
-		cam->start();
-	else
+	if(!cam->start())
 	{
 		qWarning() << DTAG << "A camera not found";
 	}

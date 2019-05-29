@@ -19,6 +19,8 @@ namespace VideoModule
 		~Camera();
 		bool isCameraAvailable();
 
+		bool isAvailable();
+
 		void start();
 
 		void stop();

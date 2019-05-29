@@ -42,6 +42,11 @@ bool Camera::isCameraAvailable()
 		return false;
 }
 
+bool Camera::isAvailable()
+{
+	return camera->isAvailable();
+}
+
 void Camera::start()
 {
 	camera->start();

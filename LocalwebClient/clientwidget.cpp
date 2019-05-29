@@ -83,6 +83,8 @@ ClientWidget::ClientWidget(ClientService* service, QWidget* parent)
 
 	connect(plistdock, SIGNAL(makeCall(QString)), this, SLOT(slotMakeCall(QString)));
 
+	connect(plistdock, SIGNAL(makeVideocall(QString)), this, SLOT(slotMakeVideoCall(QString)));
+
 	connect(pservice, SIGNAL(callingRequest(QString)), SLOT(slotReceiveCall(QString)));
 
 	connect(pservice, SIGNAL(incomingVideocall(QString)), SLOT(slotIncomingVideocall(QString)));

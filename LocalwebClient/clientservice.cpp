@@ -472,7 +472,10 @@ void ClientService::slotReadyRead()
 				QString from;
 				in >> from;
 
+				emit incomingVideocall(from);
+
 				videoModule->getVideoWidget()->show();
+
 
 				break;
 			}

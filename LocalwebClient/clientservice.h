@@ -163,6 +163,8 @@ signals:
 
 	void callingRequest(const QString& from);
 
+	void incomingVideocall(const QString& from);
+
 	void privateCallingResponseReceived();
 
 	void receivedCallStopped();

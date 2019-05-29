@@ -13,21 +13,6 @@ using namespace VideoModule;
 Camera::Camera(QObject* parent)
 	: QObject(parent)
 {
-	if(!isCameraAvailable())
-	{
-		qWarning() << "A camera not found!";
-		return;
-}
-
-	camera = new QCamera;
-
-	video_probe = new QVideoProbe;
-	video_probe->setSource(camera);
-
-	connect(video_probe, SIGNAL(videoFrameProbed(const QVideoFrame&)),
-		SLOT(slotFrameProbed(const QVideoFrame&)));
-
-	camera->setCaptureMode(QCamera::CaptureMode::CaptureVideo);
 }
 
 Camera::~Camera()

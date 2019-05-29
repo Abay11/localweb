@@ -77,6 +77,8 @@ private slots:
 
 	void slotMakeVideoCall(QString to);
 
+	void slotIncomingVideocall(QString from);
+
 public slots:
 	void slotAddressEdited();
 	void slotPortEdited();

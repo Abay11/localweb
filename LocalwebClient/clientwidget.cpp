@@ -85,6 +85,8 @@ ClientWidget::ClientWidget(ClientService* service, QWidget* parent)
 
 	connect(pservice, SIGNAL(callingRequest(QString)), SLOT(slotReceiveCall(QString)));
 
+	connect(pservice, SIGNAL(incomingVideocall(QString)), SLOT(slotIncomingVideocall(QString)));
+
 	addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, plistdock);
 
 	if(pservice->isConnected())
@@ -158,7 +160,7 @@ void ClientWidget::slotForwardToDestination(QString msg, QString from, const QTi
 void ClientWidget::slotMakeCall(QString nick)
 {
 
-	currentCunvertion->appendMsg("Исходящий звонок " + nick);
+	currentCunvertion->appendMsg("Исходящий аудиозвонок " + nick);
 
 	CallingWindow* callingWindow = initCallingWindow();
 
@@ -184,7 +186,7 @@ void ClientWidget::slotMakeCall(QString nick)
 
 void ClientWidget::slotReceiveCall(QString nick)
 {
-	currentCunvertion->appendMsg("Входящий звонок от " + nick);
+	currentCunvertion->appendMsg("Входящий аудиозвонок от " + nick);
 
 	CallingWindow* w = initCallingWindow();
 
@@ -202,7 +204,14 @@ void ClientWidget::slotCompanonFinisheCall()
 
 void ClientWidget::slotMakeVideoCall(QString to)
 {
+	currentCunvertion->appendMsg("Исходящий видеозвонок " + to);
+
 	pservice->slotVideoCall(to);
+}
+
+void ClientWidget::slotIncomingVideocall(QString from)
+{
+	currentCunvertion->appendMsg("Входящий видеозвонок от " + from);
 }
 
 CallingWindow* ClientWidget::initCallingWindow()

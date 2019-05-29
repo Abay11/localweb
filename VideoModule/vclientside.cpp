@@ -31,7 +31,7 @@ ClientSide::ClientSide(quint16 serverPort,
 
 void ClientSide::startCamera()
 {
-	if(camera->isCameraAvailable())
+	if(camera->isAvailable())
 		camera->start();
 }
 

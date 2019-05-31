@@ -26,7 +26,6 @@ VideoWidget::~VideoWidget()
 
 void VideoWidget::slotDraw(QByteArray& data)
 {
-	qDebug() << DTAG << "RECEIVED DATA TO DRAW";
 	//TODO
 	//optimize
 
@@ -38,8 +37,6 @@ void VideoWidget::slotDraw(QByteArray& data)
 	reader.setDevice(&buff);
 	reader.setFormat("jpg");
 	reader.read(&img);
-
-	qDebug() << DTAG << "received img size" << img.sizeInBytes();
 
 	if(size != img.size())
 	{
@@ -56,6 +53,8 @@ void VideoWidget::closeEvent(QCloseEvent* event)
 
 	if(cam)
 		cam->stop();
+
+	emit videoWidgetClosed(caller_nick);
 }
 
 void VideoWidget::showEvent(QShowEvent* event)

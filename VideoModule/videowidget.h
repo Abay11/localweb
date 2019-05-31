@@ -18,6 +18,10 @@ namespace VideoModule
 		~VideoWidget() override;
 
 		QString caller_nick;
+
+	signals:
+		void videoWidgetClosed(QString caller);
+
 	public slots:
 		void slotDraw(QByteArray& data);
 

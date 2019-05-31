@@ -196,6 +196,13 @@ void ServerNetworkService::sendToClient(QTcpSocket* to, DATATYPE type, QVariant 
 			QString destination = data.toString();
 			out << destination;
 
+			if(type == DATATYPE::VIDEOCALL)
+			{
+				auto from_data = reinterpret_cast<std::tuple<QString, quint16, quint16>*>(paddition);
+
+				out << std::get<0>(*from_data) << std::get<1>(*from_data) << std::get<2>(*from_data);
+			}
+
 			break;
 		}
 
@@ -555,20 +562,22 @@ void ServerNetworkService::slotReadClient()
 
 				in >> nick;
 
-				auto fromIter = socketsAndNicksOfOnlines->find(pclient);
+				auto from_in_onlines = socketsAndNicksOfOnlines->find(pclient);
 
-				if(fromIter == socketsAndNicksOfOnlines->end())
+				if(from_in_onlines == socketsAndNicksOfOnlines->end())
 				{
 					qWarning() << DTAG << "Couldn't find in the onlines the requesting client";
 
 					break;
 				}
 
-				QString from = fromIter.value();
+				QString from = from_in_onlines.value();
 
 				QTcpSocket* to = nullptr;
 
-				for(auto i = socketsAndNicksOfOnlines->begin(); i != socketsAndNicksOfOnlines->end(); ++i)
+				auto i = socketsAndNicksOfOnlines->begin();
+
+				for(; i != socketsAndNicksOfOnlines->end(); ++i)
 				{
 					if(i.value() == nick)
 					{
@@ -584,8 +593,22 @@ void ServerNetworkService::slotReadClient()
 					break;
 				}
 
+				auto from_iter = clientbase->find(from);
+				std::tuple<QString, quint16, quint16> from_data;
+
+				if(from_iter == clientbase->end())
+				{
+					from_data = std::make_tuple("", 0, 0);
+				}
+				else
+				{
+					from_data = std::make_tuple(from_iter.value()->address(),
+							from_iter.value()->audioPort(),
+							from_iter.value()->videoPort());
+				}
+
 				//checking if is the client in the base happens in the sending method
-				sendToClient(to, type, from);
+				sendToClient(to, type, from, &from_data);
 
 				break;
 			}

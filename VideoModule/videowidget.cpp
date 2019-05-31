@@ -24,6 +24,13 @@ VideoWidget::~VideoWidget()
 {
 }
 
+void VideoWidget::setCallerNick(QString nick)
+{
+	caller_nick = nick;
+
+	setWindowTitle("Видеозвонок с " + caller_nick);
+}
+
 void VideoWidget::slotDraw(QByteArray& data)
 {
 	//TODO

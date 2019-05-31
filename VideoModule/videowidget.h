@@ -17,7 +17,7 @@ namespace VideoModule
 
 		~VideoWidget() override;
 
-		QString caller_nick;
+		void setCallerNick(QString nick);
 
 	signals:
 		void videoWidgetClosed(QString caller);
@@ -30,6 +30,8 @@ namespace VideoModule
 		QSize size;
 
 		Camera* cam;
+
+		QString caller_nick;
 
 		const QString DTAG = "VideoModule::VideoWidget:";
 

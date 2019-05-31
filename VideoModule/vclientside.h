@@ -35,6 +35,8 @@ namespace VideoModule
 
 		quint16 getPort();
 
+		void setCallerNick(QString nick);
+
 	private slots:
 
 	private:

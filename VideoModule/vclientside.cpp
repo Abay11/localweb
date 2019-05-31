@@ -56,3 +56,8 @@ quint16 ClientSide::getPort()
 {
 	return connHandler->getPort();
 }
+
+void ClientSide::setCallerNick(QString nick)
+{
+	video_widget->caller_nick = nick;
+}

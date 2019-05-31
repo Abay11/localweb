@@ -482,11 +482,17 @@ void ClientService::slotReadyRead()
 				qDebug() << DTAG << "Received VIDEOCALL datatype";
 
 				QString from;
-				in >> from;
+				QString addr;
+				quint16 audio_port;
+				quint16 video_port;
+
+				in >> from >> addr >> audio_port >> video_port;
 
 				emit incomingVideocall(from);
 
+				videoModule->setDestination(QHostAddress(addr), video_port);
 				videoModule->setCallerNick(from);
+				videoModule->startCamera();
 				videoModule->getVideoWidget()->show();
 
 				break;

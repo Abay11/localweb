@@ -484,6 +484,7 @@ void ClientService::slotReadyRead()
 
 				emit incomingVideocall(from);
 
+				videoModule->setCallerNick(from);
 				videoModule->getVideoWidget()->show();
 
 
@@ -763,6 +764,7 @@ void ClientService::slotVideoCall(QString to)
 	//say to the server to notify a called about a calling
 	slotSendToServer(DATATYPE::VIDEOCALL, to);
 
+	videoModule->setCallerNick(to);
 	videoModule->startCamera();
 
 	videoModule->getVideoWidget()->show();

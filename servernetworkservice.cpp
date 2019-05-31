@@ -213,6 +213,7 @@ void ServerNetworkService::sendToClient(QTcpSocket* to, DATATYPE type, QVariant 
 		}
 
 		case DATATYPE::STOPCALLING:
+		case DATATYPE::STOPVIDEOCALL:
 		{
 			qDebug() << DTAG << "Sending the STOPCALLING";
 
@@ -629,8 +630,9 @@ void ServerNetworkService::slotReadClient()
 			}
 
 			case DATATYPE::STOPCALLING:
+			case DATATYPE::STOPVIDEOCALL:
 			{
-				qDebug() << DTAG << "Received STOPCALLING";
+				qDebug() << DTAG << "Received STOPCALLING(STOPVIDEOCALL)";
 
 				QString to;
 				in >> to;

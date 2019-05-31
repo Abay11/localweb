@@ -465,6 +465,16 @@ void ClientService::slotReadyRead()
 				break;
 			}
 
+			case DATATYPE::STOPVIDEOCALL:
+			{
+				qDebug() << DTAG << "Received STOPVIDEOCALL";
+
+				videoModule->stopCamera();
+				videoModule->getVideoWidget()->hide();
+
+				break;
+			}
+
 			case DATATYPE::VIDEOCALL:
 			{
 				qDebug() << DTAG << "Received VIDEOCALL datatype";
@@ -643,6 +653,16 @@ void ClientService::slotSendToServer(DATATYPE type, QString msg, QVariant firstA
 			break;
 		}
 
+		case DATATYPE::STOPVIDEOCALL:
+		{
+			qDebug() << DTAG << "Sending STOPVIDEOCALL";
+
+			QString to = msg;
+
+			out << to;
+
+			break;
+		}
 
 
 		default:

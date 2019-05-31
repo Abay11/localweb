@@ -72,7 +72,6 @@ void Camera::initCamera()
 
 void Camera::slotFrameProbed(const QVideoFrame& frame)
 {
-	qDebug() << DTAG << "A frame probed";
 	QVideoFrame copy_frame(frame);
 	copy_frame.map(QAbstractVideoBuffer::ReadOnly);
 	QImage img = qt_imageFromVideoFrame(copy_frame);
@@ -95,8 +94,6 @@ void Camera::slotFrameProbed(const QVideoFrame& frame)
 	{
 		qWarning() << DTAG << "Couldn't write img to device using a writer:" << writer.errorString();
 	}
-
-	qDebug() << DTAG <<  "size of img" << bytes.size();
 
 	emit newFrame(bytes);
 }

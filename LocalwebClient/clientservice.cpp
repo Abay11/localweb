@@ -98,6 +98,8 @@ ClientService::ClientService(QWidget* prnt)
 	connect(psocket, SIGNAL(readyRead()), SLOT(slotReadyRead()));
 	connect(psocket, SIGNAL(error(QAbstractSocket::SocketError)),
 		this, SLOT(slotError(QAbstractSocket::SocketError)));
+
+	connect(videoModule->getVideoWidget(), SIGNAL(videoWidgetClosed(QString)), this, SLOT(slotVideoWidgetClosed(QString)));
 }
 
 ClientService::~ClientService()
@@ -487,7 +489,6 @@ void ClientService::slotReadyRead()
 				videoModule->setCallerNick(from);
 				videoModule->getVideoWidget()->show();
 
-
 				break;
 			}
 
@@ -530,6 +531,11 @@ void ClientService::slotError(QAbstractSocket::SocketError nerr)
 	qCritical() << "Ошибка соединения с сервером: " << psocket->errorString();
 	throwOnlinesToOfflines();
 	psocket->close();
+}
+
+void ClientService::slotVideoWidgetClosed(QString caller)
+{
+	slotSendToServer(DATATYPE::STOPVIDEOCALL, caller);
 }
 
 void ClientService::slotConnectToServer()
@@ -766,7 +772,6 @@ void ClientService::slotVideoCall(QString to)
 
 	videoModule->setCallerNick(to);
 	videoModule->startCamera();
-
 	videoModule->getVideoWidget()->show();
 }
 

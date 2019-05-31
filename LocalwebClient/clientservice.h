@@ -123,6 +123,8 @@ protected slots:
 
 	void slotError(QAbstractSocket::SocketError);
 
+	void slotVideoWidgetClosed(QString caller);
+
 public slots:
 	void slotConnectToServer();
 

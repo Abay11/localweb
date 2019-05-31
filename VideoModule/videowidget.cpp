@@ -12,7 +12,8 @@ using namespace VideoModule;
 VideoWidget::VideoWidget(QWidget* parent)
 	: QLabel(parent)
 {
-	resize(400, 400);
+	setAlignment(Qt::AlignCenter);
+	resize(640, 480);
 }
 
 void VideoWidget::setCameraInstance(Camera* cam)
@@ -67,6 +68,9 @@ void VideoWidget::closeEvent(QCloseEvent* event)
 void VideoWidget::showEvent(QShowEvent* event)
 {
 	QWidget::showEvent(event);
+
+	//show no_camera as default at first time
+	setPixmap(QPixmap(":/Res/Icons/no_camera.png"));
 
 	if(!cam->start())
 	{

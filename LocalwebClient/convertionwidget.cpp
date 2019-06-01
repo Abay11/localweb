@@ -63,8 +63,12 @@ void ConvertionWidget::setSocketState(bool isOpen)
 	socketIsOpen = isOpen;
 
 	cmdSendFile->setEnabled(isOpen);
-	cmdAudioCall->setEnabled(isOpen);
-	cmdVideoCall->setEnabled(isOpen);
+
+	if(!isGeneral)
+	{
+		cmdAudioCall->setEnabled(isOpen);
+		cmdVideoCall->setEnabled(isOpen);
+	}
 }
 
 void ConvertionWidget::setSentEnabled(bool value)
@@ -79,6 +83,14 @@ void ConvertionWidget::appendMsg(const QString& msg)
 	str += " " + msg;
 
 	pdisplay->append(str);
+}
+
+void ConvertionWidget::turnOffButtonForGeneral()
+{
+	cmdAudioCall->setEnabled(false);
+	cmdVideoCall->setEnabled(false);
+
+	isGeneral = true;
 }
 
 void ConvertionWidget::slotSend()

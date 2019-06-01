@@ -15,16 +15,22 @@ class ConvertionWidget: public QWidget
 	Q_OBJECT
 private:
 	QPushButton* cmdSend;
+
 	QPushButton* cmdSendFile;
+
 	QPushButton* cmdClr;
 
 	QPushButton* cmdAudioCall;
+
 	QPushButton* cmdVideoCall;
 
 	QTextEdit* pdisplay, *pmsgField;
 
 	bool socketIsOpen = false;
+
 	QString convertionName;
+
+	bool isGeneral = false;
 
 public:
 	ConvertionWidget(QString name,
@@ -35,6 +41,8 @@ public:
 	void setSentEnabled(bool);
 
 	void appendMsg(const QString& msg);
+
+	void turnOffButtonForGeneral();
 
 
 private slots:

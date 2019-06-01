@@ -353,6 +353,7 @@ void ClientWidget::setUI()
 void ClientWidget::initConvertions()
 {
 	generalConvertion = new ConvertionWidget("Общий чат");
+	generalConvertion->turnOffButtonForGeneral();
 
 	convertionWidgets->insert("Общий чат", generalConvertion);
 

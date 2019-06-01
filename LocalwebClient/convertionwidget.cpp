@@ -12,7 +12,7 @@
 ConvertionWidget::ConvertionWidget(QString name,
 	QWidget* parent)
 	: QWidget(parent)
-	, cmdSend(new QPushButton("Отправить"))
+	, cmdSend(new QPushButton("Отправить сообщение"))
 	, cmdSendFile(new QPushButton("Отправить файл"))
 	, cmdClr(new QPushButton("Очистить"))
 	, cmdAudioCall(new QPushButton("Аудиозвонок"))
@@ -27,6 +27,12 @@ ConvertionWidget::ConvertionWidget(QString name,
 	pmsgField->setPlaceholderText("Введите сообщение...");
 	pdisplay->setReadOnly(true);
 
+	cmdAudioCall->setIcon(QIcon(":/Res/Icons/audiocall.png"));
+	cmdVideoCall->setIcon(QIcon(":/Res/Icons/videocall.png"));
+	cmdSendFile->setIcon(QIcon(":/Res/Icons/attach_file.png"));
+	cmdSend->setIcon(QIcon(":/Res/Icons/send.png"));
+	cmdClr->setIcon(QIcon(":/Res/Icons/clear.png"));
+
 	QVBoxLayout* pvlay = new QVBoxLayout;
 	pvlay->addWidget(new QLabel(name));
 	pvlay->addWidget(pdisplay, 6);
@@ -35,8 +41,8 @@ ConvertionWidget::ConvertionWidget(QString name,
 	QHBoxLayout* phlay = new QHBoxLayout;
 	phlay->addWidget(cmdAudioCall);
 	phlay->addWidget(cmdVideoCall);
-	phlay->addWidget(cmdSend);
 	phlay->addWidget(cmdSendFile);
+	phlay->addWidget(cmdSend);
 	phlay->addWidget(cmdClr);
 	pvlay->addLayout(phlay);
 

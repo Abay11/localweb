@@ -15,5 +15,10 @@
         <file>Icons/connectedCall.png</file>
         <file>Icons/incomingCall.png</file>
         <file>Icons/no_camera.png</file>
+        <file>Icons/audiocall.png</file>
+        <file>Icons/videocall.png</file>
+        <file>Icons/attach_file.png</file>
+        <file>Icons/send.png</file>
+        <file>Icons/clear.png</file>
     </qresource>
 </RCC>

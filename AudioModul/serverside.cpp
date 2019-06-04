@@ -59,19 +59,22 @@ void ServerSide::slotReadyRead()
 	uint address_size = static_cast<uint>(receivedData.at(0) + 1);
 	receivedData.remove(0, 1);
 
-	char address_buffer[address_size];
+	char* address_buffer = new char[address_size];
 	qstrncpy(address_buffer, receivedData.data(), address_size);
 	receivedData.remove(0, static_cast<int>(address_size - uint(1)));
 
 	uint port_size = static_cast<uint>(receivedData.at(0) + 1);
 	receivedData.remove(0, 1);
 
-	char port_buffer[port_size];
+	char* port_buffer = new char[port_size];
 	qstrncpy(port_buffer, receivedData.data(), port_size);
 	receivedData.remove(0, static_cast<int>(port_size - uint(1)));
 
 	QString dest_address(address_buffer);
 	quint16 dest_port = static_cast<quint16>(QString(port_buffer).toInt());
+
+	delete[] address_buffer;
+	delete[] port_buffer;
 
 	if(dest_address == "255.255.255.255")
 	{

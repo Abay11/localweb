@@ -56,7 +56,7 @@ public:
 
 	void addToOnlines(QTcpSocket* client, const QString& nick);
 
-	void updateClientInfo(CLIENTBASE::iterator* item, quint16 audio_port, quint16 video_port);
+	void updateClientInfo(CLIENTBASE::iterator* item, QHostAddress& addr, quint16 audio_port, quint16 video_port);
 
 	void notifyOthersNewConnection(const QString& nick);
 

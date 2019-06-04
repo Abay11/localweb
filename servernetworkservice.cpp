@@ -278,9 +278,10 @@ void ServerNetworkService::addToOnlines(QTcpSocket* client, const QString& nick)
 	socketsAndNicksOfOnlines->insert(client, nick);
 }
 
-void ServerNetworkService::updateClientInfo(CLIENTBASE::iterator* item, quint16 audio_port, quint16 video_port)
+void ServerNetworkService::updateClientInfo(CLIENTBASE::iterator* item, QHostAddress& addr, quint16 audio_port, quint16 video_port)
 {
 	qDebug() << DTAG << "updating clientinfo audioport & videoport: " << audio_port << video_port;
+	item->value()->address() = addr.toString();
 	item->value()->audioPort() = audio_port;
 	item->value()->videoPort() = video_port;
 }
@@ -435,7 +436,8 @@ void ServerNetworkService::slotReadClient()
 					{
 						notifyOthersNewConnection(nick);
 
-						updateClientInfo(&iter, audio_port, video_port);
+						auto peerAddr = pclient->peerAddress();
+						updateClientInfo(&iter, peerAddr, audio_port, video_port);
 
 						addToOnlines(pclient, nick);
 					}

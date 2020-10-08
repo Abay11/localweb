@@ -4,4 +4,6 @@ This is my first big project. This application is kind of messanger, like Skype.
 
 Of course, as I wanted to do many things by myself, I tried to do no use any libraries and implement many "vehicle" things :)) I did not implement any encoding to compress media data :)) so this project is still very raw.
 
+As I remember, I implemented next features: private and group text messaging, files tranfer, voice and video call.
+
 But for the first big project, I think it was very good. I got many expirience doing it :)
